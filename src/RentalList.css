@@ -1,0 +1,39 @@
+.list-container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.list-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.list-container table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.list-container th,
+.list-container td {
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.list-container th {
+  background: #3498db;
+  color: white;
+}
+
+.list-container tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.list-container tr:hover {
+  background: #f1f1f1;
+}

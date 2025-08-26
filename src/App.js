@@ -1,24 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import RentalForm from "./RentalForm";
+import RentalList from "./RentalList";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div style={{ padding: "20px" }}>
+        <nav>
+          <Link to="/" style={{ marginRight: "10px" }}>Thuê phòng</Link>
+          <Link to="/list">Danh sách</Link>
+        </nav>
+
+        <hr />
+
+        <Routes>
+          <Route path="/" element={<RentalForm />} />
+          <Route path="/list" element={<RentalList />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
