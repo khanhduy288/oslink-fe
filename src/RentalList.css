@@ -1,39 +1,76 @@
 .list-container {
-  max-width: 800px;
-  margin: 30px auto;
-  padding: 20px;
-  background: #fff;
+  width: 100%;
+  background-color: #fff;
   border-radius: 12px;
+  padding: 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin: 0 auto;
+  overflow-x: auto; /* scroll ngang nếu bảng dài */
 }
 
 .list-container h2 {
   text-align: center;
   margin-bottom: 20px;
-  color: #2c3e50;
+  color: #333;
 }
 
-.list-container table {
+table {
   width: 100%;
   border-collapse: collapse;
-  text-align: center;
+  table-layout: fixed; /* tự co dãn cột */
 }
 
-.list-container th,
-.list-container td {
-  border: 1px solid #ddd;
-  padding: 10px;
-}
-
-.list-container th {
-  background: #3498db;
+thead th {
+  background-color: #4CAF50;
   color: white;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
 }
 
-.list-container tr:nth-child(even) {
-  background: #f9f9f9;
+tbody td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.list-container tr:hover {
-  background: #f1f1f1;
+tbody tr:hover {
+  background-color: #f1f1f1;
+  transition: background-color 0.2s;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Responsive: màn hình nhỏ */
+@media screen and (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+  }
+
+  tbody td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    flex: 1;
+  }
 }

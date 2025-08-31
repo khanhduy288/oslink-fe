@@ -1,44 +1,46 @@
 .form-container {
-  max-width: 400px;
-  margin: 30px auto;
+  max-width: 400px; /* giới hạn chiều rộng form */
+  margin: 0 auto; /* căn giữa */
   padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
 }
 
 .form-container h2 {
   text-align: center;
   margin-bottom: 20px;
-  color: #2c3e50;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* khoảng cách giữa các input */
 }
 
 .form-container label {
-  display: block;
-  margin: 10px 0 5px;
-  font-weight: 600;
+  font-weight: bold;
 }
 
 .form-container input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
+  padding: 8px 10px;
+  font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 4px;
+  width: 100%; /* vẫn chiếm toàn bộ form nhưng form có max-width */
+  box-sizing: border-box;
 }
 
 .form-container button {
-  width: 100%;
-  padding: 12px;
-  background: #3498db;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #61dafb;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .form-container button:hover {
-  background: #2980b9;
+  background-color: #21a1f1;
 }

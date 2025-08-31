@@ -1,25 +1,33 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import "./RentalForm.css";
 
 function RentalForm() {
+  const { serviceId } = useParams();
   const [userId, setUserId] = useState("");
   const [rentalTime, setRentalTime] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:5000/rentals", {
-      userId,
-      rentalTime,
-    });
-    alert("Tạo mới thành công!");
-    setUserId("");
-    setRentalTime("");
+    try {
+      await axios.post("http://localhost:5000/rentals", {
+        userId,
+        rentalTime,
+        serviceId, // gửi serviceId kèm
+      });
+      toast.success("Tạo mới thành công!");
+      setUserId("");
+      setRentalTime("");
+    } catch (error) {
+      toast.error("Có lỗi xảy ra!");
+    }
   };
 
   return (
     <div className="form-container">
-      <h2>Thuê dịch vụ</h2>
+      <h2>Thuê dịch vụ #{serviceId}</h2>
       <form onSubmit={handleSubmit}>
         <label>User ID</label>
         <input

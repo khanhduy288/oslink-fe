@@ -27,14 +27,15 @@ function RentalList() {
         <tbody>
           {rentals.map(rental => (
             <tr key={rental.id}>
-              <td>{rental.id}</td>
-              <td>{rental.userId}</td>
-              <td>{rental.rentalTime / 60} giờ</td>
-              <td>{rental.createdAt}</td>
-              <td>{rental.roomCode || "Chưa tạo"}</td> {/* Hiển thị room code */}
+              <td data-label="ID">{rental.id}</td>
+              <td data-label="User ID">{rental.userId}</td>
+              <td data-label="Thời gian thuê">{rental.rentalTime / 60} giờ</td>
+              <td data-label="Ngày tạo">{rental.createdAt}</td>
+              <td data-label="Room Code">{rental.roomCode || "Chưa tạo"}</td>
             </tr>
           ))}
         </tbody>
+
       </table>
     </div>
   );
