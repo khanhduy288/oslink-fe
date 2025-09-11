@@ -12,7 +12,7 @@ function RentalForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/rentals", {
+      await axios.post("https://oslinksymtem.onrender.com/rentals", {
         userId,
         rentalTime,
         serviceId, // gửi serviceId kèm

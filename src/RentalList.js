@@ -12,7 +12,7 @@ function RentalList() {
   const [rentals, setRentals] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/rentals")
+    axios.get("https://oslinksymtem.onrender.com/rentals")
       .then(res => setRentals(res.data))
       .catch(err => console.error(err));
   }, []);
