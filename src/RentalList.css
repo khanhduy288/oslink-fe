@@ -1,17 +1,20 @@
 .list-container {
   width: 100%;
+  max-width: 1200px; /* giới hạn trên desktop */
   background-color: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin: 0 auto;
-  overflow-x: auto; /* scroll ngang nếu bảng dài */
+  overflow-x: auto;
+  box-sizing: border-box; /* fix tràn padding */
 }
 
 .expired {
   background-color: #f8d7da !important; /* đỏ nhạt */
   color: #721c24;
 }
+
 .list-container h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -51,6 +54,10 @@ tbody tr:nth-child(even) {
 
 /* Responsive: màn hình nhỏ */
 @media screen and (max-width: 768px) {
+  .list-container {
+    padding: 10px 15px; /* padding đủ để không tràn lề */
+  }
+
   table, thead, tbody, th, td, tr {
     display: block;
   }
@@ -64,10 +71,13 @@ tbody tr:nth-child(even) {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 10px;
+    box-sizing: border-box; /* fix tràn padding */
+    overflow: hidden;
   }
 
   tbody td {
     display: flex;
+    flex-wrap: wrap; /* fix chữ dài tràn */
     justify-content: space-between;
     padding: 8px 10px;
   }
@@ -75,6 +85,11 @@ tbody tr:nth-child(even) {
   tbody td::before {
     content: attr(data-label);
     font-weight: bold;
-    flex: 1;
+    flex: 1 0 45%; /* chiếm tối đa 45% + wrap nếu chữ dài */
+  }
+
+  tbody td span {
+    flex: 1 0 50%;
+    text-align: right;
   }
 }

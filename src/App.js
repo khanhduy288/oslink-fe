@@ -12,7 +12,11 @@ import GuidePage from "./GuidePage";
 import './App.css'; // import CSS
 
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false); // trạng thái menu mobile
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLinkClick = () => {
+    if (menuOpen) setMenuOpen(false); // click link → đóng menu
+  };
 
   return (
     <Router>
@@ -21,18 +25,17 @@ function App() {
         {/* Thanh menu sticky full width */}
         <nav className="sticky-menu">
           <div className="app-nav-inner">
-            {/* Hamburger cho mobile */}
-            <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+            <div className={`hamburger ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
               <div></div>
               <div></div>
               <div></div>
             </div>
 
-            <Link to="/" className={`nav-link ${menuOpen ? "active" : ""}`}>Home</Link>
-            <Link to="/list" className={`nav-link ${menuOpen ? "active" : ""}`}>Danh sách</Link>
-            <Link to="/guide" className={`nav-link ${menuOpen ? "active" : ""}`}>Hướng dẫn</Link>
-            <Link to="/login" className={`nav-link ${menuOpen ? "active" : ""}`}>Đăng nhập</Link>
-            <Link to="/register" className={`nav-link ${menuOpen ? "active" : ""}`}>Đăng ký</Link>
+            <Link to="/" className="nav-link" onClick={handleLinkClick}>Home</Link>
+            <Link to="/list" className="nav-link" onClick={handleLinkClick}>Danh sách</Link>
+            <Link to="/guide" className="nav-link" onClick={handleLinkClick}>Hướng dẫn</Link>
+            <Link to="/login" className="nav-link" onClick={handleLinkClick}>Đăng nhập</Link>
+            <Link to="/register" className="nav-link" onClick={handleLinkClick}>Đăng ký</Link>
           </div>
         </nav>
 
@@ -49,7 +52,6 @@ function App() {
           }}
         >
           <hr />
-
           <div className="page-content" style={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<Home />} />

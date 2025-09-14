@@ -1,23 +1,41 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { toast } from "react-toastify";
-import "./Auth.css"; // CSS dùng chung
+import "./Auth.css";
 
 function Register() {
   const [form, setForm] = useState({ email: "", password: "", confirm: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.password !== form.confirm) {
       toast.error("Mật khẩu không khớp");
       return;
     }
-    // TODO: call API backend register
-    console.log("Register data:", form);
-    toast.success("Đăng ký thành công (demo)");
+
+    try {
+      setLoading(true);
+      const res = await axios.post("http://localhost:5000/register", {
+        email: form.email,
+        password: form.password,
+      });
+
+      toast.success(res.data.message || "Đăng ký thành công!");
+      console.log("User registered:", res.data.user);
+      setForm({ email: "", password: "", confirm: "" });
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "Có lỗi xảy ra khi đăng ký";
+      toast.error(msg);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,6 +52,7 @@ function Register() {
             required
           />
         </div>
+
         <div className="form-group">
           <label>Mật khẩu: </label>
           <input
@@ -44,6 +63,7 @@ function Register() {
             required
           />
         </div>
+
         <div className="form-group">
           <label>Xác nhận mật khẩu: </label>
           <input
@@ -54,7 +74,10 @@ function Register() {
             required
           />
         </div>
-        <button type="submit">Đăng ký</button>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Đang đăng ký..." : "Đăng ký"}
+        </button>
       </form>
     </div>
   );

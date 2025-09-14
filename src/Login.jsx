@@ -1,19 +1,43 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { toast } from "react-toastify";
-import "./Auth.css"; // CSS dùng chung
+import "./Auth.css";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: call API backend login
-    console.log("Login data:", form);
-    toast.success("Đăng nhập thành công (demo)");
+    try {
+      setLoading(true);
+      const res = await axios.post("http://localhost:5000/login", {
+        email: form.email,
+        password: form.password,
+      });
+
+      const { token, user } = res.data;
+
+      // Lưu token + level
+      localStorage.setItem("token", token);
+      localStorage.setItem("userLevel", user.level);
+
+      toast.success(res.data.message || "Đăng nhập thành công!");
+      console.log("User logged in:", user);
+
+      setForm({ email: "", password: "" });
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "Có lỗi xảy ra khi đăng nhập";
+      toast.error(msg);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,6 +54,7 @@ function Login() {
             required
           />
         </div>
+
         <div className="form-group">
           <label>Mật khẩu: </label>
           <input
@@ -40,7 +65,10 @@ function Login() {
             required
           />
         </div>
-        <button type="submit">Đăng nhập</button>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+        </button>
       </form>
     </div>
   );
