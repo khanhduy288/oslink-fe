@@ -8,36 +8,40 @@ import Register from "./Register";
 import Footer from "./Footer";  
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import GuidePage from "./GuidePage";  // import mới
+import GuidePage from "./GuidePage";
+import './App.css'; // import CSS
+
 function App() {
   return (
     <Router>
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+
+        {/* Thanh menu sticky full width */}
+        <nav className="sticky-menu">
+          <div className="app-nav-inner">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/list" className="nav-link">Danh sách</Link>
+            <Link to="/guide" className="nav-link">Hướng dẫn</Link>
+            <Link to="/login" className="nav-link">Đăng nhập</Link>
+            <Link to="/register" className="nav-link">Đăng ký</Link>
+          </div>
+        </nav>
+
+        {/* Nội dung chính */}
         <div
+          className="app-container"
           style={{
-            padding: "20px",
             flex: 1,
             maxWidth: "1200px",
             margin: "0 auto",
             boxSizing: "border-box",
             width: "100%",
+            paddingTop: "20px"
           }}
         >
-          {/* Thanh menu */}
-          <nav style={{ marginBottom: "10px" }}>
-            <Link to="/" style={{ marginRight: "10px" }}>Home</Link>
-            <Link to="/list" style={{ marginRight: "10px" }}>Danh sách</Link>
-            <Link to="/guide">Hướng dẫn</Link> 
-            <Link to="/login" style={{ marginRight: "10px" }}>Đăng nhập</Link>
-            <Link to="/register" style={{ marginRight: "10px" }}>Đăng ký</Link>
-
-          </nav>
-
-
           <hr />
 
-          {/* Routes */}
-          <div style={{ flex: 1 }}>
+          <div className="page-content" style={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/list" element={<RentalList />} />

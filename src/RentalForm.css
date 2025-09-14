@@ -1,15 +1,17 @@
 .form-container {
   max-width: 400px; /* giới hạn chiều rộng form */
-  margin: 0 auto; /* căn giữa */
+  margin: 30px auto; /* căn giữa */
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #f9f9f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .form-container h2 {
   text-align: center;
   margin-bottom: 20px;
+  color: #1E90FF;
 }
 
 .form-container form {
@@ -22,13 +24,20 @@
   font-weight: bold;
 }
 
-.form-container input {
+.form-container input,
+.form-container select {
   padding: 8px 10px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
   width: 100%; /* vẫn chiếm toàn bộ form nhưng form có max-width */
   box-sizing: border-box;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+  outline: none;
+  border-color: #1E90FF;
 }
 
 .form-container button {
@@ -43,4 +52,21 @@
 
 .form-container button:hover {
   background-color: #21a1f1;
+}
+
+/* Style bảng giá */
+.price-table {
+  background-color: #e6f2ff;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.price-table h3 {
+  margin-bottom: 10px;
+}
+
+.price-table ul {
+  padding-left: 20px;
+  margin-bottom: 10px;
 }

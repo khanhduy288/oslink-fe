@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import "./Auth.css"; // CSS dùng chung
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -16,10 +17,10 @@ function Login() {
   };
 
   return (
-    <div>
+    <div className="auth-container">
       <h2>Đăng nhập</h2>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group">
           <label>Email: </label>
           <input
             type="email"
@@ -29,7 +30,7 @@ function Login() {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Mật khẩu: </label>
           <input
             type="password"

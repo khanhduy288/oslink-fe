@@ -1,27 +1,51 @@
 /* Container chính */
 .app-container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Menu nav */
-.app-nav {
-  margin-bottom: 20px;
-  text-align: center;
+/* Thanh menu sticky full width */
+.sticky-menu {
+  position: sticky; /* dính trên đầu */
+  top: 0;
+  width: 100%;
+  background-color: #1E90FF; /* xanh da trời */
+  z-index: 999; /* luôn trên các phần khác */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
+/* Container bên trong menu để căn giữa */
+.app-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 12px 0;
+}
+
+/* Link trong menu */
 .nav-link {
-  margin: 0 15px;
   text-decoration: none;
-  color: #4CAF50;
+  color: #fff;
   font-weight: bold;
   font-size: 16px;
+  padding: 8px 20px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
 }
 
+/* Hover effect */
 .nav-link:hover {
-  text-decoration: underline;
+  background-color: #63B8FF;
+  transform: scale(1.05);
+}
+
+/* Active link */
+.nav-link.active {
+  background-color: #0073E6;
 }
 
 /* Nội dung page */

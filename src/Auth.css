@@ -1,0 +1,82 @@
+/* Container chính */
+.auth-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px 20px;
+  background-color: #f0f8ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Tiêu đề form */
+.auth-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #1e90ff;
+}
+
+/* Form */
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Hàng label + input */
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Label cố định chiều rộng */
+.form-group label {
+  width: 120px; /* chiều rộng cố định để input thẳng hàng */
+  font-weight: 500;
+}
+
+/* Input */
+.form-group input {
+  flex: 1; /* chiếm phần còn lại */
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+  border-color: #1e90ff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(30,144,255,0.3);
+}
+
+/* Button */
+.auth-container button {
+  padding: 10px 0;
+  background-color: #1e90ff;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.auth-container button:hover {
+  background-color: #63b8ff;
+  transform: scale(1.02);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .auth-container {
+    margin: 30px 10px;
+    padding: 20px 15px;
+  }
+  .form-group label {
+    width: 100px; /* thu nhỏ label trên mobile */
+  }
+}
