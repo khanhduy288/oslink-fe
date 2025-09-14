@@ -1,55 +1,68 @@
-/* Container chính */
-.app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 /* Thanh menu sticky full width */
 .sticky-menu {
-  position: sticky; /* dính trên đầu */
+  position: sticky;
   top: 0;
   width: 100%;
-  background-color: #1E90FF; /* xanh da trời */
-  z-index: 999; /* luôn trên các phần khác */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  background-color: #1E90FF; /* màu nền xanh da trời */
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Container bên trong menu để căn giữa */
 .app-nav-inner {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  justify-content: center;
-  gap: 15px;
-  padding: 12px 0;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  flex-wrap: wrap;
 }
 
-/* Link trong menu */
 .nav-link {
-  text-decoration: none;
   color: #fff;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 8px 20px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 5px 10px;
 }
 
-/* Hover effect */
 .nav-link:hover {
-  background-color: #63B8FF;
-  transform: scale(1.05);
+  text-decoration: underline;
 }
 
-/* Active link */
-.nav-link.active {
-  background-color: #0073E6;
+/* Hamburger menu cho mobile */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
 }
 
-/* Nội dung page */
-.page-content {
-  overflow-x: auto; /* scroll ngang nếu bảng dài */
-  padding-bottom: 20px;
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background-color: #fff;
+  margin: 4px 0;
+  border-radius: 2px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .app-nav-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-link {
+    display: none;
+    width: 100%;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .nav-link.active {
+    display: block;
+  }
+
+  .hamburger {
+    display: flex;
+  }
 }

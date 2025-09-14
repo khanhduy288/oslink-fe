@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import RentalForm from "./RentalForm";
 import RentalList from "./RentalList";
@@ -12,6 +12,8 @@ import GuidePage from "./GuidePage";
 import './App.css'; // import CSS
 
 function App() {
+  const [menuOpen, setMenuOpen] = useState(false); // trạng thái menu mobile
+
   return (
     <Router>
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -19,11 +21,18 @@ function App() {
         {/* Thanh menu sticky full width */}
         <nav className="sticky-menu">
           <div className="app-nav-inner">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/list" className="nav-link">Danh sách</Link>
-            <Link to="/guide" className="nav-link">Hướng dẫn</Link>
-            <Link to="/login" className="nav-link">Đăng nhập</Link>
-            <Link to="/register" className="nav-link">Đăng ký</Link>
+            {/* Hamburger cho mobile */}
+            <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <Link to="/" className={`nav-link ${menuOpen ? "active" : ""}`}>Home</Link>
+            <Link to="/list" className={`nav-link ${menuOpen ? "active" : ""}`}>Danh sách</Link>
+            <Link to="/guide" className={`nav-link ${menuOpen ? "active" : ""}`}>Hướng dẫn</Link>
+            <Link to="/login" className={`nav-link ${menuOpen ? "active" : ""}`}>Đăng nhập</Link>
+            <Link to="/register" className={`nav-link ${menuOpen ? "active" : ""}`}>Đăng ký</Link>
           </div>
         </nav>
 
