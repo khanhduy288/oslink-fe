@@ -92,51 +92,53 @@ function RentalForm() {
         <p>Liên hệ Zalo để được tư vấn: <a href="https://zalo.me/0972734444" target="_blank" rel="noreferrer">09.72.73.4444</a></p>
       </section>
 
-  {/* --- Modal QR --- */}
-  {showQR && (
-    <div className="qr-modal" onClick={handleCloseQR}>
-      <div className="qr-content" onClick={(e) => e.stopPropagation()}>
-        <h3>Quét QR để thanh toán</h3>
-        <img
-          src="/images/qr-code.png"
-          alt="QR Payment"
-          style={{ width: "250px", height: "250px", marginBottom: "20px" }}
-        />
-        <p>CK (username): <strong>{username}</strong></p>
-        
-        {/* Nút Xác nhận và Đóng cách xa nhau */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-          <button
-            onClick={handleConfirmPayment}
-            style={{
-              backgroundColor: "#4CAF50",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Xác nhận
-          </button>
+{/* --- Modal QR --- */}
+{showQR && (
+  <div className="qr-modal" onClick={handleCloseQR}>
+    <div className="qr-content" onClick={(e) => e.stopPropagation()}>
+      <h3>Quét QR để thanh toán</h3>
+      <img
+        src="/images/qrthanhtoan.png"
+        alt="QR Payment"
+        style={{ width: "250px", height: "250px", marginBottom: "20px" }}
+      />
 
-          <button
-            onClick={handleCloseQR}
-            style={{
-              backgroundColor: "#f44336",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Đóng
-          </button>
-        </div>
+      <p><strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND</p>
+      <p><strong>📝 Nội dung CK:</strong> {username}</p>
+
+      {/* Nút Xác nhận và Đóng */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+        <button
+          onClick={handleConfirmPayment}
+          style={{
+            backgroundColor: "#4CAF50",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          Xác nhận
+        </button>
+
+        <button
+          onClick={handleCloseQR}
+          style={{
+            backgroundColor: "#f44336",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer"
+          }}
+        >
+          Đóng
+        </button>
       </div>
     </div>
-  )}
+  </div>
+)}
 
     </div>
   );

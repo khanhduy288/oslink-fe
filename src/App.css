@@ -1,3 +1,4 @@
+/* ===== Sticky menu ===== */
 .sticky-menu {
   position: sticky;
   top: 0;
@@ -7,6 +8,7 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* ===== Nav inner ===== */
 .app-nav-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -17,6 +19,16 @@
   flex-wrap: wrap;
 }
 
+/* ===== Logo ===== */
+.logo {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+/* ===== Nav links ===== */
 .nav-link {
   color: #fff;
   text-decoration: none;
@@ -29,7 +41,7 @@
   text-decoration: underline;
 }
 
-/* Hamburger */
+/* ===== Hamburger ===== */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -57,7 +69,53 @@
   transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* Mobile responsive */
+/* ===== Username / Logout ===== */
+.username-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-weight: bold;
+  white-space: nowrap;
+  padding: 6px 12px;
+  background-color: rgba(0,0,0,0.25);
+  border-radius: 6px;
+  margin-left: auto;
+}
+
+.username-display a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info span {
+  font-size: 14px;
+  color: white;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
   .hamburger {
     display: flex;
@@ -80,19 +138,22 @@
   .nav-link.active, .hamburger.open ~ .nav-link {
     display: block;
   }
-}
-.username-display {
-  margin-left: auto;
-  font-weight: bold;
-  white-space: nowrap; /* không xuống dòng */
-}
 
-/* Mobile: username luôn hiển thị */
-@media (max-width: 768px) {
   .username-display {
-    display: flex; 
-    justify-content: flex-end;
-    width: 100%; /* nằm trên cùng dòng */
-    padding: 5px 20px;
+    margin-top: 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .logout-btn {
+    font-size: 12px;
+    padding: 3px 6px; /* nút nhỏ hơn */
+  }
+}
+/* Ẩn logo trên mobile */
+@media (max-width: 768px) {
+  .logo {
+    display: none;
   }
 }
