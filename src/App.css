@@ -81,3 +81,18 @@
     display: block;
   }
 }
+.username-display {
+  margin-left: auto;
+  font-weight: bold;
+  white-space: nowrap; /* không xuống dòng */
+}
+
+/* Mobile: username luôn hiển thị */
+@media (max-width: 768px) {
+  .username-display {
+    display: flex; 
+    justify-content: flex-end;
+    width: 100%; /* nằm trên cùng dòng */
+    padding: 5px 20px;
+  }
+}

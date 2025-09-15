@@ -20,7 +20,7 @@ function Register() {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/register", {
+      const res = await axios.post("https://oslinksymtem.onrender.com/register", {
         email: form.email,
         password: form.password,
       });

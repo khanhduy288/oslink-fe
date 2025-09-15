@@ -1,82 +1,143 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import "./RentalForm.css";
 
 function RentalForm() {
-  const { serviceId } = useParams();
-  const [userId, setUserId] = useState("");
+  const username = localStorage.getItem("username") || "guest";
+  const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
+  const [showQR, setShowQR] = useState(false);
 
-  const basePrice = 150000; // 150K / 1 Tab / 1 tháng
+  const basePrice = 150000;
   const comboPrices = [
     { tabs: 3, discount: 50000, price: 400000 },
     { tabs: 5, discount: 150000, price: 600000 },
     { tabs: 10, discount: 400000, price: 1100000 },
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("https://oslinksymtem.onrender.com/rentals", {
-        userId,
-        rentalTime: months, // gửi số tháng thay cho phút
-        serviceId,
-      });
-      toast.success("Tạo mới thành công!");
-      setUserId("");
-      setMonths(1);
-    } catch (error) {
-      toast.error("Có lỗi xảy ra!");
+  const calculatePrice = () => {
+    const applicableCombo = [...comboPrices].reverse().find(combo => tabs >= combo.tabs);
+    if (applicableCombo) {
+      const comboCount = Math.floor(tabs / applicableCombo.tabs);
+      const remainderTabs = tabs % applicableCombo.tabs;
+      return comboCount * applicableCombo.price * months + remainderTabs * basePrice * months;
+    } else {
+      return tabs * basePrice * months;
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setShowQR(true);
+  };
+
+  const handleCloseQR = () => setShowQR(false);
+  const handleConfirmPayment = () => {
+    setShowQR(false);
+    alert("Cảm ơn bạn đã thanh toán!");
   };
 
   return (
     <div className="form-container">
-      <h2>Thuê dịch vụ #{serviceId}</h2>
 
-      {/* Bảng giá + combo */}
-      <div className="price-table">
-        <h3>💰 Giá cơ bản:</h3>
-        <p>👉 150K / 1 Tab / 1 tháng</p>
+      {/* --- Mục 1: Thuê Tab --- */}
+      <section style={{ marginBottom: "40px" }}>
+        <h2>Thuê Tab</h2>
 
-        <h3>🎁 Combo siêu tiết kiệm:</h3>
-        <ul>
-          {comboPrices.map((combo, idx) => (
-            <li key={idx}>
-              {combo.tabs} Tab 👉 Giảm {combo.discount / 1000}K = chỉ {combo.price / 1000}K
-            </li>
-          ))}
-        </ul>
-        <p>🔥 Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</p>
-      </div>
+        <div className="price-table">
+          <h3>💰 Giá cơ bản:</h3>
+          <p>👉 150K / 1 Tab / 1 tháng</p>
 
-      <form onSubmit={handleSubmit}>
-        <label>User ID</label>
-        <input
-          type="text"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          required
+          <h3>🎁 Combo siêu tiết kiệm:</h3>
+          <ul>
+            {comboPrices.map((combo, idx) => (
+              <li key={idx}>
+                {combo.tabs} Tab 👉 Giảm {combo.discount / 1000}K = chỉ {combo.price / 1000}K
+              </li>
+            ))}
+          </ul>
+          <p>🔥 Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <label>Số lượng Tab</label>
+          <input
+            type="number"
+            value={tabs}
+            min={1}
+            onChange={(e) => setTabs(Number(e.target.value))}
+            required
+          />
+
+          <label>Thời gian thuê (tháng)</label>
+          <select
+            value={months}
+            onChange={(e) => setMonths(Number(e.target.value))}
+          >
+            {[...Array(12)].map((_, i) => (
+              <option key={i + 1} value={i + 1}>
+                {i + 1} tháng
+              </option>
+            ))}
+          </select>
+
+          <p>Tạm tính: <strong>{calculatePrice() / 1000}K</strong></p>
+
+          <button type="submit">Thuê Tab</button>
+        </form>
+      </section>
+
+      {/* --- Mục 2: Cấu hình cao hơn --- */}
+      <section style={{ borderTop: "1px solid #ccc", paddingTop: "20px" }}>
+        <h2>Cấu hình cao hơn</h2>
+        <p>Liên hệ Zalo để được tư vấn: <a href="https://zalo.me/0972734444" target="_blank" rel="noreferrer">09.72.73.4444</a></p>
+      </section>
+
+  {/* --- Modal QR --- */}
+  {showQR && (
+    <div className="qr-modal" onClick={handleCloseQR}>
+      <div className="qr-content" onClick={(e) => e.stopPropagation()}>
+        <h3>Quét QR để thanh toán</h3>
+        <img
+          src="/images/qr-code.png"
+          alt="QR Payment"
+          style={{ width: "250px", height: "250px", marginBottom: "20px" }}
         />
+        <p>CK (username): <strong>{username}</strong></p>
+        
+        {/* Nút Xác nhận và Đóng cách xa nhau */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+          <button
+            onClick={handleConfirmPayment}
+            style={{
+              backgroundColor: "#4CAF50",
+              color: "white",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              cursor: "pointer"
+            }}
+          >
+            Xác nhận
+          </button>
 
-        <label>Thời gian thuê (tháng)</label>
-        <select
-          value={months}
-          onChange={(e) => setMonths(Number(e.target.value))}
-        >
-          {[...Array(12)].map((_, i) => (
-            <option key={i + 1} value={i + 1}>
-              {i + 1} tháng
-            </option>
-          ))}
-        </select>
+          <button
+            onClick={handleCloseQR}
+            style={{
+              backgroundColor: "#f44336",
+              color: "white",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              cursor: "pointer"
+            }}
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
 
-        <p>Tạm tính: <strong>{months * basePrice / 1000}K / 1 Tab</strong></p>
-
-        <button type="submit">Xác nhận</button>
-      </form>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import Footer from "./Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GuidePage from "./GuidePage";
+import Contact from "./Contact";
 import './App.css'; // import CSS
 
 function App() {
@@ -22,20 +23,28 @@ function App() {
     <Router>
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 
-        {/* Thanh menu sticky full width */}
         <nav className="sticky-menu">
           <div className="app-nav-inner">
-            <div className={`hamburger ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
-              <div></div>
-              <div></div>
-              <div></div>
+            <div className="nav-left">
+              <div className={`hamburger ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+
+              <Link to="/" className="nav-link">Home</Link>
+              <Link to="/list" className="nav-link">Danh sách</Link>
+              <Link to="/guide" className="nav-link">Hướng dẫn</Link>
+              <Link to="/register" className="nav-link">Đăng ký</Link>
             </div>
 
-            <Link to="/" className="nav-link" onClick={handleLinkClick}>Home</Link>
-            <Link to="/list" className="nav-link" onClick={handleLinkClick}>Danh sách</Link>
-            <Link to="/guide" className="nav-link" onClick={handleLinkClick}>Hướng dẫn</Link>
-            <Link to="/login" className="nav-link" onClick={handleLinkClick}>Đăng nhập</Link>
-            <Link to="/register" className="nav-link" onClick={handleLinkClick}>Đăng ký</Link>
+            {/* Username / Đăng nhập luôn hiển thị, khác nav-link */}
+            <div className="username-display">
+              {localStorage.getItem("username") 
+                ? <span>{localStorage.getItem("username")}</span>
+                : <Link to="/login">Đăng nhập</Link>
+              }
+            </div>
           </div>
         </nav>
 
@@ -56,10 +65,11 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/list" element={<RentalList />} />
-              <Route path="/rent/:serviceId" element={<RentalForm />} />
+              <Route path="/rent" element={<RentalForm />} />
               <Route path="/guide" element={<GuidePage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/contact" element={<Contact />} />
             </Routes>
           </div>
         </div>
