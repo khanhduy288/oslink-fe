@@ -9,36 +9,50 @@ function Login({ setUsername }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const BACKEND_URL = "https://oslinksymtem.onrender.com"; // <-- đảm bảo đúng URL backend Render
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.phone || !form.password) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
     try {
       setLoading(true);
-      const res = await axios.post("https://oslinksymtem.onrender.com/login", {
+      const res = await axios.post(`${BACKEND_URL}/login`, {
         phone: form.phone,
         password: form.password,
       });
 
       const { token, user } = res.data;
+      if (!token || !user) {
+        toast.error("Server trả dữ liệu không hợp lệ");
+        return;
+      }
+
+      // lấy display name
       const displayName = user.username || user.phone;
 
+      // lưu localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("userLevel", user.level);
+      localStorage.setItem("userId", user.id); // thêm userId
       localStorage.setItem("username", displayName);
-
       if (setUsername) setUsername(displayName);
 
       toast.success(res.data.message || "Đăng nhập thành công!");
       console.log("User logged in:", user);
 
-      navigate("/"); 
+      navigate("/"); // chuyển về trang chủ
     } catch (err) {
-      const msg = err.response?.data?.message || "Có lỗi xảy ra khi đăng nhập";
+      const msg = err.response?.data?.message || err.message || "Có lỗi xảy ra khi đăng nhập";
       toast.error(msg);
-      console.error(err);
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
@@ -55,6 +69,7 @@ function Login({ setUsername }) {
             name="phone"
             value={form.phone}
             onChange={handleChange}
+            placeholder="VD: 0912345678"
             required
           />
         </div>
@@ -66,6 +81,7 @@ function Login({ setUsername }) {
             name="password"
             value={form.password}
             onChange={handleChange}
+            placeholder="Mật khẩu ≥6 ký tự"
             required
           />
         </div>

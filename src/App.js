@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import RentalForm from "./RentalForm";
 import RentalList from "./RentalList";
 import Home from "./Home";
@@ -14,9 +14,16 @@ import './App.css';
 import GuideImagePage from "./GuideImagePage";
 import GuideVideoPage from "./GuideVideoPage";
 
+// Admin pages
+import Dashboard from "./admin/Dashboard";
+import Rentals from "./admin/Rentals";
+import Stats from "./admin/Stats";
+import Users from "./admin/Users";
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [username, setUsername] = useState(null);
+  const [userLevel, setUserLevel] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // Cập nhật trạng thái mobile khi resize
@@ -26,9 +33,12 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Lấy thông tin user từ localStorage
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
+    const storedLevel = Number(localStorage.getItem("userLevel")) || 0;
     if (storedUsername) setUsername(storedUsername);
+    setUserLevel(storedLevel);
   }, []);
 
   const handleLinkClick = () => {
@@ -38,6 +48,7 @@ function App() {
   const handleLogout = () => {
     localStorage.clear();
     setUsername(null);
+    setUserLevel(0);
     window.location.href = "/"; 
   };
 
@@ -79,8 +90,14 @@ function App() {
 
               <Link to="/" className="nav-link" onClick={handleLinkClick}>Trang chủ</Link>
               <Link to="/list" className="nav-link" onClick={handleLinkClick}>Danh sách</Link>
+              <Link to="/rent" className="nav-link" onClick={handleLinkClick}>Thuê Tab</Link>
               <Link to="/guide" className="nav-link" onClick={handleLinkClick}>Hướng dẫn</Link>
               <Link to="/register" className="nav-link" onClick={handleLinkClick}>Đăng ký</Link>
+
+              {/* Admin menu chỉ hiện nếu userLevel > 10 */}
+              {userLevel > 10 && (
+                <Link to="/admin/rentals" className="nav-link" onClick={handleLinkClick}>Admin</Link>
+              )}
             </div>
 
             <div className="username-display" style={{ color: "white" }}>
@@ -127,6 +144,18 @@ function App() {
               <Route path="/login" element={<Login setUsername={setUsername} />} /> 
               <Route path="/register" element={<Register />} />
               <Route path="/contact" element={<Contact />} />
+
+              {/* Admin routes chỉ cho userLevel > 10 */}
+              {userLevel > 10 && (
+                <Route path="/admin" element={<Dashboard />}>
+                  <Route path="rentals" element={<Rentals />} />
+                  <Route path="stats" element={<Stats />} />
+                  <Route path="users" element={<Users />} />
+                </Route>
+              )}
+
+              {/* Redirect nếu cố truy cập admin mà không đủ quyền */}
+              <Route path="/admin/*" element={<Navigate to="/" />} />
             </Routes>
           </div>
         </div>

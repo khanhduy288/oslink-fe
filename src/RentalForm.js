@@ -1,8 +1,23 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode"; // sửa import
 import "./RentalForm.css";
 
 function RentalForm() {
   const username = localStorage.getItem("username") || "guest";
+  const token = localStorage.getItem("token");
+
+  // Lấy userId từ token nếu có
+  let userId = null;
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      userId = decoded.id;
+    } catch (e) {
+      console.error("Token không hợp lệ:", e);
+    }
+  }
+
   const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
   const [showQR, setShowQR] = useState(false);
@@ -31,22 +46,38 @@ function RentalForm() {
   };
 
   const handleCloseQR = () => setShowQR(false);
-  const handleConfirmPayment = () => {
+
+  const handleConfirmPayment = async () => {
     setShowQR(false);
-    alert("Cảm ơn bạn đã thanh toán!");
+
+    if (!userId || !token) {
+      alert("Bạn chưa đăng nhập!");
+      return;
+    }
+
+    try {
+      const rentalTimeInMinutes = tabs * months * 30 * 24 * 60; // giả lập 1 tab = 1 tháng = 30 ngày
+      const res = await axios.post(
+        "https://oslinksymtem.onrender.com/rentals",
+        { userId, rentalTime: rentalTimeInMinutes },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert(`Tạo đơn thành công! Room code: ${res.data.rental.roomCode || "Chưa có"}`);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
+    }
   };
 
   return (
     <div className="form-container">
-
-      {/* --- Mục 1: Thuê Tab --- */}
       <section style={{ marginBottom: "40px" }}>
         <h2>Thuê Tab</h2>
 
         <div className="price-table">
           <h3>💰 Giá cơ bản:</h3>
           <p>👉 150K / 1 Tab / 1 tháng</p>
-
           <h3>🎁 Combo siêu tiết kiệm:</h3>
           <ul>
             {comboPrices.map((combo, idx) => (
@@ -60,86 +91,39 @@ function RentalForm() {
 
         <form onSubmit={handleSubmit}>
           <label>Số lượng Tab</label>
-          <input
-            type="number"
-            value={tabs}
-            min={1}
-            onChange={(e) => setTabs(Number(e.target.value))}
-            required
-          />
+          <input type="number" value={tabs} min={1} onChange={(e) => setTabs(Number(e.target.value))} required />
 
           <label>Thời gian thuê (tháng)</label>
-          <select
-            value={months}
-            onChange={(e) => setMonths(Number(e.target.value))}
-          >
+          <select value={months} onChange={(e) => setMonths(Number(e.target.value))}>
             {[...Array(12)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1} tháng
-              </option>
+              <option key={i + 1} value={i + 1}>{i + 1} tháng</option>
             ))}
           </select>
 
           <p>Tạm tính: <strong>{calculatePrice() / 1000}K</strong></p>
-
           <button type="submit">Thuê Tab</button>
         </form>
       </section>
 
-      {/* --- Mục 2: Cấu hình cao hơn --- */}
-      <section style={{ borderTop: "1px solid #ccc", paddingTop: "20px" }}>
-        <h2>Cấu hình cao hơn</h2>
-        <p>Liên hệ Zalo để được tư vấn: <a href="https://zalo.me/0972734444" target="_blank" rel="noreferrer">09.72.73.4444</a></p>
-      </section>
+      {showQR && (
+        <div className="qr-modal" onClick={handleCloseQR}>
+          <div className="qr-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Quét QR để thanh toán</h3>
+            <img src="/images/qrthanhtoan.png" alt="QR Payment" style={{ width: "250px", height: "250px", marginBottom: "20px" }} />
+            <p><strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND</p>
+            <p><strong>📝 Nội dung CK:</strong> {username}</p>
 
-{/* --- Modal QR --- */}
-{showQR && (
-  <div className="qr-modal" onClick={handleCloseQR}>
-    <div className="qr-content" onClick={(e) => e.stopPropagation()}>
-      <h3>Quét QR để thanh toán</h3>
-      <img
-        src="/images/qrthanhtoan.png"
-        alt="QR Payment"
-        style={{ width: "250px", height: "250px", marginBottom: "20px" }}
-      />
-
-      <p><strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND</p>
-      <p><strong>📝 Nội dung CK:</strong> {username}</p>
-
-      {/* Nút Xác nhận và Đóng */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-        <button
-          onClick={handleConfirmPayment}
-          style={{
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            cursor: "pointer"
-          }}
-        >
-          Xác nhận
-        </button>
-
-        <button
-          onClick={handleCloseQR}
-          style={{
-            backgroundColor: "#f44336",
-            color: "white",
-            border: "none",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            cursor: "pointer"
-          }}
-        >
-          Đóng
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+              <button onClick={handleConfirmPayment} style={{ backgroundColor: "#4CAF50", color: "white", border: "none", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}>
+                Xác nhận
+              </button>
+              <button onClick={handleCloseQR} style={{ backgroundColor: "#f44336", color: "white", border: "none", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}>
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
