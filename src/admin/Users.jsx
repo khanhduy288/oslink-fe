@@ -11,9 +11,12 @@ function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("https://oslinksymtem.onrender.com/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        "https://oslinksymtem.onrender.com/admin/users", // sửa URL
+        {
+          headers: { Authorization: `Bearer ${token}` }, // gửi token admin
+        }
+      );
       setUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -24,9 +27,12 @@ function Users() {
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa user này?")) return;
     try {
-      await axios.delete(`https://oslinksymtem.onrender.com/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://oslinksymtem.onrender.com/admin/users/${id}`, // sửa URL xóa
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchUsers();
     } catch (err) {
       console.error(err);
@@ -48,7 +54,7 @@ function Users() {
           </tr>
         </thead>
         <tbody>
-          {users.map(u => (
+          {users.map((u) => (
             <tr key={u.id}>
               <td>{u.id}</td>
               <td>{u.username}</td>
