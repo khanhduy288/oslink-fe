@@ -17,6 +17,14 @@ import GuideVideoPage from "./GuideVideoPage";
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [username, setUsername] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Cập nhật trạng thái mobile khi resize
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -36,17 +44,30 @@ function App() {
   return (
     <Router>
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-        <nav className="sticky-menu">
+        <nav
+          className="sticky-menu"
+          style={{
+            backgroundColor: isMobile ? "transparent" : "#1E90FF",
+            backgroundImage: isMobile ? "url('/images/menu-bg.jpg')" : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            position: "sticky",
+            top: 0,
+            zIndex: 100,
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+          }}
+        >
           <div className="app-nav-inner">
-            
-            {/* --- LOGO + MENU --- */}
             <div className="nav-left">
-              {/* Logo */}
-            <Link to="/" className="logo-link" onClick={handleLinkClick}>
-              <img src="/images/logo.jpg" alt="Logo" className="logo" style={{ height: "40px", marginRight: "15px" }} />
-            </Link>
+              <Link to="/" className="logo-link" onClick={handleLinkClick}>
+                <img
+                  src="/images/logo.jpg"
+                  alt="Logo"
+                  className="logo"
+                  style={{ height: "40px", marginRight: "15px", display: isMobile ? "none" : "block" }}
+                />
+              </Link>
 
-              {/* Hamburger menu */}
               <div
                 className={`hamburger ${menuOpen ? "open" : ""}`}
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -56,14 +77,12 @@ function App() {
                 <div></div>
               </div>
 
-              {/* Navigation links */}
               <Link to="/" className="nav-link" onClick={handleLinkClick}>Trang chủ</Link>
               <Link to="/list" className="nav-link" onClick={handleLinkClick}>Danh sách</Link>
               <Link to="/guide" className="nav-link" onClick={handleLinkClick}>Hướng dẫn</Link>
               <Link to="/register" className="nav-link" onClick={handleLinkClick}>Đăng ký</Link>
             </div>
 
-            {/* --- Username / Login --- */}
             <div className="username-display" style={{ color: "white" }}>
               {username ? (
                 <div>
@@ -85,7 +104,6 @@ function App() {
           </div>
         </nav>
 
-        {/* --- Nội dung chính --- */}
         <div
           className="app-container"
           style={{
@@ -99,23 +117,17 @@ function App() {
         >
           <hr />
           <div className="page-content" style={{ flex: 1 }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/list" element={<RentalList />} />
-            <Route path="/rent" element={<RentalForm />} />
-
-            {/* Giữ route cũ */}
-            <Route path="/guide" element={<GuidePage />} />
-
-            {/* Thêm 2 route mới */}
-            <Route path="/guide/images" element={<GuideImagePage />} />
-            <Route path="/guide/videos" element={<GuideVideoPage />} />
-
-            <Route path="/login" element={<Login setUsername={setUsername} />} /> 
-            <Route path="/register" element={<Register />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/list" element={<RentalList />} />
+              <Route path="/rent" element={<RentalForm />} />
+              <Route path="/guide" element={<GuidePage />} />
+              <Route path="/guide/images" element={<GuideImagePage />} />
+              <Route path="/guide/videos" element={<GuideVideoPage />} />
+              <Route path="/login" element={<Login setUsername={setUsername} />} /> 
+              <Route path="/register" element={<Register />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
           </div>
         </div>
 

@@ -157,3 +157,23 @@
     display: none;
   }
 }
+/* ===== Background ảnh cho mobile ===== */
+@media (max-width: 768px) {
+  .sticky-menu {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: transparent; /* bỏ màu nền cũ */
+    position: sticky;
+  }
+
+  /* Overlay mờ để chữ/links dễ đọc */
+  .sticky-menu::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    z-index: -1;
+  }
+}
