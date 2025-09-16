@@ -46,7 +46,7 @@ const Home = () => {
           style={{ width: 40, height: 40 }}
         />
         <div>
-          <h3>4. ZALO ADM SUPPORT</h3>
+          <h3>4. TRẢI NGHIỆM THỬ - INBOX =&gt; ZALO SUPPORT</h3>
           <p>Liên hệ ngay qua Zalo để được hỗ trợ nhanh chóng.</p>
         </div>
       </div>

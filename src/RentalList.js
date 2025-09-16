@@ -68,27 +68,33 @@ function RentalList() {
 
   const closeExtendModal = () => setExtendModal({ show: false, rental: null, months: 1 });
 
-  const handleConfirmExtend = async () => {
-    const { rental, months } = extendModal;
-    if (!rental) return;
+const handleConfirmExtend = async () => {
+  const { rental, months } = extendModal;
+  if (!rental) return;
 
-    const tabs = Math.ceil(rental.rentalTime / (30 * 24 * 60)); // ước lượng tabs từ rentalTime
-    const extendTimeInMinutes = tabs * months * 30 * 24 * 60;
+  const tabs = Math.ceil(rental.rentalTime / (30 * 24 * 60)); // ước lượng tabs từ rentalTime
+  const extendTimeInMinutes = tabs * months * 30 * 24 * 60;
 
-    try {
-      await axios.patch(
-        `https://oslinksymtem.onrender.com/rentals/${rental.id}/extend`,
-        { months, tabs },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Yêu cầu gia hạn đã gửi, chờ admin xác nhận!");
-      closeExtendModal();
-      fetchRentals();
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Lỗi khi gửi yêu cầu gia hạn");
-    }
-  };
+  try {
+    await axios.patch(
+      `https://oslinksymtem.onrender.com/rentals/${rental.id}`,
+      { 
+        status: "pending_extend",  // báo admin là user đang yêu cầu gia hạn
+        months, 
+        tabs,
+        extendTimeInMinutes 
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    alert("Yêu cầu gia hạn đã gửi, chờ admin xác nhận!");
+    closeExtendModal();
+    fetchRentals();
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Lỗi khi gửi yêu cầu gia hạn");
+  }
+};
+
 
   if (loading) return <p>Đang tải danh sách thuê...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -137,27 +143,76 @@ function RentalList() {
         <div className="qr-modal" onClick={closeExtendModal}>
           <div className="qr-content" onClick={(e) => e.stopPropagation()}>
             <h3>Gia hạn đơn ID: {extendModal.rental.id}</h3>
+            
             <label>Thời gian gia hạn (tháng):</label>
             <select
               value={extendModal.months}
-              onChange={(e) => setExtendModal({ ...extendModal, months: Number(e.target.value) })}
+              onChange={(e) =>
+                setExtendModal({ ...extendModal, months: Number(e.target.value) })
+              }
             >
               {[...Array(12)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1} tháng</option>
+                <option key={i + 1} value={i + 1}>
+                  {i + 1} tháng
+                </option>
               ))}
             </select>
-            <p>Tạm tính: <strong>{calculatePrice(Math.ceil(extendModal.rental.rentalTime / (30*24*60)), extendModal.months) / 1000}K</strong></p>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-              <button onClick={handleConfirmExtend} style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px 20px", borderRadius: "5px" }}>
+
+            <p>
+              Tạm tính:{" "}
+              <strong>
+                {calculatePrice(
+                  Math.ceil(extendModal.rental.rentalTime / (30 * 24 * 60)),
+                  extendModal.months
+                ) / 1000}
+                K
+              </strong>
+            </p>
+
+            {/* QR Payment */}
+            <div style={{ textAlign: "center", margin: "20px 0" }}>
+              <p>Quét mã QR để thanh toán</p>
+              <img
+                src="/images/qrthanhtoan.png"  // đặt file trong public/images
+                alt="QR thanh toán"
+                style={{ width: "220px", border: "1px solid #ccc", borderRadius: "8px" }}
+              />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "20px",
+              }}
+            >
+              <button
+                onClick={handleConfirmExtend}
+                style={{
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  padding: "10px 20px",
+                  borderRadius: "5px",
+                }}
+              >
                 Xác nhận
               </button>
-              <button onClick={closeExtendModal} style={{ backgroundColor: "#f44336", color: "white", padding: "10px 20px", borderRadius: "5px" }}>
+              <button
+                onClick={closeExtendModal}
+                style={{
+                  backgroundColor: "#f44336",
+                  color: "white",
+                  padding: "10px 20px",
+                  borderRadius: "5px",
+                }}
+              >
                 Đóng
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

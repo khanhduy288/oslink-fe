@@ -21,11 +21,14 @@ function Rentals() {
     }
   };
 
+  // Xác nhận rental ban đầu
   const handleUpdateStatus = async (id, status) => {
     try {
-      await axios.put(`https://oslinksymtem.onrender.com/rentals/${id}`, { status }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.patch(
+        `https://oslinksymtem.onrender.com/rentals/${id}`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       fetchRentals();
     } catch (err) {
       console.error(err);
@@ -33,6 +36,22 @@ function Rentals() {
     }
   };
 
+  // Admin xác nhận gia hạn
+  const handleConfirmExtend = async (id) => {
+    try {
+      await axios.patch(
+        `https://oslinksymtem.onrender.com/rentals/${id}/extend-confirm`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchRentals();
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi xác nhận gia hạn");
+    }
+  };
+
+  // Xóa rental
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa đơn này?")) return;
     try {
@@ -57,11 +76,12 @@ function Rentals() {
             <th>Thời gian thuê (phút)</th>
             <th>Status</th>
             <th>Room Code</th>
+            <th>Gia hạn</th>
             <th>Thao tác</th>
           </tr>
         </thead>
         <tbody>
-          {rentals.map(r => (
+          {rentals.map((r) => (
             <tr key={r.id}>
               <td>{r.id}</td>
               <td>{r.userId}</td>
@@ -69,8 +89,21 @@ function Rentals() {
               <td>{r.status}</td>
               <td>{r.roomCode || "Chưa tạo"}</td>
               <td>
+                {/* Nếu có yêu cầu gia hạn thì hiển thị số tháng */}
+                {r.requestedExtendMonths
+                  ? `${r.requestedExtendMonths} tháng`
+                  : "-"}
+              </td>
+              <td>
                 {r.status === "pending" && (
-                  <button onClick={() => handleUpdateStatus(r.id, "active")}>Xác nhận</button>
+                  <button onClick={() => handleUpdateStatus(r.id, "active")}>
+                    Xác nhận
+                  </button>
+                )}
+                {r.status === "pending_extend" && (
+                  <button onClick={() => handleConfirmExtend(r.id)}>
+                    Xác nhận gia hạn
+                  </button>
                 )}
                 <button onClick={() => handleDelete(r.id)}>Xóa</button>
               </td>

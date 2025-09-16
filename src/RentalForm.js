@@ -87,6 +87,7 @@ function RentalForm() {
             ))}
           </ul>
           <p>🔥 Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</p>
+          <p>🔥Cần hỗ trợ tải game - Ibox Zalo Support ngay!</p>
         </div>
 
         <form onSubmit={handleSubmit}>
