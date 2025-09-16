@@ -72,20 +72,21 @@ const handleConfirmExtend = async () => {
   const { rental, months } = extendModal;
   if (!rental) return;
 
-  const tabs = Math.ceil(rental.rentalTime / (30 * 24 * 60)); // ước lượng tabs từ rentalTime
+  // tính tabs (ước lượng)
+  const tabs = Math.ceil(rental.rentalTime / (30 * 24 * 60)); 
   const extendTimeInMinutes = tabs * months * 30 * 24 * 60;
 
   try {
-    await axios.patch(
-      `https://oslinksymtem.onrender.com/rentals/${rental.id}`,
+    await axios.post(
+      `https://oslinksymtem.onrender.com/rentals/${rental.id}/request-extend`,
       { 
-        status: "pending_extend",  // báo admin là user đang yêu cầu gia hạn
-        months, 
+        requestedExtendMonths: months,
         tabs,
-        extendTimeInMinutes 
+        extendTimeInMinutes
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );
+
     alert("Yêu cầu gia hạn đã gửi, chờ admin xác nhận!");
     closeExtendModal();
     fetchRentals();

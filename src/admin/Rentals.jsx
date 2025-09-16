@@ -36,11 +36,10 @@ function Rentals() {
     }
   };
 
-  // Admin xác nhận gia hạn
   const handleConfirmExtend = async (id) => {
     try {
       await axios.patch(
-        `https://oslinksymtem.onrender.com/rentals/${id}/extend-confirm`,
+        `https://oslinksymtem.onrender.com/rentals/${id}/confirm-extend`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
