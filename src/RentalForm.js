@@ -1,22 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // sửa import
+import jwtDecode from "jwt-decode"; // sửa import
 import "./RentalForm.css";
 
 function RentalForm() {
   const username = localStorage.getItem("username") || "guest";
   const token = localStorage.getItem("token");
-
-  // Lấy userId từ token nếu có
-  let userId = null;
-  if (token) {
-    try {
-      const decoded = jwtDecode(token);
-      userId = decoded.id;
-    } catch (e) {
-      console.error("Token không hợp lệ:", e);
-    }
-  }
 
   const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
@@ -50,20 +39,20 @@ function RentalForm() {
   const handleConfirmPayment = async () => {
     setShowQR(false);
 
-    if (!userId || !token) {
+    if (!token) {
       alert("Bạn chưa đăng nhập!");
       return;
     }
 
     try {
-      const rentalTimeInMinutes = tabs * months * 30 * 24 * 60; // giả lập 1 tab = 1 tháng = 30 ngày
-      const res = await axios.post(
+      // gửi username, tabs và months → backend sẽ tạo n bản ghi
+      await axios.post(
         "https://oslinksymtem.onrender.com/rentals",
-        { userId, rentalTime: rentalTimeInMinutes },
+        { username, tabs, months },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(`Tạo đơn thành công! Room code: ${res.data.rental.roomCode || "Chưa có"}`);
+      alert(`Tạo ${tabs} đơn thành công!`);
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
@@ -92,16 +81,26 @@ function RentalForm() {
 
         <form onSubmit={handleSubmit}>
           <label>Số lượng Tab</label>
-          <input type="number" value={tabs} min={1} onChange={(e) => setTabs(Number(e.target.value))} required />
+          <input
+            type="number"
+            value={tabs}
+            min={1}
+            onChange={(e) => setTabs(Number(e.target.value))}
+            required
+          />
 
           <label>Thời gian thuê (tháng)</label>
           <select value={months} onChange={(e) => setMonths(Number(e.target.value))}>
             {[...Array(12)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1} tháng</option>
+              <option key={i + 1} value={i + 1}>
+                {i + 1} tháng
+              </option>
             ))}
           </select>
 
-          <p>Tạm tính: <strong>{calculatePrice() / 1000}K</strong></p>
+          <p>
+            Tạm tính: <strong>{calculatePrice() / 1000}K</strong>
+          </p>
           <button type="submit">Thuê Tab</button>
         </form>
       </section>
@@ -110,15 +109,43 @@ function RentalForm() {
         <div className="qr-modal" onClick={handleCloseQR}>
           <div className="qr-content" onClick={(e) => e.stopPropagation()}>
             <h3>Quét QR để thanh toán</h3>
-            <img src="/images/qrthanhtoan.png" alt="QR Payment" style={{ width: "250px", height: "250px", marginBottom: "20px" }} />
-            <p><strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND</p>
-            <p><strong>📝 Nội dung CK:</strong> {username}</p>
+            <img
+              src="/images/qrthanhtoan.png"
+              alt="QR Payment"
+              style={{ width: "250px", height: "250px", marginBottom: "20px" }}
+            />
+            <p>
+              <strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND
+            </p>
+            <p>
+              <strong>📝 Nội dung CK:</strong> {username}
+            </p>
 
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-              <button onClick={handleConfirmPayment} style={{ backgroundColor: "#4CAF50", color: "white", border: "none", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}>
+              <button
+                onClick={handleConfirmPayment}
+                style={{
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
                 Xác nhận
               </button>
-              <button onClick={handleCloseQR} style={{ backgroundColor: "#f44336", color: "white", border: "none", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}>
+              <button
+                onClick={handleCloseQR}
+                style={{
+                  backgroundColor: "#f44336",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
                 Đóng
               </button>
             </div>

@@ -108,6 +108,7 @@ const handleConfirmExtend = async () => {
         <thead>
           <tr>
             <th>ID</th>
+            <th>Username</th> {/* thêm cột username */}
             <th>Thời gian thuê</th>
             <th>Ngày tạo</th>
             <th>Room Code</th>
@@ -119,6 +120,7 @@ const handleConfirmExtend = async () => {
           {rentals.map((rental) => (
             <tr key={rental.id} className={isExpired(rental) ? "expired" : ""}>
               <td data-label="ID">{rental.id}</td>
+              <td data-label="Username">{rental.username}</td> {/* hiển thị username */}
               <td data-label="Thời gian thuê">{rental.rentalTime / 60} giờ</td>
               <td data-label="Ngày tạo">
                 {new Date(rental.createdAt).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}
@@ -133,7 +135,6 @@ const handleConfirmExtend = async () => {
                 {rental.status === "pending" && <span>Đang xác nhận</span>}
                 {rental.status === "expired" && <span>Hết hạn</span>}
               </td>
-
             </tr>
           ))}
         </tbody>

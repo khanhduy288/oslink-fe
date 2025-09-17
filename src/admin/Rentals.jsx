@@ -71,7 +71,7 @@ function Rentals() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>UserId</th>
+            <th>Username</th> {/* đổi từ UserId */}
             <th>Thời gian thuê (phút)</th>
             <th>Status</th>
             <th>Room Code</th>
@@ -83,15 +83,12 @@ function Rentals() {
           {rentals.map((r) => (
             <tr key={r.id}>
               <td>{r.id}</td>
-              <td>{r.userId}</td>
+              <td>{r.username}</td> {/* hiển thị username */}
               <td>{r.rentalTime}</td>
               <td>{r.status}</td>
               <td>{r.roomCode || "Chưa tạo"}</td>
               <td>
-                {/* Nếu có yêu cầu gia hạn thì hiển thị số tháng */}
-                {r.requestedExtendMonths
-                  ? `${r.requestedExtendMonths} tháng`
-                  : "-"}
+                {r.requestedExtendMonths ? `${r.requestedExtendMonths} tháng` : "-"}
               </td>
               <td>
                 {r.status === "pending" && (
