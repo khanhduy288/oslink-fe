@@ -143,3 +143,7 @@ td[data-label="Thao tác"] span {
   background-color: #f0f0f0;
   border-radius: 4px;
 }
+table th,
+table td {
+  text-align: left !important;
+}
