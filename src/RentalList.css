@@ -93,3 +93,53 @@ tbody tr:nth-child(even) {
     text-align: right;
   }
 }
+/* RentalList.css */
+
+/* --- Cột thao tác --- */
+.action-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+/* Nút gia hạn */
+.action-btn.extend {
+  background-color: #4caf50;
+  color: white;
+}
+
+.action-btn.extend:hover {
+  background-color: #45a049;
+}
+
+/* Nút đổi tab */
+.action-btn.change-tab {
+  background-color: #2196f3;
+  color: white;
+}
+
+.action-btn.change-tab:hover {
+  background-color: #1976d2;
+}
+
+/* Khi các nút nằm cạnh nhau */
+td[data-label="Thao tác"] div {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap; /* responsive, khi nhỏ sẽ xuống hàng */
+  justify-content: flex-start;
+}
+
+/* Thêm một chút spacing cho span trạng thái */
+td[data-label="Thao tác"] span {
+  padding: 4px 8px;
+  font-weight: 500;
+  color: #555;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}

@@ -1,16 +1,18 @@
-import React from "react";
+// Dashboard.jsx
+import React, { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 
 function Dashboard() {
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
-    <div className="admin-dashboard">
+    <div className={`admin-dashboard ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
       <aside className="sidebar">
         <h2>Admin Panel</h2>
         <nav>
@@ -18,11 +20,13 @@ function Dashboard() {
           <Link to="stats">Thống kê</Link>
           <Link to="users">Quản lý Users</Link>
         </nav>
-        <button className="logout-btn" onClick={handleLogout}>Đăng xuất</button>
       </aside>
 
       <main className="main-content">
         <header className="topbar">
+          <button className="toggle-btn" onClick={toggleSidebar}>
+            {sidebarOpen ? "<<" : ">>"}
+          </button>
           <h1>Dashboard</h1>
         </header>
         <section className="page-container">

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -45,6 +47,19 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
+  const handleChangeTab = (rental) => {
+    toast.info("Chức năng đang phát triển, vui lòng liên hệ Zalo admin support", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "colored",
+    });
+  };
+
+  
   const calculatePrice = (tabs, months) => {
     const applicableCombo = [...comboPrices].reverse().find(combo => tabs >= combo.tabs);
     if (applicableCombo) {
@@ -129,12 +144,20 @@ const handleConfirmExtend = async () => {
               <td data-label="Status">{rental.status}</td>
               <td data-label="Thao tác">
                 {rental.status === "active" && (
-                  <button onClick={() => openExtendModal(rental)}>Gia hạn</button>
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    <button className="action-btn extend" onClick={() => openExtendModal(rental)}>
+                      Gia hạn
+                    </button>
+                    <button className="action-btn change-tab" onClick={() => handleChangeTab(rental)}>
+                      Đổi tab
+                    </button>
+                  </div>
                 )}
                 {rental.status === "pending_extend" && <span>Chờ admin</span>}
                 {rental.status === "pending" && <span>Đang xác nhận</span>}
                 {rental.status === "expired" && <span>Hết hạn</span>}
               </td>
+
             </tr>
           ))}
         </tbody>
@@ -214,7 +237,7 @@ const handleConfirmExtend = async () => {
           </div>
         </div>
       )}
-
+      <ToastContainer />
     </div>
   );
 }
