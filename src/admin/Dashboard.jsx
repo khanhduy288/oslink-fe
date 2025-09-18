@@ -24,9 +24,6 @@ function Dashboard() {
 
       <main className="main-content">
         <header className="topbar">
-          <button className="toggle-btn" onClick={toggleSidebar}>
-            {sidebarOpen ? "<<" : ">>"}
-          </button>
           <h1>Dashboard</h1>
         </header>
         <section className="page-container">
