@@ -18,7 +18,8 @@ function Rentals() {
 
   const fetchRentals = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/rentals`, {
+      const endpoint = localStorage.getItem("userLevel") >= 10 ? "/admin/rentals" : "/rentals";
+      const res = await axios.get(`${API_BASE}${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRentals(res.data);
@@ -27,6 +28,7 @@ function Rentals() {
       toast.error("Lỗi khi tải danh sách rentals");
     }
   };
+
 
   const handleUpdateStatus = async (id, status) => {
     try {
