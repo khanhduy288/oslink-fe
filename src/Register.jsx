@@ -8,6 +8,8 @@ function Register() {
   const [form, setForm] = useState({ phone: "", username: "", password: "", confirm: "" });
   const [loading, setLoading] = useState(false);
 
+  const BACKEND_URL = "https://api.tabtreo.com"; // <-- đổi sang VPS mới
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -43,7 +45,7 @@ function Register() {
 
     try {
       setLoading(true);
-      const res = await axios.post("https://oslinksymtem.onrender.com/register", {
+      const res = await axios.post(`${BACKEND_URL}/register`, {
         phone: form.phone,
         username: form.username,
         password: form.password,

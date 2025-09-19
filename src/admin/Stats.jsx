@@ -12,7 +12,7 @@ function Stats() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("https://oslinksymtem.onrender.com/rentals", {
+        const res = await axios.get("https://api.tabtreo.com", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRentals(res.data);

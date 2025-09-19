@@ -5,6 +5,8 @@ function Users() {
   const [users, setUsers] = useState([]);
   const token = localStorage.getItem("token");
 
+  const API_BASE = "https://api.tabtreo.com"; // <-- URL backend mới
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -12,7 +14,7 @@ function Users() {
   const fetchUsers = async () => {
     try {
       const res = await axios.get(
-        "https://oslinksymtem.onrender.com/admin/users", // sửa URL
+        `${API_BASE}/admin/users`, // dùng biến API_BASE
         {
           headers: { Authorization: `Bearer ${token}` }, // gửi token admin
         }
@@ -28,7 +30,7 @@ function Users() {
     if (!window.confirm("Bạn có chắc muốn xóa user này?")) return;
     try {
       await axios.delete(
-        `https://oslinksymtem.onrender.com/admin/users/${id}`, // sửa URL xóa
+        `${API_BASE}/admin/users/${id}`, // dùng biến API_BASE
         {
           headers: { Authorization: `Bearer ${token}` },
         }

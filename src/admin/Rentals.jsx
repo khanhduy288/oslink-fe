@@ -6,9 +6,11 @@ import './Rentals.css'; // CSS cho bảng, nút và modal
 
 function Rentals() {
   const [rentals, setRentals] = useState([]);
-  const [editingRental, setEditingRental] = useState(null); // rental đang edit
+  const [editingRental, setEditingRental] = useState(null);
   const [editData, setEditData] = useState({ rentalTime: '', roomCode: '', requestedExtendMonths: '' });
   const token = localStorage.getItem("token");
+
+  const API_BASE = "https://api.tabtreo.com"; // <-- Thay đổi URL backend ở đây
 
   useEffect(() => {
     fetchRentals();
@@ -16,7 +18,7 @@ function Rentals() {
 
   const fetchRentals = async () => {
     try {
-      const res = await axios.get("https://oslinksymtem.onrender.com/rentals", {
+      const res = await axios.get(`${API_BASE}/rentals`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRentals(res.data);
@@ -29,7 +31,7 @@ function Rentals() {
   const handleUpdateStatus = async (id, status) => {
     try {
       await axios.patch(
-        `https://oslinksymtem.onrender.com/rentals/${id}`,
+        `${API_BASE}/rentals/${id}`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -44,7 +46,7 @@ function Rentals() {
   const handleConfirmExtend = async (id) => {
     try {
       await axios.patch(
-        `https://oslinksymtem.onrender.com/rentals/${id}/confirm-extend`,
+        `${API_BASE}/rentals/${id}/confirm-extend`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -59,7 +61,7 @@ function Rentals() {
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa đơn này?")) return;
     try {
-      await axios.delete(`https://oslinksymtem.onrender.com/rentals/${id}`, {
+      await axios.delete(`${API_BASE}/rentals/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchRentals();
@@ -96,7 +98,7 @@ function Rentals() {
   const handleEditSubmit = async () => {
     try {
       await axios.patch(
-        `https://oslinksymtem.onrender.com/rentals/${editingRental.id}`,
+        `${API_BASE}/rentals/${editingRental.id}`,
         editData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

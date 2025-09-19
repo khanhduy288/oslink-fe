@@ -9,7 +9,7 @@ function Login({ setUsername }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const BACKEND_URL = "https://oslinksymtem.onrender.com"; // <-- đảm bảo đúng URL backend Render
+  const BACKEND_URL = "https://api.tabtreo.com"; // <-- đổi sang VPS mới
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -41,7 +41,7 @@ function Login({ setUsername }) {
       // lưu localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("userLevel", user.level);
-      localStorage.setItem("userId", user.id); // thêm userId
+      localStorage.setItem("userId", user.id);
       localStorage.setItem("username", displayName);
       if (setUsername) setUsername(displayName);
 

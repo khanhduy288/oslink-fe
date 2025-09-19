@@ -47,7 +47,7 @@ function RentalForm() {
     try {
       // gửi username, tabs và months → backend sẽ tạo n bản ghi
       await axios.post(
-        "https://oslinksymtem.onrender.com/rentals",
+        "https://api.tabtreo.com/rentals",
         { username, tabs, months },
         { headers: { Authorization: `Bearer ${token}` } }
       );
