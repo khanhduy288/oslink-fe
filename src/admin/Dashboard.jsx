@@ -19,6 +19,7 @@ function Dashboard() {
           <Link to="rentals">Quản lý Rentals</Link>
           <Link to="stats">Thống kê</Link>
           <Link to="users">Quản lý Users</Link>
+          <Link to="settings">Cấu hình Tool</Link>   {/* ✅ Thêm */}
         </nav>
       </aside>
 

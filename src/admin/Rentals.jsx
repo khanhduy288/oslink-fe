@@ -8,9 +8,10 @@ function Rentals() {
   const [rentals, setRentals] = useState([]);
   const [editingRental, setEditingRental] = useState(null);
   const [editData, setEditData] = useState({ rentalTime: '', roomCode: '', requestedExtendMonths: '' });
+  const [filterStatus, setFilterStatus] = useState("all"); // trạng thái filter
   const token = localStorage.getItem("token");
 
-  const API_BASE = "https://api.tabtreo.com"; // <-- Thay đổi URL backend ở đây
+  const API_BASE = "https://api.tabtreo.com"; 
 
   useEffect(() => {
     fetchRentals();
@@ -28,7 +29,6 @@ function Rentals() {
       toast.error("Lỗi khi tải danh sách rentals");
     }
   };
-
 
   const handleUpdateStatus = async (id, status) => {
     try {
@@ -115,9 +115,29 @@ function Rentals() {
 
   const handleEditCancel = () => setEditingRental(null);
 
+  // --- Lọc danh sách theo trạng thái ---
+  const filteredRentals = rentals.filter(r => {
+    if (filterStatus === "all") return true;
+    return r.status === filterStatus;
+  });
+
   return (
     <div className="rentals-container">
       <h2>Quản lý Rentals</h2>
+
+      {/* Bộ lọc trạng thái */}
+      <div className="filter-bar">
+        <label>Lọc theo trạng thái: </label>
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+          <option value="all">Tất cả</option>
+          <option value="pending">Đang chờ xác nhận</option>
+          <option value="active">Đơn đang chạy</option>
+          <option value="expired">Đơn hết hạn</option>
+          <option value="pending_extend">Yêu cầu gia hạn</option>
+          <option value="change_tab">Yêu cầu đổi tab</option>
+        </select>
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -131,7 +151,7 @@ function Rentals() {
           </tr>
         </thead>
         <tbody>
-          {rentals.map((r) => (
+          {filteredRentals.map((r) => (
             <tr key={r.id}>
               <td>{r.id}</td>
               <td>{r.username}</td>
@@ -148,6 +168,11 @@ function Rentals() {
                 {r.status === "pending_extend" && (
                   <button className="btn-extend" onClick={() => handleConfirmExtend(r.id)}>
                     Xác nhận gia hạn
+                  </button>
+                )}
+                {r.status === "change_tab" && (
+                  <button className="btn-tab" onClick={() => handleChangeTab(r)}>
+                    Đổi tab
                   </button>
                 )}
                 <button className="btn-edit" onClick={() => handleEditClick(r)}>Edit</button>

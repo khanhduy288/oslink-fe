@@ -19,6 +19,8 @@ import Dashboard from "./admin/Dashboard";
 import Rentals from "./admin/Rentals";
 import Stats from "./admin/Stats";
 import Users from "./admin/Users";
+import Settings from "./admin/Settings";
+
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -151,6 +153,7 @@ function App() {
                   <Route path="rentals" element={<Rentals />} />
                   <Route path="stats" element={<Stats />} />
                   <Route path="users" element={<Users />} />
+                  <Route path="settings" element={<Settings />} />
                 </Route>
               )}
 
