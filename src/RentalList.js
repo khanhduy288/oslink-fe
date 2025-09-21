@@ -47,17 +47,22 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
-  const handleChangeTab = (rental) => {
-    toast.info("Chức năng đang phát triển, vui lòng liên hệ Zalo admin support", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "colored",
-    });
-  };
+// 🟢 User chỉ đổi status sang pending_change_tab
+const handleRequestChangeTab = async (rentalId) => {
+  try {
+    await axios.patch(
+      `${BACKEND_URL}/rentals/${rentalId}`,
+      { status: "pending_change_tab" },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    toast.success("Đã gửi yêu cầu đổi tabs, chờ admin duyệt");
+    fetchRentals(); // refresh danh sách
+  } catch (err) {
+    toast.error("Gửi yêu cầu thất bại!");
+    console.error(err);
+  }
+};
 
   const calculatePrice = (tabs, months) => {
     const applicableCombo = [...comboPrices].reverse().find(combo => tabs >= combo.tabs);
@@ -138,7 +143,10 @@ function RentalList() {
                     <button className="action-btn extend" onClick={() => openExtendModal(rental)}>
                       Gia hạn
                     </button>
-                    <button className="action-btn change-tab" onClick={() => handleChangeTab(rental)}>
+                    <button
+                      className="action-btn change-tab"
+                      onClick={() => handleRequestChangeTab(rental.id)}
+                    >
                       Đổi tab
                     </button>
                   </div>
