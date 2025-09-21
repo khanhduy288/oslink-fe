@@ -10,6 +10,7 @@ function RentalForm() {
   const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
   const [showQR, setShowQR] = useState(false);
+  const [qrLoading, setQrLoading] = useState(true); // ✅ trạng thái load QR
 
   const basePrice = 150000;
   const comboPrices = [
@@ -31,6 +32,7 @@ function RentalForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setQrLoading(true);   // khi mở modal → reset trạng thái load
     setShowQR(true);
   };
 
@@ -45,7 +47,6 @@ function RentalForm() {
     }
 
     try {
-      // gửi username, tabs và months → backend sẽ tạo n bản ghi
       await axios.post(
         "https://api.tabtreo.com/rentals",
         { username, tabs, months },
@@ -109,11 +110,17 @@ function RentalForm() {
         <div className="qr-modal" onClick={handleCloseQR}>
           <div className="qr-content" onClick={(e) => e.stopPropagation()}>
             <h3>Quét QR để thanh toán</h3>
+
+            {/* ✅ Hiện loader trong lúc ảnh chưa load */}
+            {qrLoading && <div className="spinner"></div>}
+
             <img
               src="/images/qrthanhtoan.png"
               alt="QR Payment"
-              style={{ width: "250px", height: "250px", marginBottom: "20px" }}
+              style={{ width: "250px", height: "250px", marginBottom: "20px", display: qrLoading ? "none" : "block" }}
+              onLoad={() => setQrLoading(false)} // khi load xong → ẩn spinner
             />
+
             <p>
               <strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND
             </p>
