@@ -20,7 +20,7 @@ import Rentals from "./admin/Rentals";
 import Stats from "./admin/Stats";
 import Users from "./admin/Users";
 import Settings from "./admin/Settings";
-
+import RoomGroups from "./admin/RoomGroups";
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -154,6 +154,7 @@ function App() {
                   <Route path="stats" element={<Stats />} />
                   <Route path="users" element={<Users />} />
                   <Route path="settings" element={<Settings />} />
+                  <Route path="room-groups" element={<RoomGroups />} />   {/* ✅ mới */}
                 </Route>
               )}
 
