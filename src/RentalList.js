@@ -47,6 +47,21 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
+const handleCancelChangeTab = async (rentalId) => {
+  try {
+    await axios.patch(
+      `${BACKEND_URL}/rentals/${rentalId}`,
+      { status: "active" },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.info("Đã hủy yêu cầu đổi tab, trở lại trạng thái active");
+    fetchRentals();
+  } catch (err) {
+    toast.error("Hủy yêu cầu thất bại!");
+    console.error(err);
+  }
+};
+
 // 🟢 User chỉ đổi status sang pending_change_tab
 const handleRequestChangeTab = async (rentalId) => {
   try {
@@ -151,6 +166,19 @@ const handleRequestChangeTab = async (rentalId) => {
                     </button>
                   </div>
                 )}
+
+                {rental.status === "pending_change_tab" && (
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    <span>Đang chờ đổi tab...</span>
+                    <button
+                      className="action-btn cancel"
+                      onClick={() => handleCancelChangeTab(rental.id)}
+                    >
+                      Hủy yêu cầu
+                    </button>
+                  </div>
+                )}
+
                 {rental.status === "pending_extend" && <span>Chờ admin</span>}
                 {rental.status === "pending" && <span>Đang xác nhận</span>}
                 {rental.status === "expired" && <span>Hết hạn</span>}

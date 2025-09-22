@@ -30,20 +30,21 @@ function Rentals() {
     }
   };
 
-  const handleUpdateStatus = async (id, status) => {
-    try {
-      await axios.patch(
-        `${API_BASE}/rentals/${id}`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchRentals();
-      toast.success("Đã xác nhận rental!");
-    } catch (err) {
-      console.error(err);
-      toast.error("Lỗi khi cập nhật status");
-    }
-  };
+const handleUpdateStatus = async (id, status, action = null) => {
+  try {
+    await axios.patch(
+      `${API_BASE}/rentals/${id}`,
+      { status, action },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    fetchRentals();
+    toast.success("Đã cập nhật rental!");
+  } catch (err) {
+    console.error(err);
+    toast.error("Lỗi khi cập nhật status");
+  }
+};
+
 
   const handleConfirmExtend = async (id) => {
     try {
@@ -134,7 +135,7 @@ function Rentals() {
           <option value="active">Đơn đang chạy</option>
           <option value="expired">Đơn hết hạn</option>
           <option value="pending_extend">Yêu cầu gia hạn</option>
-          <option value="change_tab">Yêu cầu đổi tab</option>
+          <option value="pending_change_tab">Yêu cầu đổi tab</option>
         </select>
       </div>
 
@@ -174,6 +175,27 @@ function Rentals() {
                   <button className="btn-tab" onClick={() => handleChangeTab(r)}>
                     Đổi tab
                   </button>
+                )}
+                {r.status === "pending_change_tab" && (
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    <span>Đang chờ đổi tab...</span>
+                    <button
+                      className="btn-confirm"
+                      onClick={() =>
+                        handleUpdateStatus(r.id, "active", "confirm_change_tab")
+                      }
+                    >
+                      Xác nhận đổi tab
+                    </button>
+                    <button
+                      className="btn-cancel"
+                      onClick={() =>
+                        handleUpdateStatus(r.id, "active", "cancel_change_tab")
+                      }
+                    >
+                      Hủy yêu cầu
+                    </button>
+                  </div>
                 )}
                 <button className="btn-edit" onClick={() => handleEditClick(r)}>Edit</button>
                 <button className="btn-delete" onClick={() => handleDelete(r.id)}>Xóa</button>
