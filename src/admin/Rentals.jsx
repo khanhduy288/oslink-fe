@@ -10,7 +10,8 @@ function Rentals() {
   const [editData, setEditData] = useState({ rentalTime: '', roomCode: '', requestedExtendMonths: '' });
   const [filterStatus, setFilterStatus] = useState("all"); // trạng thái filter
   const token = localStorage.getItem("token");
-
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newRentalData, setNewRentalData] = useState({ username: "", tabs: 1, months: 1 });
   const API_BASE = "https://api.tabtreo.com"; 
 
   useEffect(() => {
@@ -116,6 +117,35 @@ const handleUpdateStatus = async (id, status, action = null) => {
 
   const handleEditCancel = () => setEditingRental(null);
 
+// Hàm xử lý input trong modal tạo mới
+const handleCreateChange = (e) => {
+  const { name, value } = e.target;
+  setNewRentalData(prev => ({ ...prev, [name]: value }));
+};
+
+// Gửi POST tạo rental mới
+const handleCreateSubmit = async () => {
+  const { username, tabs, months } = newRentalData;
+  if (!username || tabs < 1 || months < 1) {
+    toast.warn("Vui lòng nhập đầy đủ thông tin hợp lệ!");
+    return;
+  }
+
+  try {
+    await axios.post(`${API_BASE}/rentals`, { username, tabs, months }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    toast.success(`Tạo ${tabs} đơn thành công!`);
+    setShowCreateModal(false);
+    setNewRentalData({ username: "", tabs: 1, months: 1 });
+    fetchRentals(); // load lại danh sách
+  } catch (err) {
+    console.error(err);
+    toast.error(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
+  }
+};
+
+
   // --- Lọc danh sách theo trạng thái ---
   const filteredRentals = rentals.filter(r => {
     if (filterStatus === "all") return true;
@@ -126,18 +156,47 @@ const handleUpdateStatus = async (id, status, action = null) => {
     <div className="rentals-container">
       <h2>Quản lý Rentals</h2>
 
-      {/* Bộ lọc trạng thái */}
-      <div className="filter-bar">
-        <label>Lọc theo trạng thái: </label>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-          <option value="all">Tất cả</option>
-          <option value="pending">Đang chờ xác nhận</option>
-          <option value="active">Đơn đang chạy</option>
-          <option value="expired">Đơn hết hạn</option>
-          <option value="pending_extend">Yêu cầu gia hạn</option>
-          <option value="pending_change_tab">Yêu cầu đổi tab</option>
-        </select>
+  {/* Bộ lọc trạng thái */}
+  <div className="filter-bar">
+    <label>Lọc theo trạng thái: </label>
+    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+      <option value="all">Tất cả</option>
+      <option value="pending">Đang chờ xác nhận</option>
+      <option value="active">Đơn đang chạy</option>
+      <option value="expired">Đơn hết hạn</option>
+      <option value="pending_extend">Yêu cầu gia hạn</option>
+      <option value="pending_change_tab">Yêu cầu đổi tab</option>
+    </select>
+  </div>
+
+  {/* Nút tạo rental thủ công */}
+  <button className="btn-create" onClick={() => setShowCreateModal(true)}>+ Tạo mới</button>
+
+  {/* --- CREATE MODAL --- */}
+  {showCreateModal && (
+    <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h3>Tạo Rental mới</h3>
+        <label>
+          Username:
+          <input type="text" name="username" value={newRentalData.username} onChange={handleCreateChange} />
+        </label>
+        <label>
+          Số tabs:
+          <input type="number" name="tabs" value={newRentalData.tabs} min="1" onChange={handleCreateChange} />
+        </label>
+        <label>
+          Số tháng:
+          <input type="number" name="months" value={newRentalData.months} min="1" onChange={handleCreateChange} />
+        </label>
+        <div className="modal-actions">
+          <button className="btn-save" onClick={handleCreateSubmit}>Tạo</button>
+          <button className="btn-cancel" onClick={() => setShowCreateModal(false)}>Hủy</button>
+        </div>
       </div>
+    </div>
+  )}
+
 
       <table>
         <thead>

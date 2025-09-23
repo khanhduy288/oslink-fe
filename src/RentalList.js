@@ -132,7 +132,7 @@ const handleRequestChangeTab = async (rentalId) => {
       <table>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>Mã đơn</th>
             <th>Username</th>
             <th>Thời gian thuê</th>
             <th>Ngày tạo</th>

@@ -10,10 +10,11 @@
   color: #333;
 }
 
-/* Filter bar */
+/* Container filter + create button */
 .filter-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Filter bên trái, nút bên phải */
   margin-bottom: 15px;
   gap: 10px;
 }
@@ -169,6 +170,24 @@
 .btn-save:hover, .btn-cancel:hover {
   transform: translateY(-2px);
   opacity: 0.9;
+}
+
+/* Nút tạo rental */
+.btn-create {
+  background-color: #1e90ff;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 15px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-create:hover {
+  background-color: #007bff;
+  transform: translateY(-2px);
 }
 
 /* Animation */
