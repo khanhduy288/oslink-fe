@@ -7,8 +7,8 @@ function Footer() {
         © {new Date().getFullYear()} Oslink System. All rights reserved.
       </p>
       <div style={styles.links}>
-        <a href="https://github.com/khanhduy288" target="_blank" rel="noreferrer">
-          GitHub
+        <a href="https://itviet.vn/developers/68a847d2f2b6db0a9526471e" target="_blank" rel="noreferrer">
+          By
         </a>
         <a href="/about">About</a>
         <a href="/contact">Contact</a>
