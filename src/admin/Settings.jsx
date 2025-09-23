@@ -58,6 +58,22 @@ function Settings() {
         </div>
 
         {message && <p className="message">{message}</p>}
+
+        {/* Hướng dẫn bật tool */}
+        <div className="instructions">
+          <h3>📌 Hướng dẫn bật tool</h3>
+          <ol>
+            <li>Mở CMD/PowerShell, chuyển đến thư mục <code>OslinkSymtem\agent</code>
+            </li>
+            <li>Chạy agent:
+              <br /><code>python agent.py</code>
+            </li>
+            <li>Mở một cửa sổ CMD khác để chạy ngrok:
+              <br /><code>ngrok http 5001</code>
+            </li>
+            <li>Sao chép URL ngrok và dán vào ô WORKER_API ở trên, nhấn "Lưu"</li>
+          </ol>
+        </div>
       </div>
     </div>
   );
