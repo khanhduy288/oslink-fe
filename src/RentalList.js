@@ -47,6 +47,14 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
+const getRemainingHours = (rental) => {
+  const created = dayjs.utc(rental.createdAt).tz("Asia/Bangkok");
+  const rentalEnd = created.add(rental.rentalTime, "minute");
+  const now = dayjs().tz("Asia/Bangkok");
+  const diff = rentalEnd.diff(now, "minute"); // số phút còn lại
+  return diff > 0 ? (diff / 60).toFixed(1) : 0; // trả về giờ, 1 chữ số thập phân
+};
+
 const handleCancelChangeTab = async (rentalId) => {
   try {
     await axios.patch(
@@ -136,6 +144,7 @@ const handleRequestChangeTab = async (rentalId) => {
             <th>Username</th>
             <th>Thời gian thuê</th>
             <th>Ngày tạo</th>
+            <th>Thời gian còn lại (giờ)</th> 
             <th>Room Code</th>
             <th>Room Pass</th>
             <th>Status</th>
@@ -151,6 +160,7 @@ const handleRequestChangeTab = async (rentalId) => {
               <td data-label="Ngày tạo">
                 {new Date(rental.createdAt).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}
               </td>
+              <td data-label="Thời gian còn lại (giờ)">{getRemainingHours(rental)}</td> 
               <td data-label="Room Code">{rental.roomCode || "Chưa tạo"}</td>
               <td data-label="Room Pass">
                 {rental.roomCode ? (
