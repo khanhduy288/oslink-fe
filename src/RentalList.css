@@ -147,3 +147,25 @@ table th,
 table td {
   text-align: left !important;
 }
+/* Nút Copy Pass */
+.copy-pass {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  background-color: #2196F3; /* màu xanh */
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.copy-pass:hover {
+  background-color: #1976d2;
+}
+
+/* Đảm bảo container hiển thị flex, khoảng cách đẹp */
+td[data-label="Room Pass"] > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

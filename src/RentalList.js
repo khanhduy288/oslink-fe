@@ -137,6 +137,7 @@ const handleRequestChangeTab = async (rentalId) => {
             <th>Thời gian thuê</th>
             <th>Ngày tạo</th>
             <th>Room Code</th>
+            <th>Room Pass</th>
             <th>Status</th>
             <th>Thao tác</th>
           </tr>
@@ -151,6 +152,24 @@ const handleRequestChangeTab = async (rentalId) => {
                 {new Date(rental.createdAt).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}
               </td>
               <td data-label="Room Code">{rental.roomCode || "Chưa tạo"}</td>
+              <td data-label="Room Pass">
+                {rental.roomCode ? (
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                    <span>{rental.roomCode.split(" ").slice(-1)[0]}</span>
+                    <button
+                      className="copy-pass"
+                      onClick={() => {
+                        navigator.clipboard.writeText(rental.roomCode.split(" ").slice(-1)[0]);
+                        toast.success("Copied Pass!");
+                      }}
+                    >
+                      Copy Pass
+                    </button>
+                  </div>
+                ) : (
+                  "-"
+                )}
+              </td>
               <td data-label="Status">{rental.status}</td>
               <td data-label="Thao tác">
                 {rental.status === "active" && (
