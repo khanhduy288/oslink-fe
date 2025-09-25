@@ -22,18 +22,10 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="card-box" onClick={() => handleNavigate("/guide/images")}>
-        <FaDownload size={40} color="#28a745" />
-        <div>
-          <h3>2. ẢNH HƯỚNG DẪN</h3>
-          <p>Xem hướng dẫn chi tiết cách tải app, game và sử dụng chức năng.</p>
-        </div>
-      </div>
-
       <div className="card-box" onClick={() => handleNavigate("/guide/videos")}>
         <FaVideo size={40} color="#f39c12" />
         <div>
-          <h3>3. VIDEO HƯỚNG DẪN</h3>
+          <h3>2. HƯỚNG DẪN</h3>
           <p>Xem video hướng dẫn tải app và game.</p>
         </div>
       </div>
@@ -46,7 +38,7 @@ const Home = () => {
           style={{ width: 40, height: 40 }}
         />
         <div>
-          <h3>4. TRẢI NGHIỆM THỬ - INBOX =&gt; ZALO SUPPORT</h3>
+          <h3>3. TRẢI NGHIỆM THỬ - INBOX =&gt; ZALO SUPPORT</h3>
           <p>Liên hệ ngay qua Zalo để được hỗ trợ nhanh chóng.</p>
         </div>
       </div>
