@@ -73,7 +73,20 @@ function RentalForm() {
     <div className="form-container">
       <section style={{ marginBottom: "40px" }}>
         <h2>Thuê Tab</h2>
-
+        <div className="price-table">
+          <h3>💰 Giá cơ bản:</h3>
+          <p>👉 150K / 1 Tab / 1 tháng</p>
+          <h3>🎁 Combo siêu tiết kiệm:</h3>
+          <ul>
+            {comboPrices.map((combo, idx) => (
+              <li key={idx}>
+                {combo.tabs} Tab 👉 Giảm {combo.discount / 1000}K = chỉ {combo.price / 1000}K
+              </li>
+            ))}
+          </ul>
+          <p>🔥 Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</p>
+          <p>🔥Cần hỗ trợ tải game - Ibox Zalo Support ngay!</p>
+        </div>
         <form onSubmit={handleSubmit}>
           <label>Số lượng Tab (tối đa 10)</label>
           <input
