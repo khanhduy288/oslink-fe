@@ -14,9 +14,19 @@ function Rentals() {
   const [newRentalData, setNewRentalData] = useState({ username: "", tabs: 1, months: 1 });
   const API_BASE = "https://api.tabtreo.com"; 
 
-  useEffect(() => {
+useEffect(() => {
+  // Lần đầu fetch
+  fetchRentals();
+
+  // Thiết lập interval để tự động fetch mỗi 5 giây
+  const interval = setInterval(() => {
     fetchRentals();
-  }, []);
+  }, 5000); // 5000ms = 5 giây
+
+  // Cleanup khi component unmount
+  return () => clearInterval(interval);
+}, []);
+
 
   const fetchRentals = async () => {
     try {

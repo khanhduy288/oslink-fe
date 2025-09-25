@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import jwtDecode from "jwt-decode"; // sửa import
 import "./RentalForm.css";
 
 function RentalForm() {
@@ -10,6 +9,8 @@ function RentalForm() {
   const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
   const [showQR, setShowQR] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
 
   const basePrice = 150000;
   const comboPrices = [
@@ -37,15 +38,22 @@ function RentalForm() {
   const handleCloseQR = () => setShowQR(false);
 
   const handleConfirmPayment = async () => {
-    setShowQR(false);
+    const now = Date.now();
+    if (now - lastSubmitTime < 60000) { // 1 phút
+      alert("Vui lòng chờ ít nhất 1 phút trước khi tạo đơn tiếp theo!");
+      return;
+    }
 
     if (!token) {
       alert("Bạn chưa đăng nhập!");
       return;
     }
 
+    setLoading(true);
+    setShowQR(false);
+    setLastSubmitTime(now);
+
     try {
-      // gửi username, tabs và months → backend sẽ tạo n bản ghi
       await axios.post(
         "https://api.tabtreo.com/rentals",
         { username, tabs, months },
@@ -56,6 +64,8 @@ function RentalForm() {
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,28 +74,14 @@ function RentalForm() {
       <section style={{ marginBottom: "40px" }}>
         <h2>Thuê Tab</h2>
 
-        <div className="price-table">
-          <h3>💰 Giá cơ bản:</h3>
-          <p>👉 150K / 1 Tab / 1 tháng</p>
-          <h3>🎁 Combo siêu tiết kiệm:</h3>
-          <ul>
-            {comboPrices.map((combo, idx) => (
-              <li key={idx}>
-                {combo.tabs} Tab 👉 Giảm {combo.discount / 1000}K = chỉ {combo.price / 1000}K
-              </li>
-            ))}
-          </ul>
-          <p>🔥 Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</p>
-          <p>🔥Cần hỗ trợ tải game - Ibox Zalo Support ngay!</p>
-        </div>
-
         <form onSubmit={handleSubmit}>
-          <label>Số lượng Tab</label>
+          <label>Số lượng Tab (tối đa 10)</label>
           <input
             type="number"
             value={tabs}
             min={1}
-            onChange={(e) => setTabs(Number(e.target.value))}
+            max={10} // giới hạn tối đa 10
+            onChange={(e) => setTabs(Math.min(10, Number(e.target.value)))}
             required
           />
 
@@ -99,7 +95,7 @@ function RentalForm() {
           </select>
 
           <p>
-            Tạm tính: <strong>{calculatePrice() / 1000}K</strong>
+            Tạm tính: <strong>{calculatePrice().toLocaleString()} VND</strong>
           </p>
           <button type="submit">Thuê Tab</button>
         </form>
@@ -124,13 +120,15 @@ function RentalForm() {
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
               <button
                 onClick={handleConfirmPayment}
+                disabled={loading}
                 style={{
                   backgroundColor: "#4CAF50",
                   color: "white",
                   border: "none",
                   padding: "10px 20px",
                   borderRadius: "5px",
-                  cursor: "pointer",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.5 : 1,
                 }}
               >
                 Xác nhận
