@@ -162,7 +162,14 @@ const handleRequestChangeTab = async (rentalId) => {
                 {new Date(rental.createdAt).toLocaleString("vi-VN", { timeZone: "Asia/Bangkok" })}
               </td>
               <td data-label="Thời gian còn lại (giờ)">{getRemainingHours(rental)}</td> 
-              <td data-label="Room Code">{rental.roomCode || "Chưa tạo"}</td>
+              <td data-label="Room Code">
+                {rental.roomCode
+                  ? rental.roomCode
+                      .split(" ")             
+                      .slice(0, -1)           
+                      .join(" ")              
+                  : "Chưa tạo"}
+              </td>
               <td data-label="Room Pass">
                 {rental.roomCode ? (
                   <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
