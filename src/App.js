@@ -93,7 +93,6 @@ function App() {
               <Link to="/" className="nav-link" onClick={handleLinkClick}>Trang chủ</Link>
               <Link to="/list" className="nav-link" onClick={handleLinkClick}>Đơn Hàng</Link>
               <Link to="/rent" className="nav-link" onClick={handleLinkClick}>Thuê Tab</Link>
-              <Link to="/guide" className="nav-link" onClick={handleLinkClick}>Hướng dẫn</Link>
               <Link to="/register" className="nav-link" onClick={handleLinkClick}>Đăng ký</Link>
 
               {/* Admin menu chỉ hiện nếu userLevel > 10 */}
