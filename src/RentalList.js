@@ -168,7 +168,7 @@ const handleRequestChangeTab = async (rentalId) => {
                       .split(" ")             
                       .slice(0, -1)           
                       .join(" ")              
-                  : "Chưa tạo"}
+                  : "Chờ 3-5 phút"}
               </td>
               <td data-label="Room Pass">
                 {rental.roomCode ? (
