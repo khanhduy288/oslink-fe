@@ -195,11 +195,12 @@
 .status.expired { color: red; font-weight: bold; }
 .status.retrieved { color: gray; font-weight: bold; }
 .status.pending_extend { color: blue; font-weight: bold; }
-.status.pending_change_tab { color: purple; font-weight: bold; 
+.status.pending_change_tab { color: purple; font-weight: bold; }
 
 /* Animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(0.9); }
 }
+
 
