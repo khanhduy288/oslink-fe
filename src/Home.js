@@ -32,6 +32,7 @@ const Home = () => {
           <div className="warning-content">
             <h3>⚠️ LƯU Ý QUAN TRỌNG</h3>
             <ul style={{ textAlign: "left", paddingLeft: "20px", marginBottom: "15px" }}>
+              <li>✅ App treo game hỗ trợ trên cả Android và iOS, chạy mượt, ổn định !</li>
               <li>❌ Không đổi tên TAB sau khi thuê để tránh tình trạng mất TAB.</li>
               <li>💸 Không hoàn lại tiền trong mọi trường hợp.</li>
               <li>🧪 Hãy test trước khi thuê – liên hệ Support để được hỗ trợ test trong 1 giờ.</li>
