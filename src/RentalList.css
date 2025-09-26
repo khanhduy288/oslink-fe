@@ -1,158 +1,56 @@
 .list-container {
   width: 100%;
-  max-width: 1200px; /* giới hạn trên desktop */
+  max-width: 1200px;
   background-color: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin: 0 auto;
-  overflow-x: auto;
-  box-sizing: border-box; /* fix tràn padding */
+  box-sizing: border-box;
+  overflow: hidden; /* ⚡ fix scroll ngang */
 }
 
-.expired {
-  background-color: #f8d7da !important; /* đỏ nhạt */
-  color: #721c24;
+.rental-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.list-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
+.rental-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  overflow: hidden; /* ⚡ đảm bảo scale không phá layout */
+}
+
+.rental-card:hover {
+  transform: scale(1); /* scale vừa phải */
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* Summary info */
+.card-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-summary div {
+  font-size: 14px;
   color: #333;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed; /* tự co dãn cột */
-}
-
-thead th {
-  background-color: #83b3fc;
-  color: white;
-  padding: 12px;
-  text-align: left;
-  border-bottom: 2px solid #ddd;
-}
-
-tbody td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  word-wrap: break-word;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-tbody tr:hover {
-  background-color: #f1f1f1;
-  transition: background-color 0.2s;
-}
-
-tbody tr:nth-child(even) {
-  background-color: #fafafa;
-}
-
-/* Responsive: màn hình nhỏ */
-@media screen and (max-width: 768px) {
-  .list-container {
-    padding: 10px 15px; /* padding đủ để không tràn lề */
-  }
-
-  table, thead, tbody, th, td, tr {
-    display: block;
-  }
-
-  thead {
-    display: none;
-  }
-
-  tbody tr {
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    box-sizing: border-box; /* fix tràn padding */
-    overflow: hidden;
-  }
-
-  tbody td {
-    display: flex;
-    flex-wrap: wrap; /* fix chữ dài tràn */
-    justify-content: space-between;
-    padding: 8px 10px;
-  }
-
-  tbody td::before {
-    content: attr(data-label);
-    font-weight: bold;
-    flex: 1 0 45%; /* chiếm tối đa 45% + wrap nếu chữ dài */
-  }
-
-  tbody td span {
-    flex: 1 0 50%;
-    text-align: right;
-  }
-}
-/* RentalList.css */
-
-/* --- Cột thao tác --- */
-.action-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  min-width: 80px;
-}
-
-/* Nút gia hạn */
-.action-btn.extend {
-  background-color: #4caf50;
-  color: white;
-}
-
-.action-btn.extend:hover {
-  background-color: #45a049;
-}
-
-/* Nút đổi tab */
-.action-btn.change-tab {
-  background-color: #2196f3;
-  color: white;
-}
-
-.action-btn.change-tab:hover {
-  background-color: #1976d2;
-}
-
-/* Khi các nút nằm cạnh nhau */
-td[data-label="Thao tác"] div {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap; /* responsive, khi nhỏ sẽ xuống hàng */
-  justify-content: flex-start;
-}
-
-/* Thêm một chút spacing cho span trạng thái */
-td[data-label="Thao tác"] span {
-  padding: 4px 8px;
-  font-weight: 500;
-  color: #555;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-}
-table th,
-table td {
-  text-align: left !important;
-}
-/* Nút Copy Pass */
+/* Room Pass + nút Copy */
 .copy-pass {
   padding: 4px 8px;
   font-size: 12px;
   border-radius: 4px;
-  background-color: #2196F3; /* màu xanh */
+  background-color: #2196F3;
   color: #fff;
   border: none;
   cursor: pointer;
@@ -163,9 +61,86 @@ table td {
   background-color: #1976d2;
 }
 
-/* Đảm bảo container hiển thị flex, khoảng cách đẹp */
-td[data-label="Room Pass"] > div {
+/* Chi tiết khi bấm Xem chi tiết */
+.card-detail {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.toggle-detail-btn {
+  padding: 6px 12px;
+  background: #3498db;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.toggle-detail-btn:hover {
+  background: #2980b9;
+}
+
+/* Action buttons trong chi tiết */
+.action-buttons {
+  margin-top: 10px;
   display: flex;
-  align-items: center;
-  gap: 6px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-buttons button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.btn-cancel:hover {
+  background: #c0392b;
+}
+
+.btn-extend {
+  background: #27ae60;
+  color: #fff;
+}
+
+.btn-extend:hover {
+  background: #1e8449;
+}
+
+/* Expired */
+.expired {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .card-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .toggle-detail-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
 }
