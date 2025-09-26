@@ -30,15 +30,17 @@ useEffect(() => {
 
 const fetchRentals = async () => {
   try {
-    const endpoint = localStorage.getItem("userLevel") >= 10 ? "/admin/rentals" : "/rentals";
+    const endpoint =
+      localStorage.getItem("userLevel") >= 10
+        ? "/admin/rentals"
+        : "/rentals";
+
     const res = await axios.get(`${API_BASE}${endpoint}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    // Sort theo id giảm dần
-    const sortedRentals = res.data.sort((a, b) => b.id - a.id);
-
-    setRentals(sortedRentals);
+    // 👉 Không sort, dùng nguyên dữ liệu BE trả về
+    setRentals(res.data);
   } catch (err) {
     console.error(err);
     toast.error("Lỗi khi tải danh sách rentals");
@@ -376,3 +378,4 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
