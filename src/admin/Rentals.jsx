@@ -172,6 +172,7 @@ const handleCreateSubmit = async () => {
       <h2>Quản lý Rentals</h2>
 
   {/* Bộ lọc trạng thái */}
+{/* --- Lọc trạng thái --- */}
   <div className="filter-bar">
     <label>Lọc theo trạng thái: </label>
     <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
@@ -179,6 +180,7 @@ const handleCreateSubmit = async () => {
       <option value="pending">Đang chờ xác nhận</option>
       <option value="active">Đơn đang chạy</option>
       <option value="expired">Đơn hết hạn</option>
+      <option value="retrieved">Đã thu hồi</option> {/* thêm */}
       <option value="pending_extend">Yêu cầu gia hạn</option>
       <option value="pending_change_tab">Yêu cầu đổi tab</option>
     </select>
@@ -231,13 +233,30 @@ const handleCreateSubmit = async () => {
               <td>{r.id}</td>
               <td>{r.username}</td>
               <td>{r.rentalTime}</td>
-              <td>{r.status}</td>
+              <td>
+                <span className={`status ${r.status}`}>
+                  {r.status === "pending" && "Đang chờ xác nhận"}
+                  {r.status === "active" && "Đơn đang chạy"}
+                  {r.status === "expired" && "Đơn hết hạn"}
+                  {r.status === "retrieved" && "Đã thu hồi"}
+                  {r.status === "pending_extend" && "Yêu cầu gia hạn"}
+                  {r.status === "pending_change_tab" && "Yêu cầu đổi tab"}
+                </span>
+              </td>
               <td>{r.roomCode || "Chưa tạo"}</td>
               <td>{r.requestedExtendMonths ? `${r.requestedExtendMonths} tháng` : "-"}</td>
               <td className="actions">
                 {r.status === "pending" && (
                   <button className="btn-confirm" onClick={() => handleUpdateStatus(r.id, "active")}>
                     Xác nhận
+                  </button>
+                )}
+                {r.status === "expired" && (
+                  <button
+                    className="btn-retrieve"
+                    onClick={() => handleUpdateStatus(r.id, "retrieved")}
+                  >
+                    Thu hồi
                   </button>
                 )}
                 {r.status === "pending_extend" && (
@@ -310,4 +329,3 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
-
