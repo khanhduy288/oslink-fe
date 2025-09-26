@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -24,6 +26,26 @@ function Users() {
       alert("Lỗi khi tải danh sách users");
     }
   };
+
+  const exportExcel = () => {
+  if (!users || users.length === 0) return;
+
+  const data = users.map(u => ({
+    ID: u.id,
+    Username: u.username,
+    Phone: u.phone,
+    Level: u.level,
+    CreatedAt: u.createdAt
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Users");
+
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+  saveAs(blob, "Danh_sach_users.xlsx");
+};
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa user này?")) return;
@@ -71,6 +93,9 @@ function Users() {
   return (
     <div>
       <h2>Quản lý Users</h2>
+      <button onClick={exportExcel} style={{ marginBottom: "12px" }}>
+        Xuất Excel
+      </button>
       <table>
         <thead>
           <tr>
