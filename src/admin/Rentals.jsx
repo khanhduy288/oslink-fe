@@ -99,13 +99,14 @@ const handleUpdateStatus = async (id, status, action = null) => {
     toast.info("Chức năng đang phát triển, vui lòng liên hệ admin support");
   };
 
-  // --- EDIT FUNCTIONS ---
   const handleEditClick = (rental) => {
     setEditingRental(rental);
     setEditData({
+      username: rental.username,
       rentalTime: rental.rentalTime,
       roomCode: rental.roomCode || '',
       requestedExtendMonths: rental.requestedExtendMonths || '',
+      status: rental.status,
     });
   };
 
@@ -303,18 +304,63 @@ const handleCreateSubmit = async () => {
         <div className="modal-overlay" onClick={handleEditCancel}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Sửa Rental ID {editingRental.id}</h3>
+
+            <label>
+              Username:
+              <input
+                type="text"
+                name="username"
+                value={editData.username || ""}
+                onChange={handleEditChange}
+              />
+            </label>
+
             <label>
               Thời gian thuê (phút):
-              <input type="number" name="rentalTime" value={editData.rentalTime} onChange={handleEditChange} />
+              <input
+                type="number"
+                name="rentalTime"
+                value={editData.rentalTime}
+                onChange={handleEditChange}
+              />
             </label>
+
             <label>
               Room Code:
-              <input type="text" name="roomCode" value={editData.roomCode} onChange={handleEditChange} />
+              <input
+                type="text"
+                name="roomCode"
+                value={editData.roomCode}
+                onChange={handleEditChange}
+              />
             </label>
+
             <label>
               Gia hạn (tháng):
-              <input type="number" name="requestedExtendMonths" value={editData.requestedExtendMonths} onChange={handleEditChange} />
+              <input
+                type="number"
+                name="requestedExtendMonths"
+                value={editData.requestedExtendMonths}
+                onChange={handleEditChange}
+              />
             </label>
+
+            <label>
+              Status:
+              <select
+                name="status"
+                value={editData.status || editingRental.status}
+                onChange={handleEditChange}
+              >
+                <option value="pending">Đang chờ xác nhận</option>
+                <option value="active">Đơn đang chạy</option>
+                <option value="expired">Đơn hết hạn</option>
+                <option value="retrieved">Đã thu hồi</option>
+                <option value="pending_extend">Yêu cầu gia hạn</option>
+                <option value="pending_change_tab">Yêu cầu đổi tab</option>
+              </select>
+            </label>
+
             <div className="modal-actions">
               <button className="btn-save" onClick={handleEditSubmit}>Lưu</button>
               <button className="btn-cancel" onClick={handleEditCancel}>Hủy</button>
@@ -322,6 +368,7 @@ const handleCreateSubmit = async () => {
           </div>
         </div>
       )}
+
 
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
