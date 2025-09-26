@@ -76,16 +76,18 @@ function RentalForm() {
         <div className="price-table">
           <h3>💰 Giá cơ bản:</h3>
           <p>👉 150K / 1 Tab / 1 tháng</p>
+        
           <h3>🎁 Combo siêu tiết kiệm:</h3>
           <ul>
-            {comboPrices.map((combo, idx) => (
-              <li key={idx}>
-                {combo.tabs} Tab 👉 Giảm {combo.discount / 1000}K = chỉ {combo.price / 1000}K
-              </li>
-            ))}
+            <li>3 Tab 👉 Giảm 50K = chỉ 400K</li>
+            <li>5 Tab 👉 Giảm 150K = chỉ 600K</li>
+            <li>10 Tab 👉 Giảm 400K = chỉ 1100K</li>
           </ul>
+        
           <p>🔥 Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</p>
-          <p>🔥Cần hỗ trợ tải game - Ibox Zalo Support ngay!</p>
+          <p>🔥 Quá Trình Cấp TAB (3 phút / 1 tab)</p>
+          <p>Nhiều TAB sẽ cấp từng tab vào Room</p>
+          <p>🔥 Cần hỗ trợ tải game - Ibox Zalo Support ngay!</p>
         </div>
         <form onSubmit={handleSubmit}>
           <label>Số lượng Tab (tối đa 10)</label>
