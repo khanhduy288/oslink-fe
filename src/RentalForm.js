@@ -39,25 +39,23 @@ function RentalForm() {
 
 const handleConfirmPayment = async () => {
   const now = Date.now();
+  const waitTime = 180000; // 3 phút
+  const diff = now - lastSubmitTime;
 
-  // Chặn tạo đơn trong vòng 1 phút
-  if (now - lastSubmitTime < 60000) {
-    alert("Vui lòng chờ ít nhất 1 phút trước khi tạo đơn tiếp theo!");
+  if (diff < waitTime) {
+    const remaining = Math.ceil((waitTime - diff) / 1000);
+    alert(`Vui lòng chờ ${remaining} giây trước khi tạo đơn tiếp theo!`);
     return;
   }
 
-  // Kiểm tra login
   if (!token) {
     alert("Bạn chưa đăng nhập!");
     return;
   }
 
-  // Nếu đang xử lý thì không cho click thêm
   if (loading) return;
 
   setLoading(true);
-  setShowQR(false);
-  setLastSubmitTime(now);
 
   try {
     await axios.post(
@@ -66,7 +64,9 @@ const handleConfirmPayment = async () => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
+    setLastSubmitTime(Date.now());
     alert(`Tạo ${tabs} đơn thành công!`);
+    setShowQR(false);
   } catch (err) {
     console.error(err);
     alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
@@ -74,7 +74,6 @@ const handleConfirmPayment = async () => {
     setLoading(false);
   }
 };
-
 
   return (
     <div className="form-container">
@@ -123,55 +122,64 @@ const handleConfirmPayment = async () => {
         </form>
       </section>
 
-      {showQR && (
-        <div className="qr-modal" onClick={handleCloseQR}>
-          <div className="qr-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Quét QR để thanh toán</h3>
-            <img
-              src="/images/qrthanhtoan.png"
-              alt="QR Payment"
-              style={{ width: "250px", height: "250px", marginBottom: "20px" }}
-            />
-            <p>
-              <strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND
-            </p>
-            <p>
-              <strong>📝 Nội dung CK:</strong> {username}
-            </p>
+{showQR && (
+  <div className="qr-modal" onClick={handleCloseQR}>
+    <div className="qr-content" onClick={(e) => e.stopPropagation()}>
+      <h3 style={{ textAlign: "center" }}>Quét QR hoặc chuyển khoản</h3>
+      <img
+        src="/images/qrthanhtoan.png"
+        alt="QR Payment"
+        style={{ width: "250px", height: "250px", margin: "20px auto", display: "block" }}
+      />
+      <div style={{ textAlign: "center", marginBottom: "15px" }}>
+        <p><strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND</p>
+        <p><strong>📝 Nội dung CK:</strong> {username}</p>
+        <p>🏧 Phương thức thanh toán: Vietinbank | Momo | ZaloPay</p>
+        <p><strong>STK:</strong> 0981263234 - <strong>Trần Văn Đông</strong></p>
+        <p style={{ color: "red", fontWeight: "bold" }}>
+          ⚠️ Lưu ý: Nếu cần support liên hệ admin
+        </p>
+      </div>
 
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-              <button
-                onClick={handleConfirmPayment}
-                disabled={loading}
-                style={{
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "5px",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.5 : 1,
-                }}
-              >
-                Xác nhận
-              </button>
-              <button
-                onClick={handleCloseQR}
-                style={{
-                  backgroundColor: "#f44336",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div style={{ display: "flex", justifyContent: "space-around" }}>
+        <button
+          onClick={handleConfirmPayment}
+          disabled={loading}
+          style={{
+            backgroundColor: "#4CAF50",
+            color: "white",
+            border: "none",
+            padding: "10px 25px",
+            borderRadius: "5px",
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.5 : 1,
+            fontWeight: "bold",
+          }}
+        >
+          {loading ? "Đang xử lý..." : "Xác nhận"}
+        </button>
+        <button
+          onClick={handleCloseQR}
+          style={{
+            backgroundColor: "#f44336",
+            color: "white",
+            border: "none",
+            padding: "10px 25px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          Đóng
+        </button>
+      </div>
+      <p style={{ textAlign: "center", marginTop: "10px", fontSize: "14px", color: "#555" }}>
+        ⚠️ Quá trình cấp TAB mất khoảng 3 phút / 1 tab. Nhiều TAB sẽ cấp từng tab.
+      </p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
