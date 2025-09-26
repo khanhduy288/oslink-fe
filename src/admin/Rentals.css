@@ -229,8 +229,8 @@
   }
 
   .actions button {
-    margin: 1px;
-    padding: 2px 3px;     /* nút nhỏ gọn */
+    margin: 3px;
+    padding: 3px 4px;     /* nút nhỏ gọn */
     font-size: 11px;
   }
 
@@ -243,3 +243,4 @@
     margin-bottom: 7px;
   }
 }
+
