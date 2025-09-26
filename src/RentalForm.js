@@ -37,37 +37,44 @@ function RentalForm() {
 
   const handleCloseQR = () => setShowQR(false);
 
-  const handleConfirmPayment = async () => {
-    const now = Date.now();
-    if (now - lastSubmitTime < 60000) { // 1 phút
-      alert("Vui lòng chờ ít nhất 1 phút trước khi tạo đơn tiếp theo!");
-      return;
-    }
+const handleConfirmPayment = async () => {
+  const now = Date.now();
 
-    if (!token) {
-      alert("Bạn chưa đăng nhập!");
-      return;
-    }
+  // Chặn tạo đơn trong vòng 1 phút
+  if (now - lastSubmitTime < 60000) {
+    alert("Vui lòng chờ ít nhất 1 phút trước khi tạo đơn tiếp theo!");
+    return;
+  }
 
-    setLoading(true);
-    setShowQR(false);
-    setLastSubmitTime(now);
+  // Kiểm tra login
+  if (!token) {
+    alert("Bạn chưa đăng nhập!");
+    return;
+  }
 
-    try {
-      await axios.post(
-        "https://api.tabtreo.com/rentals",
-        { username, tabs, months },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  // Nếu đang xử lý thì không cho click thêm
+  if (loading) return;
 
-      alert(`Tạo ${tabs} đơn thành công!`);
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setShowQR(false);
+  setLastSubmitTime(now);
+
+  try {
+    await axios.post(
+      "https://api.tabtreo.com/rentals",
+      { username, tabs, months },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert(`Tạo ${tabs} đơn thành công!`);
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="form-container">
