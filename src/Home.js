@@ -3,7 +3,7 @@ import { FaLaptop, FaVideo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
-const POPUP_DELAY_HOURS = 24; // sau 24h lại hiện
+const POPUP_DELAY_HOURS = 1; // sau 24h lại hiện
 
 const Home = () => {
   const navigate = useNavigate();
