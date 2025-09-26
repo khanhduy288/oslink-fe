@@ -30,3 +30,57 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+.warning-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* nền mờ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.warning-content {
+  background-color: #4a90e2; /* xanh áo trời, đồng bộ menu */
+  color: #fff;
+  padding: 25px 30px;
+  border-radius: 15px;
+  text-align: center;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.warning-content h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.warning-content ul {
+  margin-bottom: 15px;
+  text-align: left;
+  padding-left: 20px;
+}
+
+.warning-content p {
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.warning-content button {
+  padding: 10px 20px;
+  background-color: #357ab8; /* xanh đậm hover đồng bộ */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.warning-content button:hover {
+  background-color: #2a5d8f;
+}
