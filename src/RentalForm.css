@@ -84,11 +84,24 @@
 }
 
 .qr-content {
-  background-color: white;
-  padding: 20px 30px;
-  border-radius: 10px;
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 20px; /* bo tròn hơn */
+  max-width: 400px;
+  width: 90%;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  position: relative;
+  animation: slideUp 0.3s ease-in-out;
+}
+
+.qr-content img {
+  width: 250px;
+  height: 250px;
+  margin: 15px auto;
+  display: block;
+  border-radius: 20px; /* bo tròn QR image */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .qr-content button {
