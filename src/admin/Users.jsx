@@ -3,9 +3,11 @@ import axios from "axios";
 
 function Users() {
   const [users, setUsers] = useState([]);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetData, setResetData] = useState({ userId: null, newPassword: "" });
   const token = localStorage.getItem("token");
 
-  const API_BASE = "https://api.tabtreo.com"; // <-- URL backend mới
+  const API_BASE = "https://api.tabtreo.com";
 
   useEffect(() => {
     fetchUsers();
@@ -13,12 +15,9 @@ function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(
-        `${API_BASE}/admin/users`, // dùng biến API_BASE
-        {
-          headers: { Authorization: `Bearer ${token}` }, // gửi token admin
-        }
-      );
+      const res = await axios.get(`${API_BASE}/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -29,16 +28,43 @@ function Users() {
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa user này?")) return;
     try {
-      await axios.delete(
-        `${API_BASE}/admin/users/${id}`, // dùng biến API_BASE
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.delete(`${API_BASE}/admin/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchUsers();
     } catch (err) {
       console.error(err);
       alert("Lỗi khi xóa user");
+    }
+  };
+
+  // Mở modal reset pass
+  const handleOpenReset = (userId) => {
+    setResetData({ userId, newPassword: "" });
+    setShowResetModal(true);
+  };
+
+  const handleResetChange = (e) => {
+    setResetData({ ...resetData, newPassword: e.target.value });
+  };
+
+  const handleResetSubmit = async () => {
+    const { userId, newPassword } = resetData;
+    if (!newPassword || newPassword.length < 6) {
+      alert("Mật khẩu phải >= 6 ký tự");
+      return;
+    }
+    try {
+      await axios.post(
+        `${API_BASE}/admin/reset-password`,
+        { userId, newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Reset mật khẩu thành công!");
+      setShowResetModal(false);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Lỗi khi reset mật khẩu");
     }
   };
 
@@ -64,11 +90,40 @@ function Users() {
               <td>{u.level}</td>
               <td>
                 <button onClick={() => handleDelete(u.id)}>Xóa</button>
+                <button
+                  style={{ marginLeft: "8px" }}
+                  onClick={() => handleOpenReset(u.id)}
+                >
+                  Reset Pass
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* --- RESET PASSWORD MODAL --- */}
+      {showResetModal && (
+        <div className="modal-overlay" onClick={() => setShowResetModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Reset mật khẩu</h3>
+            <label>
+              Mật khẩu mới:
+              <input
+                type="password"
+                value={resetData.newPassword}
+                onChange={handleResetChange}
+              />
+            </label>
+            <div style={{ marginTop: "12px" }}>
+              <button onClick={handleResetSubmit}>Xác nhận</button>
+              <button onClick={() => setShowResetModal(false)} style={{ marginLeft: "8px" }}>
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
