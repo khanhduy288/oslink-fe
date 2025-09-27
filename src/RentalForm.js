@@ -137,7 +137,7 @@ const handleConfirmPayment = async () => {
         <p>🏧 Phương thức thanh toán: Vietinbank | Momo | ZaloPay</p>
         <p><strong>STK:</strong> 0981263234 - <strong>Trần Văn Đông</strong></p>
         <p style={{ color: "red", fontWeight: "bold" }}>
-          ⚠️ Lưu ý: Nếu cần support liên hệ admin
+          ⚠️ Lưu ý: Bank xong nhắn cho support duyệt đơn!
         </p>
       </div>
 
