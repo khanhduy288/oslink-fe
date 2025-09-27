@@ -87,38 +87,41 @@
 }
 
 /* Action buttons trong chi tiết */
-.action-buttons {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.action-buttons button {
-  flex: 1;
-  padding: 8px;
+.action-btn {
+  padding: 8px 12px;
   border-radius: 6px;
   border: none;
   cursor: pointer;
+  font-size: 14px;
   transition: all 0.2s;
+  margin-right: 6px;
 }
 
-.btn-cancel {
-  background: #e74c3c;
+.action-btn.extend {
+  background-color: #27ae60;
   color: #fff;
 }
 
-.btn-cancel:hover {
-  background: #c0392b;
+.action-btn.extend:hover {
+  background-color: #1e8449;
 }
 
-.btn-extend {
-  background: #27ae60;
+.action-btn.change-tab {
+  background-color: #3498db;
   color: #fff;
 }
 
-.btn-extend:hover {
-  background: #1e8449;
+.action-btn.change-tab:hover {
+  background-color: #2980b9;
+}
+
+.action-btn.cancel {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.action-btn.cancel:hover {
+  background-color: #c0392b;
 }
 
 /* Expired */
@@ -140,7 +143,10 @@
     text-align: center;
   }
 
-  .action-buttons {
-    flex-direction: column;
+  .action-btn {
+    width: 20%;
+    margin-right: 0;
+    text-align: center;
+    margin-bottom: 6px;
   }
 }
