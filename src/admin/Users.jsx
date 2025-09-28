@@ -28,24 +28,24 @@ function Users() {
   };
 
   const exportExcel = () => {
-  if (!users || users.length === 0) return;
+    if (!users || users.length === 0) return;
 
-  const data = users.map(u => ({
-    ID: u.id,
-    Username: u.username,
-    Phone: u.phone,
-    Level: u.level,
-    CreatedAt: u.createdAt
-  }));
+    const data = users.map((u) => ({
+      ID: u.id,
+      Username: u.username,
+      Phone: u.phone,
+      Level: u.level,
+      CreatedAt: u.createdAt,
+    }));
 
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Users");
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Users");
 
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-  saveAs(blob, "Danh_sach_users.xlsx");
-};
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "Danh_sach_users.xlsx");
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa user này?")) return;
@@ -90,37 +90,78 @@ function Users() {
     }
   };
 
+  // --- STYLES ---
+  const container = { padding: "20px", fontFamily: "Arial, sans-serif" };
+  const title = { fontSize: "22px", fontWeight: "bold", marginBottom: "15px", color: "#333" };
+  const button = {
+    padding: "6px 12px",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "14px",
+    marginRight: "8px",
+  };
+  const btnExport = { ...button, background: "#28a745", color: "#fff" };
+  const btnDelete = { ...button, background: "#dc3545", color: "#fff" };
+  const btnReset = { ...button, background: "#007bff", color: "#fff" };
+  const table = {
+    width: "100%",
+    borderCollapse: "collapse",
+    borderRadius: "8px",
+    overflow: "hidden",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  };
+  const th = { background: "#007bff", color: "#fff", padding: "10px", textAlign: "left" };
+  const td = { border: "1px solid #ddd", padding: "10px", fontSize: "14px" };
+  const modalOverlay = {
+    position: "fixed",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  };
+  const modalContent = {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "10px",
+    width: "300px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+  };
+  const input = {
+    width: "100%",
+    padding: "8px",
+    marginTop: "8px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+  };
+
   return (
-    <div>
-      <h2>Quản lý Users</h2>
-      <button onClick={exportExcel} style={{ marginBottom: "12px" }}>
-        Xuất Excel
-      </button>
-      <table>
+    <div style={container}>
+      <h2 style={title}>Quản lý Users</h2>
+      <button onClick={exportExcel} style={btnExport}>📊 Xuất Excel</button>
+
+      <table style={table}>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Phone</th>
-            <th>Level</th>
-            <th>Thao tác</th>
+            <th style={th}>ID</th>
+            <th style={th}>Username</th>
+            <th style={th}>Phone</th>
+            <th style={th}>Level</th>
+            <th style={th}>Thao tác</th>
           </tr>
         </thead>
         <tbody>
           {users.map((u) => (
             <tr key={u.id}>
-              <td>{u.id}</td>
-              <td>{u.username}</td>
-              <td>{u.phone}</td>
-              <td>{u.level}</td>
-              <td>
-                <button onClick={() => handleDelete(u.id)}>Xóa</button>
-                <button
-                  style={{ marginLeft: "8px" }}
-                  onClick={() => handleOpenReset(u.id)}
-                >
-                  Reset Pass
-                </button>
+              <td style={td}>{u.id}</td>
+              <td style={td}>{u.username}</td>
+              <td style={td}>{u.phone}</td>
+              <td style={td}>{u.level}</td>
+              <td style={td}>
+                <button style={btnDelete} onClick={() => handleDelete(u.id)}>Xóa</button>
+                <button style={btnReset} onClick={() => handleOpenReset(u.id)}>Reset Pass</button>
               </td>
             </tr>
           ))}
@@ -129,8 +170,8 @@ function Users() {
 
       {/* --- RESET PASSWORD MODAL --- */}
       {showResetModal && (
-        <div className="modal-overlay" onClick={() => setShowResetModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div style={modalOverlay} onClick={() => setShowResetModal(false)}>
+          <div style={modalContent} onClick={(e) => e.stopPropagation()}>
             <h3>Reset mật khẩu</h3>
             <label>
               Mật khẩu mới:
@@ -138,13 +179,12 @@ function Users() {
                 type="password"
                 value={resetData.newPassword}
                 onChange={handleResetChange}
+                style={input}
               />
             </label>
-            <div style={{ marginTop: "12px" }}>
-              <button onClick={handleResetSubmit}>Xác nhận</button>
-              <button onClick={() => setShowResetModal(false)} style={{ marginLeft: "8px" }}>
-                Hủy
-              </button>
+            <div style={{ marginTop: "12px", textAlign: "right" }}>
+              <button style={btnReset} onClick={handleResetSubmit}>Xác nhận</button>
+              <button style={btnDelete} onClick={() => setShowResetModal(false)}>Hủy</button>
             </div>
           </div>
         </div>
