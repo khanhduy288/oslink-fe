@@ -130,7 +130,7 @@ function Users() {
     boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
   };
   const input = {
-    width: "100%",
+    width: "95%",
     padding: "8px",
     marginTop: "8px",
     borderRadius: "6px",
@@ -141,7 +141,7 @@ function Users() {
     <div style={container}>
       <h2 style={title}>Quản lý Users</h2>
       <button onClick={exportExcel} style={btnExport}>📊 Xuất Excel</button>
-
+      <br></br>
       <table style={table}>
         <thead>
           <tr>
