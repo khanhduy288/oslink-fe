@@ -5,13 +5,33 @@ import { Link } from "react-router-dom";
 import "./Auth.css";
 
 function Register() {
-  const [form, setForm] = useState({ phone: "", username: "", password: "", confirm: "" });
+  const [form, setForm] = useState({
+    phone: "",
+    username: "",
+    password: "",
+    confirm: "",
+  });
   const [loading, setLoading] = useState(false);
 
   const BACKEND_URL = "https://api.tabtreo.com"; // <-- đổi sang VPS mới
 
+  // Hàm loại bỏ ký tự đặc biệt + dấu tiếng Việt
+  const sanitizeInput = (value) => {
+    return value
+      .normalize("NFD") // tách dấu
+      .replace(/[\u0300-\u036f]/g, "") // xóa dấu
+      .replace(/[^a-zA-Z0-9]/g, ""); // chỉ giữ chữ + số
+  };
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const cleanedValue = sanitizeInput(value);
+
+    if (value !== cleanedValue) {
+      toast.warn("Chỉ cho phép nhập chữ (không dấu) và số!");
+    }
+
+    setForm({ ...form, [name]: cleanedValue });
   };
 
   const validateForm = () => {
@@ -74,6 +94,7 @@ function Register() {
             name="phone"
             value={form.phone}
             onChange={handleChange}
+            placeholder="VD: 0912345678"
             required
           />
         </div>
@@ -85,6 +106,7 @@ function Register() {
             name="username"
             value={form.username}
             onChange={handleChange}
+            placeholder="Chỉ chữ và số (không dấu)"
             required
           />
         </div>
@@ -96,6 +118,7 @@ function Register() {
             name="password"
             value={form.password}
             onChange={handleChange}
+            placeholder="Ít nhất 6 ký tự (chữ và số)"
             required
           />
         </div>
@@ -107,6 +130,7 @@ function Register() {
             name="confirm"
             value={form.confirm}
             onChange={handleChange}
+            placeholder="Nhập lại mật khẩu"
             required
           />
         </div>
