@@ -19,9 +19,14 @@ const Home = () => {
     }
   }, []);
 
-  const handleNavigate = (link) => {
-    navigate(link);
-  };
+const handleNavigate = (link) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+  navigate(link);
+};
 
   const closeWarning = () => setShowWarning(false);
 
