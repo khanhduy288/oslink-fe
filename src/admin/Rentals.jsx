@@ -147,10 +147,12 @@ const handleEditSubmit = async () => {
     await axios.patch(
       `${API_BASE}/rentals/${editingRental.id}`,
       {
-        ...editData,
+        username: editData.username,
+        roomCode: editData.roomCode,
         rentalTime: newRentalTime,
         expiresAt: newExpiresAt,
-        requestedExtendMonths: null // reset sau khi gia hạn
+        requestedExtendMonths: null, // reset sau khi gia hạn
+        status: editData.status
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -163,6 +165,7 @@ const handleEditSubmit = async () => {
     toast.error("Lỗi khi cập nhật rental");
   }
 };
+
 
   const handleEditCancel = () => setEditingRental(null);
 
@@ -410,6 +413,7 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
 
 
 
