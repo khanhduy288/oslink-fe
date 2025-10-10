@@ -27,16 +27,16 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
-useEffect(() => {
-  if (!editingRental) return;
+// useEffect(() => {
+//   if (!editingRental) return;
 
-  const months = Number(editData.requestedExtendMonths) || 0;
-  // Cập nhật rentalTime dựa trên requestedExtendMonths
-  setEditData(prev => ({
-    ...prev,
-    rentalTime: editingRental.rentalTime + months * 30 * 24 * 60 // cộng thêm phút
-  }));
-}, [editData.requestedExtendMonths]);
+//   const months = Number(editData.requestedExtendMonths) || 0;
+//   // Cập nhật rentalTime dựa trên requestedExtendMonths
+//   setEditData(prev => ({
+//     ...prev,
+//     rentalTime: editingRental.rentalTime + months * 30 * 24 * 60 // cộng thêm phút
+//   }));
+// }, [editData.requestedExtendMonths]);
 
 const fetchRentals = async () => {
   try {
@@ -415,6 +415,7 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
 
 
 
