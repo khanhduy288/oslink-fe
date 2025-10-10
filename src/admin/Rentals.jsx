@@ -136,10 +136,6 @@ const handleUpdateStatus = async (id, status, action = null) => {
 const handleEditSubmit = async () => {
   try {
     const months = Number(editData.requestedExtendMonths) || 0;
-    if (months <= 0) {
-      toast.warn("Vui lòng nhập số tháng gia hạn hợp lệ!");
-      return;
-    }
 
     const extendMinutes = months * 30 * 24 * 60; // 1 tháng = 30 ngày
     const oldRentalTime = Number(editingRental.rentalTime);
@@ -167,7 +163,6 @@ const handleEditSubmit = async () => {
     toast.error("Lỗi khi cập nhật rental");
   }
 };
-
 
   const handleEditCancel = () => setEditingRental(null);
 
@@ -415,6 +410,7 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
 
 
 
