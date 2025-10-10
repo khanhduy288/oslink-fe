@@ -127,21 +127,37 @@ const handleUpdateStatus = async (id, status, action = null) => {
     setEditData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleEditSubmit = async () => {
-    try {
-      await axios.patch(
-        `${API_BASE}/rentals/${editingRental.id}`,
-        editData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchRentals();
-      setEditingRental(null);
-      toast.success("Đã cập nhật rental!");
-    } catch (err) {
-      console.error(err);
-      toast.error("Lỗi khi cập nhật rental");
-    }
-  };
+const handleEditSubmit = async () => {
+  try {
+    const months = Number(editData.requestedExtendMonths) || 0;
+    const extendTimeInMinutes = months * 30 * 24 * 60; // 1 tháng = 30 ngày
+
+    // rentalTime mới
+    const newRentalTime = Number(editData.rentalTime) + extendTimeInMinutes;
+
+    // expiresAt mới dựa trên thời điểm hiện tại + newRentalTime
+    const newExpiresAt = new Date(Date.now() + newRentalTime * 60000).toISOString();
+
+    // Gửi patch lên backend
+    await axios.patch(
+      `${API_BASE}/rentals/${editingRental.id}`,
+      {
+        ...editData,
+        rentalTime: newRentalTime,
+        expiresAt: newExpiresAt,
+        requestedExtendMonths: null // reset sau khi gia hạn
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    fetchRentals();
+    setEditingRental(null);
+    toast.success("Đã cập nhật rental và thời gian hết hạn!");
+  } catch (err) {
+    console.error(err);
+    toast.error("Lỗi khi cập nhật rental");
+  }
+};
 
   const handleEditCancel = () => setEditingRental(null);
 
@@ -388,3 +404,4 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
