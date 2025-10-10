@@ -57,6 +57,12 @@ const fetchRentals = async () => {
   }
 };
 
+const formatMinutesToHours = (minutes) => {
+  if (!minutes || minutes <= 0) return "0 giờ";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m > 0 ? `${h} giờ ${m} phút` : `${h} giờ`;
+};
 
 const handleUpdateStatus = async (id, status, action = null) => {
   try {
@@ -261,7 +267,7 @@ const handleCreateSubmit = async () => {
             <tr key={r.id}>
               <td>{r.id}</td>
               <td>{r.username}</td>
-              <td>{r.rentalTime}</td>
+              <td>{formatMinutesToHours(r.rentalTime)}</td>
               <td>
                 <span className={`status ${r.status}`}>
                   {r.status === "pending" && "Đang chờ xác nhận"}
@@ -351,6 +357,7 @@ const handleCreateSubmit = async () => {
                 value={editData.rentalTime}
                 onChange={handleEditChange}
               />
+              <span style={{ marginLeft: "8px" }}>{formatMinutesToHours(editData.rentalTime)}</span>
             </label>
 
             <label>
@@ -404,4 +411,5 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
 
