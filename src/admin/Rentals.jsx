@@ -136,15 +136,17 @@ const handleUpdateStatus = async (id, status, action = null) => {
 const handleEditSubmit = async () => {
   try {
     const months = Number(editData.requestedExtendMonths) || 0;
-    const extendTimeInMinutes = months * 30 * 24 * 60; // 1 tháng = 30 ngày
+    if (months <= 0) {
+      toast.warn("Vui lòng nhập số tháng gia hạn hợp lệ!");
+      return;
+    }
 
-    // rentalTime mới
+    const extendMinutes = months * 30 * 24 * 60; // 1 tháng = 30 ngày
     const oldRentalTime = Number(editingRental.rentalTime);
-    const newRentalTime = oldRentalTime + extendTimeInMinutes;
-
-    // expiresAt mới = oldExpiresAt + (newRentalTime - oldRentalTime)
     const oldExpiresAt = new Date(editingRental.expiresAt).getTime();
-    const newExpiresAt = new Date(oldExpiresAt + (newRentalTime - oldRentalTime) * 60000).toISOString();
+
+    const newRentalTime = oldRentalTime + extendMinutes;
+    const newExpiresAt = new Date(oldExpiresAt + extendMinutes * 60000).toISOString();
 
     await axios.patch(
       `${API_BASE}/rentals/${editingRental.id}`,
@@ -413,6 +415,7 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
 
 
 
