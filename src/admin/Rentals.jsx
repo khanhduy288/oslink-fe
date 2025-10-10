@@ -255,7 +255,7 @@ const handleCreateSubmit = async () => {
           <tr>
             <th>ID</th>
             <th>Username</th>
-            <th>Thời gian thuê (phút)</th>
+            <th>Thời gian thuê</th>
             <th>Status</th>
             <th>Room Code</th>
             <th>Gia hạn</th>
@@ -411,5 +411,6 @@ const handleCreateSubmit = async () => {
 }
 
 export default Rentals;
+
 
 
