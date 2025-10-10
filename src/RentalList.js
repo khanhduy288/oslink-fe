@@ -46,13 +46,14 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
-  const getRemainingHours = (rental) => {
-    const created = dayjs(rental.createdAt).tz("Asia/Bangkok");
-    const rentalEnd = created.add(rental.rentalTime, "minute");
-    const now = dayjs().tz("Asia/Bangkok");
-    const diff = rentalEnd.diff(now, "minute");
-    return diff > 0 ? (diff / 60).toFixed(1) : 0;
-  };
+const getRemainingHours = (rental) => {
+  if (!rental.expiresAt) return 0;
+  const rentalEnd = dayjs(rental.expiresAt).tz("Asia/Bangkok"); // dùng expiresAt trực tiếp
+  const now = dayjs().tz("Asia/Bangkok");
+  const diff = rentalEnd.diff(now, "minute"); // số phút còn lại
+  return diff > 0 ? (diff / 60).toFixed(1) : 0; // đổi ra giờ
+};
+
 
   const handleCancelChangeTab = async (rentalId) => {
     try {
