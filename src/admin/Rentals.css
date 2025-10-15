@@ -1,8 +1,12 @@
+/* Container chính */
 .rentals-container {
-  padding: 20px;
+  width: 100%;
+  padding: 5px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
+/* Tiêu đề */
 .rentals-container h2 {
   margin-bottom: 15px;
   font-size: 22px;
@@ -10,56 +14,86 @@
   color: #333;
 }
 
-/* Container filter + create button */
+/* Filter + nút tạo mới */
 .filter-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Filter bên trái, nút bên phải */
+  justify-content: space-between;
   margin-bottom: 15px;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.filter-bar label {
-  font-weight: 500;
-  color: #444;
+.filter-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.filter-bar select {
+.filter-left input[type="text"],
+.filter-left select {
   padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
   outline: none;
   font-size: 14px;
-  transition: all 0.2s;
+  min-width: 120px;
+  flex: 1 1 150px;
 }
 
-.filter-bar select:hover {
+.filter-left input[type="text"]:focus,
+.filter-left select:hover {
   border-color: #007bff;
+}
+
+/* Nút tạo rental */
+.btn-create {
+  background-color: #1e90ff;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 15px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-create:hover {
+  background-color: #007bff;
+  transform: translateY(-2px);
+}
+
+/* Wrapper table để scroll nếu cần */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
 }
 
 /* Table */
 .rentals-container table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* tối ưu không gian */
   border-radius: 10px;
-  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  word-break: break-word; /* xuống dòng nếu text dài */
+}
+
+.rentals-container th,
+.rentals-container td {
+  padding: 10px;
+  font-size: 14px;
+  text-align: center;
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 .rentals-container th {
   background: #007bff;
   color: white;
-  padding: 12px;
-  font-size: 14px;
   text-transform: uppercase;
-}
-
-.rentals-container td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-  color: #333;
-  text-align: center;
 }
 
 .rentals-container tr:nth-child(even) {
@@ -81,6 +115,7 @@
   font-size: 13px;
   font-weight: 500;
   transition: all 0.2s ease-in-out;
+  white-space: nowrap;
 }
 
 .btn-confirm { background-color: #28a745; }
@@ -88,11 +123,24 @@
 .btn-tab    { background-color: #ff9800; }
 .btn-edit   { background-color: #17a2b8; }
 .btn-delete { background-color: #dc3545; }
+.btn-retrieve { background-color: #f07502; }
 
 .actions button:hover {
   transform: translateY(-2px);
   opacity: 0.9;
 }
+
+.btn-retrieve:hover {
+  background-color: #633108;
+}
+
+/* Status */
+.status.pending { color: orange; font-weight: bold; }
+.status.active { color: green; font-weight: bold; }
+.status.expired { color: red; font-weight: bold; }
+.status.retrieved { color: gray; font-weight: bold; }
+.status.pending_extend { color: blue; font-weight: bold; }
+.status.pending_change_tab { color: purple; font-weight: bold; }
 
 /* Modal */
 .modal-overlay {
@@ -107,6 +155,7 @@
   padding: 20px;
   border-radius: 12px;
   width: 350px;
+  max-width: 95%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -126,7 +175,8 @@
   color: #444;
 }
 
-.modal-content input {
+.modal-content input,
+.modal-content select {
   width: 93%;
   padding: 8px 10px;
   margin-top: 5px;
@@ -136,7 +186,8 @@
   transition: border 0.2s;
 }
 
-.modal-content input:focus {
+.modal-content input:focus,
+.modal-content select:focus {
   border-color: #007bff;
 }
 
@@ -172,52 +223,13 @@
   opacity: 0.9;
 }
 
-/* Nút tạo rental */
-.btn-create {
-  background-color: #1e90ff;
-  color: #fff;
-  border: none;
-  padding: 7px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-bottom: 15px;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.btn-create:hover {
-  background-color: #007bff;
-  transform: translateY(-2px);
-}
-
-.status.pending { color: orange; font-weight: bold; }
-.status.active { color: green; font-weight: bold; }
-.status.expired { color: red; font-weight: bold; }
-.status.retrieved { color: gray; font-weight: bold; }
-.status.pending_extend { color: blue; font-weight: bold; }
-.status.pending_change_tab { color: purple; font-weight: bold; }
-
-/* Nút thu hồi (retrieved) */
-.btn-retrieve {
-  background-color: #f07502; /* đỏ nổi bật */
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.btn-retrieve:hover {
-  background-color: #633108; /* đỏ đậm khi hover */
-}
 /* Animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(0.9); }
 }
 
+/* Mobile responsive */
 @media (max-width: 768px) {
   .rentals-container {
     padding: 5px;
@@ -225,22 +237,22 @@
 
   .rentals-container th,
   .rentals-container td {
-    padding: 2px;         /* thu gọn khoảng cách */
-    font-size: 12px;      /* chữ nhỏ hơn */
+    padding: 4px;         
+    font-size: 12px;
   }
 
   .actions button {
-    margin: 8px;
-    padding: 7px 11px;     /* nút nhỏ gọn */
+    margin: 2px;
+    padding: 5px 8px;     
     font-size: 11px;
-  }
-
-  .rentals-container table {
-    box-shadow: none;     /* bỏ shadow cho nhẹ */
   }
 
   .rentals-container h2 {
     font-size: 18px;
     margin-bottom: 7px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto; /* scroll table nếu cực nhỏ */
   }
 }
