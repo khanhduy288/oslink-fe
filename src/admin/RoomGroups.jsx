@@ -107,7 +107,6 @@ function RoomGroups() {
           <thead>
             <tr>
               <th style={thStyle}>GroupKey</th>
-              <th style={thStyle}>Username</th>
               <th style={thStyle}>Phone</th>
               <th style={thStyle}>RoomCode</th>
               <th style={thStyle}>Thời gian còn lại</th>
@@ -117,7 +116,6 @@ function RoomGroups() {
             {filteredGroups.map((g, idx) => (
               <tr key={idx} style={g.expired ? expiredRow : {}}>
                 <td style={tdStyle}>{g.group}</td>
-                <td style={tdStyle}>{g.username}</td>
                 <td style={tdStyle}>{g.phone}</td>
                 <td style={tdStyle}>
                   {g.rooms.map((r, i) => (
