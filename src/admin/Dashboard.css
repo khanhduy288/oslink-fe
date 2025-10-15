@@ -58,7 +58,7 @@
 }
 
 .page-container {
-  padding: 20px;
+  padding: 5px;
   flex: 1;
   overflow-y: auto;
 }
@@ -120,3 +120,4 @@
     z-index: 10;
   }
 }
+
