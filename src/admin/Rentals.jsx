@@ -10,6 +10,7 @@ function Rentals() {
   const [editData, setEditData] = useState({ rentalTime: '', roomCode: '', requestedExtendMonths: '' });
   const [filterStatus, setFilterStatus] = useState("all"); // trạng thái filter
   const token = localStorage.getItem("token");
+  const [filterUsername, setFilterUsername] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newRentalData, setNewRentalData] = useState({ username: "", tabs: 1, months: 1 });
   const API_BASE = "https://api.tabtreo.com"; 
@@ -27,16 +28,6 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
-// useEffect(() => {
-//   if (!editingRental) return;
-
-//   const months = Number(editData.requestedExtendMonths) || 0;
-//   // Cập nhật rentalTime dựa trên requestedExtendMonths
-//   setEditData(prev => ({
-//     ...prev,
-//     rentalTime: editingRental.rentalTime + months * 30 * 24 * 60 // cộng thêm phút
-//   }));
-// }, [editData.requestedExtendMonths]);
 
 const fetchRentals = async () => {
   try {
@@ -199,33 +190,43 @@ const handleCreateSubmit = async () => {
 
 
   // --- Lọc danh sách theo trạng thái ---
-  const filteredRentals = rentals.filter(r => {
-    if (filterStatus === "all") return true;
-    return r.status === filterStatus;
-  });
+const filteredRentals = rentals.filter(r => {
+  const matchesStatus = filterStatus === "all" || r.status === filterStatus;
+  const matchesUsername = r.username.toLowerCase().includes(filterUsername.toLowerCase());
+  return matchesStatus && matchesUsername;
+});
 
   return (
     <div className="rentals-container">
       <h2>Quản lý Rentals</h2>
-
-  {/* Bộ lọc trạng thái */}
-{/* --- Lọc trạng thái --- */}
-  <div className="filter-bar">
-    <label>Lọc theo trạng thái: </label>
-    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+{/* Filter + search gộp vào filter-left */}
+<div className="filter-bar">
+  <div className="filter-left" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+    <input
+      type="text"
+      placeholder="Tìm username..."
+      value={filterUsername}
+      onChange={(e) => setFilterUsername(e.target.value)}
+      style={{ flex: '1 1 150px', minWidth: '120px' }}
+    />
+    <select
+      value={filterStatus}
+      onChange={(e) => setFilterStatus(e.target.value)}
+      style={{ flex: '1 1 150px', minWidth: '120px' }}
+    >
       <option value="all">Tất cả</option>
       <option value="pending">Đang chờ xác nhận</option>
       <option value="active">Đơn đang chạy</option>
       <option value="expired">Đơn hết hạn</option>
-      <option value="retrieved">Đã thu hồi</option> {/* thêm */}
+      <option value="retrieved">Đã thu hồi</option>
       <option value="pending_extend">Yêu cầu gia hạn</option>
       <option value="pending_change_tab">Yêu cầu đổi tab</option>
     </select>
   </div>
 
-  {/* Nút tạo rental thủ công */}
+  {/* Nút tạo rental */}
   <button className="btn-create" onClick={() => setShowCreateModal(true)}>+ Tạo mới</button>
-
+</div>
   {/* --- CREATE MODAL --- */}
   {showCreateModal && (
     <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
@@ -256,11 +257,11 @@ const handleCreateSubmit = async () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Username</th>
-            <th>Thời gian thuê</th>
+            <th>User</th>
+            <th>Time</th>
             <th>Status</th>
             <th>Room Code</th>
-            <th>Gia hạn</th>
+            {/* <th>Gia hạn</th> */}
             <th>Thao tác</th>
           </tr>
         </thead>
@@ -281,7 +282,6 @@ const handleCreateSubmit = async () => {
                 </span>
               </td>
               <td>{r.roomCode || "Chưa tạo"}</td>
-              <td>{r.requestedExtendMonths ? `${r.requestedExtendMonths} tháng` : "-"}</td>
               <td className="actions">
                 {r.status === "pending" && (
                   <button className="btn-confirm" onClick={() => handleUpdateStatus(r.id, "active")}>
