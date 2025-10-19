@@ -51,43 +51,37 @@ const Home = () => {
 
       <h2 className="home-title">TAB Treo Game Mobile</h2>
 
-      {/* 1. THUÊ TAB */}
-      <div className="card-box" onClick={() => handleNavigate("/rent")}>
-        <FaLaptop size={40} color="#4a90e2" />
-        <div>
-          <h3>1. THUÊ TAB</h3>
-          <p>Chọn và thuê tab game phù hợp với nhu cầu của bạn.</p>
+      <div className="card-grid">
+        <div className="card-box" onClick={() => handleNavigate("/rent")}>
+          <FaLaptop size={40} color="#4a90e2" />
+          <div>
+            <h3>1. THUÊ TAB</h3>
+            <p>Chọn và thuê tab game phù hợp với nhu cầu của bạn.</p>
+          </div>
         </div>
-      </div>
 
-      {/* 2. ĐƠN HÀNG */}
-      <div className="card-box" onClick={() => handleNavigate("/list")}>
-        <FaListAlt size={40} color="#2ecc71" />
-        <div>
-          <h3>2. ĐƠN HÀNG</h3>
-          <p>Xem các đơn hàng đã thuê, trạng thái và thời gian còn lại.</p>
+        <div className="card-box" onClick={() => handleNavigate("/list")}>
+          <FaListAlt size={40} color="#2ecc71" />
+          <div>
+            <h3>2. ĐƠN HÀNG</h3>
+            <p>Xem các đơn hàng đã thuê, trạng thái và thời gian còn lại.</p>
+          </div>
         </div>
-      </div>
 
-      {/* 3. HƯỚNG DẪN */}
-      <div className="card-box" onClick={() => handleNavigate("/guide/videos")}>
-        <FaVideo size={40} color="#f39c12" />
-        <div>
-          <h3>3. HƯỚNG DẪN</h3>
-          <p>Xem video hướng dẫn tải app và game.</p>
+        <div className="card-box" onClick={() => handleNavigate("/guide/videos")}>
+          <FaVideo size={40} color="#f39c12" />
+          <div>
+            <h3>3. HƯỚNG DẪN</h3>
+            <p>Xem video hướng dẫn tải app và game.</p>
+          </div>
         </div>
-      </div>
 
-      {/* 4. TRẢI NGHIỆM THỬ */}
-      <div className="card-box" onClick={() => handleNavigate("/contact")}>
-        <img
-          src="/images/zalo-logo.png"
-          alt="Zalo Logo"
-          style={{ width: 40, height: 40 }}
-        />
-        <div>
-          <h3>4. TRẢI NGHIỆM THỬ - INBOX =&gt; ZALO SUPPORT</h3>
-          <p>Liên hệ ngay qua Zalo để được hỗ trợ nhanh chóng.</p>
+        <div className="card-box" onClick={() => handleNavigate("/contact")}>
+          <img src="/images/zalo-logo.png" alt="Zalo Logo" style={{ width: 40, height: 40 }} />
+          <div>
+            <h3>4. TRẢI NGHIỆM THỬ - INBOX =&gt; ZALO SUPPORT</h3>
+            <p>Liên hệ ngay qua Zalo để được hỗ trợ nhanh chóng.</p>
+          </div>
         </div>
       </div>
     </div>
