@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { FaLaptop, FaVideo } from "react-icons/fa";
+import { FaLaptop, FaVideo, FaListAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
-const POPUP_DELAY_HOURS = 1; // sau 24h lại hiện
+const POPUP_DELAY_HOURS = 1; // sau 1h lại hiện popup
 
 const Home = () => {
   const navigate = useNavigate();
@@ -19,14 +19,14 @@ const Home = () => {
     }
   }, []);
 
-const handleNavigate = (link) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    navigate("/login");
-    return;
-  }
-  navigate(link);
-};
+  const handleNavigate = (link) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    navigate(link);
+  };
 
   const closeWarning = () => setShowWarning(false);
 
@@ -51,6 +51,7 @@ const handleNavigate = (link) => {
 
       <h2 className="home-title">TAB Treo Game Mobile</h2>
 
+      {/* 1. THUÊ TAB */}
       <div className="card-box" onClick={() => handleNavigate("/rent")}>
         <FaLaptop size={40} color="#4a90e2" />
         <div>
@@ -59,18 +60,33 @@ const handleNavigate = (link) => {
         </div>
       </div>
 
+      {/* 2. ĐƠN HÀNG */}
+      <div className="card-box" onClick={() => handleNavigate("/list")}>
+        <FaListAlt size={40} color="#2ecc71" />
+        <div>
+          <h3>2. ĐƠN HÀNG</h3>
+          <p>Xem các đơn hàng đã thuê, trạng thái và thời gian còn lại.</p>
+        </div>
+      </div>
+
+      {/* 3. HƯỚNG DẪN */}
       <div className="card-box" onClick={() => handleNavigate("/guide/videos")}>
         <FaVideo size={40} color="#f39c12" />
         <div>
-          <h3>2. HƯỚNG DẪN</h3>
+          <h3>3. HƯỚNG DẪN</h3>
           <p>Xem video hướng dẫn tải app và game.</p>
         </div>
       </div>
 
+      {/* 4. TRẢI NGHIỆM THỬ */}
       <div className="card-box" onClick={() => handleNavigate("/contact")}>
-        <img src="/images/zalo-logo.png" alt="Zalo Logo" style={{ width: 40, height: 40 }} />
+        <img
+          src="/images/zalo-logo.png"
+          alt="Zalo Logo"
+          style={{ width: 40, height: 40 }}
+        />
         <div>
-          <h3>3. TRẢI NGHIỆM THỬ - INBOX =&gt; ZALO SUPPORT</h3>
+          <h3>4. TRẢI NGHIỆM THỬ - INBOX =&gt; ZALO SUPPORT</h3>
           <p>Liên hệ ngay qua Zalo để được hỗ trợ nhanh chóng.</p>
         </div>
       </div>
