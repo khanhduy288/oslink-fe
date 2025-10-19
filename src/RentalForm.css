@@ -1,36 +1,39 @@
 .form-container {
-  max-width: 400px; /* giới hạn chiều rộng form */
-  margin: 30px auto; /* căn giữa */
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  max-width: 420px;
+  margin: 30px auto;
+  padding: 18px;
+  border: 1px solid #dce3ec;
+  border-radius: 10px;
+  background-color: #f3f6fa; /* nhẹ hơn để card trắng nổi bật */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .form-container h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   color: #1E90FF;
+  font-size: 20px;
 }
 
 .form-container form {
   display: flex;
   flex-direction: column;
-  gap: 15px; /* khoảng cách giữa các input */
+  gap: 12px;
 }
 
 .form-container label {
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 14.5px;
 }
 
 .form-container input,
 .form-container select {
-  padding: 8px 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%; /* vẫn chiếm toàn bộ form nhưng form có max-width */
+  padding: 7px 10px;
+  font-size: 15px;
+  border: 1px solid #c8d5e0;
+  border-radius: 6px;
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -38,45 +41,92 @@
 .form-container select:focus {
   outline: none;
   border-color: #1E90FF;
+  background-color: #fff;
 }
 
 .form-container button {
-  padding: 10px;
+  padding: 9px;
   font-size: 16px;
-  background-color: #61dafb;
+  background-color: #1E90FF;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.25s;
 }
 
 .form-container button:hover {
-  background-color: #21a1f1;
+  background-color: #1874d1;
 }
 
-/* Style bảng giá */
+/* 🌟 Bảng giá gọn gàng, có phân tầng rõ */
 .price-table {
-  background-color: #e6f2ff;
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 15px 18px;
+  box-shadow: 0 4px 14px rgba(30, 144, 255, 0.1);
+  margin: 20px 0;
+  color: #333;
+  font-size: 14.5px;
+  line-height: 1.6;
+  border: 1px solid #e2ecf9;
 }
 
 .price-table h3 {
-  margin-bottom: 10px;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  color: #1976d2;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.price-table p {
+  margin: 5px 0;
 }
 
 .price-table ul {
-  padding-left: 20px;
-  margin-bottom: 10px;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 5px;
 }
+
+.price-table li {
+  background: #f7faff;
+  border-left: 4px solid #1E90FF;
+  padding: 7px 10px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.price-table li:hover {
+  background: #eaf3ff;
+}
+
+.price-table strong {
+  color: #111;
+}
+
+.price-table .highlight {
+  background: linear-gradient(90deg, #fff7b3, #ffef99);
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 🧾 QR Modal */
 .qr-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -85,31 +135,70 @@
 
 .qr-content {
   background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 20px; /* bo tròn hơn */
-  max-width: 400px;
+  padding: 22px 26px;
+  border-radius: 20px;
+  max-width: 380px;
   width: 90%;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.3s ease-in-out;
 }
 
 .qr-content img {
-  width: 250px;
-  height: 250px;
-  margin: 15px auto;
+  width: 220px;
+  height: 220px;
+  margin: 10px auto 15px;
   display: block;
-  border-radius: 20px; /* bo tròn QR image */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .qr-content button {
-  margin-top: 15px;
+  margin-top: 12px;
   padding: 8px 15px;
   border: none;
   background-color: #007bff;
   color: white;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.25s;
+}
+
+.qr-content button:hover {
+  background-color: #0056b3;
+}
+
+/* 🔄 Animation mở QR */
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 📱 Responsive cho mobile */
+@media (max-width: 480px) {
+  .form-container {
+    margin: 20px 10px;
+    padding: 15px;
+  }
+
+  .price-table {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .qr-content {
+    max-width: 90%;
+    padding: 18px 20px;
+  }
+
+  .qr-content img {
+    width: 180px;
+    height: 180px;
+  }
 }
