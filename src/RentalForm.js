@@ -18,7 +18,6 @@ function RentalForm() {
   const comboPrices = [
     { tabs: 3, discount: 50000, price: 400000 },
     { tabs: 5, discount: 150000, price: 600000 },
-    { tabs: 10, discount: 400000, price: 1100000 },
   ];
 
   const calculatePrice = () => {
@@ -87,23 +86,24 @@ function RentalForm() {
         <h2>Thuê Tab</h2>
 
         <div className="price-table">
-          <h3>💰 Giá cơ bản:</h3>
-          <p>👉 150K / 1 Tab / 1 tháng (Gói thường)</p>
+          <h3>💰 Giá cơ bản</h3>
+          <p><strong>150.000 VND</strong> / 1 Tab / 1 tháng <span className="highlight">(Gói Thường)</span></p>
 
-          <h3>🎁 Combo siêu tiết kiệm:</h3>
+          <h3>🎁 Combo siêu tiết kiệm</h3>
           <ul>
-            <li>3 Tab 👉 Giảm 50K = chỉ 400K</li>
-            <li>5 Tab 👉 Giảm 150K = chỉ 600K</li>
-            <li>10 Tab 👉 Giảm 400K = chỉ 1100K</li>
+            <li>3 Tab 👉 Giảm <strong>50K</strong> → chỉ <strong>400K</strong></li>
+            <li>5 Tab 👉 Giảm <strong>150K</strong> → chỉ <strong>600K</strong></li>
           </ul>
 
-          <h3>🌟 Gói VIP:</h3>
-          <p>👉 250K / 1 Tab / 1 tháng — Ưu tiên cấp Tab nhanh + hỗ trợ riêng</p>
+          <h3>🌟 Gói VIP</h3>
+          <p><strong>250.000 VND</strong> / 1 Tab / 1 tháng</p>
+          <p>Ưu tiên cấp Tab nhanh ⚡ + hỗ trợ riêng 🎧</p>
 
-          <p>🔥 Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</p>
-          <p>🔥 Quá Trình Cấp TAB (3 phút / 1 tab)</p>
-          <p>Nhiều TAB sẽ cấp từng tab vào Room</p>
-          <p>🔥 Cần hỗ trợ tải game - Ibox Zalo Support ngay!</p>
+          <div style={{ marginTop: "10px" }}>
+            <p>🔥 <strong>Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</strong></p>
+            <p>⏱️ Quá trình cấp Tab: <strong>~3 phút / 1 Tab</strong></p>
+            <p>💬 Cần hỗ trợ tải game? <strong>Liên hệ Zalo Support</strong></p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>
