@@ -5,6 +5,8 @@ import { saveAs } from "file-saver";
 
 function Users() {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchPhone, setSearchPhone] = useState("");
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetData, setResetData] = useState({ userId: null, newPassword: "" });
   const token = localStorage.getItem("token");
@@ -21,11 +23,24 @@ function Users() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
+      setFilteredUsers(res.data);
     } catch (err) {
       console.error(err);
       alert("Lỗi khi tải danh sách users");
     }
   };
+
+  // Lọc theo số điện thoại
+  useEffect(() => {
+    if (searchPhone.trim() === "") {
+      setFilteredUsers(users);
+    } else {
+      const lower = searchPhone.toLowerCase();
+      setFilteredUsers(
+        users.filter((u) => u.phone?.toLowerCase().includes(lower))
+      );
+    }
+  }, [searchPhone, users]);
 
   const exportExcel = () => {
     if (!users || users.length === 0) return;
@@ -60,7 +75,6 @@ function Users() {
     }
   };
 
-  // Mở modal reset pass
   const handleOpenReset = (userId) => {
     setResetData({ userId, newPassword: "" });
     setShowResetModal(true);
@@ -91,37 +105,80 @@ function Users() {
   };
 
   // --- STYLES ---
-  const container = { padding: "20px", fontFamily: "Arial, sans-serif" };
-  const title = { fontSize: "22px", fontWeight: "bold", marginBottom: "15px", color: "#333" };
+  const container = {
+    padding: "16px",
+    fontFamily: "Arial, sans-serif",
+    backgroundColor: "#f8fafc",
+    minHeight: "100vh",
+    boxSizing: "border-box",
+  };
+
+  const title = {
+    fontSize: "22px",
+    fontWeight: "bold",
+    marginBottom: "15px",
+    color: "#333",
+    textAlign: "center",
+  };
+
+  const controls = {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+    marginBottom: "20px",
+  };
+
+  const input = {
+    padding: "8px 10px",
+    border: "1px solid #ccc",
+    borderRadius: "6px",
+    width: "220px",
+    fontSize: "14px",
+  };
+
   const button = {
-    padding: "6px 12px",
+    padding: "8px 12px",
     border: "none",
     borderRadius: "6px",
     cursor: "pointer",
     fontSize: "14px",
-    marginRight: "8px",
   };
+
   const btnExport = { ...button, background: "#28a745", color: "#fff" };
   const btnDelete = { ...button, background: "#dc3545", color: "#fff" };
   const btnReset = { ...button, background: "#007bff", color: "#fff" };
+
+  const tableWrapper = {
+    overflowX: "auto",
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  };
+
   const table = {
     width: "100%",
     borderCollapse: "collapse",
-    borderRadius: "8px",
-    overflow: "hidden",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    minWidth: "600px",
   };
+
   const th = { background: "#007bff", color: "#fff", padding: "10px", textAlign: "left" };
   const td = { border: "1px solid #ddd", padding: "10px", fontSize: "14px" };
+
   const modalOverlay = {
     position: "fixed",
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: "rgba(0,0,0,0.5)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1000,
   };
+
   const modalContent = {
     background: "#fff",
     padding: "20px",
@@ -129,44 +186,63 @@ function Users() {
     width: "300px",
     boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
   };
-  const input = {
-    width: "95%",
-    padding: "8px",
-    marginTop: "8px",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
-  };
 
   return (
     <div style={container}>
-      <h2 style={title}>Quản lý Users</h2>
-      <button onClick={exportExcel} style={btnExport}>📊 Xuất Excel</button>
-      <br></br>
-      <table style={table}>
-        <thead>
-          <tr>
-            <th style={th}>ID</th>
-            <th style={th}>Username</th>
-            <th style={th}>Phone</th>
-            <th style={th}>Level</th>
-            <th style={th}>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td style={td}>{u.id}</td>
-              <td style={td}>{u.username}</td>
-              <td style={td}>{u.phone}</td>
-              <td style={td}>{u.level}</td>
-              <td style={td}>
-                <button style={btnDelete} onClick={() => handleDelete(u.id)}>Xóa</button>
-                <button style={btnReset} onClick={() => handleOpenReset(u.id)}>Reset Pass</button>
-              </td>
+      <h2 style={title}>👤 Quản lý Users</h2>
+
+      <div style={controls}>
+        <input
+          type="text"
+          placeholder="🔍 Tìm theo số điện thoại..."
+          value={searchPhone}
+          onChange={(e) => setSearchPhone(e.target.value)}
+          style={input}
+        />
+        <button onClick={exportExcel} style={btnExport}>
+          📊 Xuất Excel
+        </button>
+      </div>
+
+      <div style={tableWrapper}>
+        <table style={table}>
+          <thead>
+            <tr>
+              <th style={th}>ID</th>
+              <th style={th}>Username</th>
+              <th style={th}>Phone</th>
+              <th style={th}>Level</th>
+              <th style={th}>Thao tác</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredUsers.length === 0 ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+                  Không tìm thấy người dùng nào.
+                </td>
+              </tr>
+            ) : (
+              filteredUsers.map((u) => (
+                <tr key={u.id}>
+                  <td style={td}>{u.id}</td>
+                  <td style={td}>{u.username}</td>
+                  <td style={td}>{u.phone}</td>
+                  <td style={td}>{u.level}</td>
+                  <td style={td}>
+                    <button style={btnDelete} onClick={() => handleDelete(u.id)}>
+                      Xóa
+                    </button>
+                    <button style={btnReset} onClick={() => handleOpenReset(u.id)}>
+                      Reset Pass
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* --- RESET PASSWORD MODAL --- */}
       {showResetModal && (
@@ -179,12 +255,16 @@ function Users() {
                 type="password"
                 value={resetData.newPassword}
                 onChange={handleResetChange}
-                style={input}
+                style={{ ...input, width: "95%", marginTop: "8px" }}
               />
             </label>
             <div style={{ marginTop: "12px", textAlign: "right" }}>
-              <button style={btnReset} onClick={handleResetSubmit}>Xác nhận</button>
-              <button style={btnDelete} onClick={() => setShowResetModal(false)}>Hủy</button>
+              <button style={btnReset} onClick={handleResetSubmit}>
+                Xác nhận
+              </button>
+              <button style={btnDelete} onClick={() => setShowResetModal(false)}>
+                Hủy
+              </button>
             </div>
           </div>
         </div>
