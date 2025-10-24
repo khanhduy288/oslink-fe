@@ -115,9 +115,11 @@ const handleUpdateStatus = async (id, status, action = null) => {
       rentalTime: rental.rentalTime,
       roomCode: rental.roomCode || '',
       requestedExtendMonths: rental.requestedExtendMonths || '',
+      expiresAt: rental.expiresAt ? rental.expiresAt.slice(0,16) : "",
       status: rental.status,
     });
   };
+
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -128,11 +130,9 @@ const handleEditSubmit = async () => {
   try {
     const months = Number(editData.requestedExtendMonths) || 0;
 
-    const extendMinutes = months * 30 * 24 * 60; // 1 tháng = 30 ngày
-    const oldRentalTime = Number(editingRental.rentalTime);
-    const oldExpiresAt = new Date(editingRental.expiresAt).getTime();
+    const oldExpiresAt = new Date(editData.expiresAt).getTime();
+    const extendMinutes = months * 30 * 24 * 60;
 
-    const newRentalTime = oldRentalTime + extendMinutes;
     const newExpiresAt = new Date(oldExpiresAt + extendMinutes * 60000).toISOString();
 
     await axios.patch(
@@ -140,20 +140,20 @@ const handleEditSubmit = async () => {
       {
         username: editData.username,
         roomCode: editData.roomCode,
-        rentalTime: newRentalTime,
+        rentalTime: Number(editData.rentalTime), // admin tự nhập => lấy trực tiếp luôn
         expiresAt: newExpiresAt,
-        requestedExtendMonths: null, // reset sau khi gia hạn
-        status: editData.status
+        requestedExtendMonths: null,
+        status: editData.status,
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     fetchRentals();
     setEditingRental(null);
-    toast.success("Đã cập nhật rental và thời gian hết hạn!");
+    toast.success("✅ Đã cập nhật rental!");
   } catch (err) {
     console.error(err);
-    toast.error("Lỗi khi cập nhật rental");
+    toast.error("❌ Lỗi khi cập nhật rental");
   }
 };
 
@@ -373,6 +373,16 @@ const filteredRentals = rentals.filter(r => {
             </label>
 
             <label>
+              Hết hạn lúc:
+              <input
+                type="datetime-local"
+                name="expiresAt"
+                value={editData.expiresAt}
+                onChange={handleEditChange}
+              />
+            </label>
+
+            <label>
               Gia hạn (tháng):
               <input
                 type="number"
@@ -413,11 +423,5 @@ const filteredRentals = rentals.filter(r => {
 }
 
 export default Rentals;
-
-
-
-
-
-
 
 
