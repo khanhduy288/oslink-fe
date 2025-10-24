@@ -77,15 +77,8 @@ const getRemainingHours = (rental) => {
     }
   };
 
-  const calculatePrice = (tabs, months) => {
-    const applicableCombo = [...comboPrices].reverse().find((combo) => tabs >= combo.tabs);
-    if (applicableCombo) {
-      const comboCount = Math.floor(tabs / applicableCombo.tabs);
-      const remainderTabs = tabs % applicableCombo.tabs;
-      return comboCount * applicableCombo.price * months + remainderTabs * basePrice * months;
-    } else {
-      return tabs * basePrice * months;
-    }
+  const calculatePrice = (months) => {
+    return basePrice * months; // basePrice = 150000 => 150k / tháng
   };
 
   const isExpired = (rental) => {
@@ -100,20 +93,28 @@ const getRemainingHours = (rental) => {
   const handleConfirmExtend = async () => {
     const { rental, months } = extendModal;
     if (!rental) return;
-    const tabs = Math.ceil(rental.rentalTime / (30 * 24 * 60));
-    const extendTimeInMinutes = tabs * months * 30 * 24 * 60;
+
+    // 1 tab cố định → chỉ cộng theo số tháng
+    const extendTimeInMinutes = months * 30 * 24 * 60;
+
     try {
       await axios.post(
         `${BACKEND_URL}/rentals/${rental.id}/request-extend`,
-        { requestedExtendMonths: months, tabs, extendTimeInMinutes },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          requestedExtendMonths: months,
+          extendTimeInMinutes,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
-      alert("Yêu cầu gia hạn đã gửi, chờ admin xác nhận!");
-      closeExtendModal();
+
+      toast.success("Gửi yêu cầu gia hạn thành công!");
+      setExtendModal({ show: false, rental: null, months: 1 });
       fetchRentals();
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Lỗi khi gửi yêu cầu gia hạn");
+    } catch (error) {
+      console.error("Lỗi khi gửi yêu cầu gia hạn:", error);
+      toast.error("Không thể gửi yêu cầu. Vui lòng thử lại!");
     }
   };
 
@@ -202,7 +203,8 @@ const getRemainingHours = (rental) => {
             </select>
 
             <p>
-              Tạm tính: <strong>{calculatePrice(Math.ceil(extendModal.rental.rentalTime / (30 * 24 * 60)), extendModal.months) / 1000} K</strong>
+              Tạm tính:
+              <strong>{calculatePrice(extendModal.months) / 1000} K</strong>
             </p>
 
             <div style={{ textAlign: "center", margin: "20px 0" }}>
