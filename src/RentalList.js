@@ -77,9 +77,12 @@ const getRemainingHours = (rental) => {
     }
   };
 
-  const calculatePrice = (months) => {
-    return basePrice * months; // basePrice = 150000 => 150k / tháng
+  // Thay vì basePrice cố định
+  const calculatePrice = (rental, months) => {
+    if (!rental.pricePerTab) return 0;
+    return rental.pricePerTab * months;
   };
+
 
   const isExpired = (rental) => {
     const created = dayjs.utc(rental.createdAt).tz("Asia/Bangkok");
@@ -203,8 +206,9 @@ const getRemainingHours = (rental) => {
       </select>
 
       <p>
-        Tạm tính: <strong>{calculatePrice(extendModal.months) / 1000} K</strong>
+        Tạm tính: <strong>{calculatePrice(extendModal.rental, extendModal.months).toLocaleString()} VND</strong>
       </p>
+
 
       <div style={{ textAlign: "center", margin: "20px 0" }}>
         <p>Quét mã QR để thanh toán</p>

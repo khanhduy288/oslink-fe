@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -37,6 +36,7 @@ function Stats() {
     fetchData();
   }, [token]);
 
+  // Tính doanh thu theo combo
   const calcRevenue = (tabs) => {
     const comboPrices = [
       { tabs: 10, price: 1100 },
@@ -60,6 +60,7 @@ function Stats() {
     return total;
   };
 
+  // Gộp rentals theo username + createdAt
   const rentalsGrouped = Object.values(
     rentals.reduce((acc, r) => {
       const key = `${r.username}-${r.createdAt}`;
@@ -69,71 +70,66 @@ function Stats() {
     }, {})
   );
 
+  // Doanh thu theo tháng
   const revenueByMonth = rentalsGrouped.reduce((acc, r) => {
     const date = new Date(r.createdAt);
-    const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}`;
+    const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,"0")}`;
     acc[monthKey] = (acc[monthKey] || 0) + calcRevenue(r.tabs);
     return acc;
   }, {});
 
   const sortedMonths = Object.keys(revenueByMonth).sort();
 
+  // Tính % tăng/giảm doanh thu so với tháng trước
+  const revenueChanges = sortedMonths.map((month, index) => {
+    if(index === 0) return { month, revenue: revenueByMonth[month], change: null };
+    const prev = revenueByMonth[sortedMonths[index - 1]];
+    const current = revenueByMonth[month];
+    const change = ((current - prev) / prev) * 100;
+    return { month, revenue: current, change };
+  });
+
+  // Top 5 users theo số rental
   const rentalCountByUser = rentalsGrouped.reduce((acc, r) => {
     acc[r.username] = (acc[r.username] || 0) + 1;
     return acc;
   }, {});
 
   const topUsers = Object.entries(rentalCountByUser)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,5);
 
-// Hàm export Excel
-const exportExcel = () => {
-  const wb = XLSX.utils.book_new();
+  // Export Excel
+  const exportExcel = () => {
+    const wb = XLSX.utils.book_new();
 
-  // --- Sheet 1: Doanh thu theo tháng ---
-  const revenueByMonth = rentalsGrouped.reduce((acc, r) => {
-    const date = new Date(r.createdAt);
-    const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}`;
-    acc[monthKey] = (acc[monthKey] || 0) + calcRevenue(r.tabs);
-    return acc;
-  }, {});
-
-  const sheetMonth = XLSX.utils.json_to_sheet(
-    Object.entries(revenueByMonth).map(([month, revenue]) => ({
-      Tháng: month,
-      "Doanh thu (K)": revenue
-    }))
-  );
-  XLSX.utils.book_append_sheet(wb, sheetMonth, "Doanh thu theo tháng");
-
-  // --- Sheet 2: Doanh thu theo ngày ---
-  const revenueByDay = rentalsGrouped.reduce((acc, r) => {
-    const date = new Date(r.createdAt);
-    const dayKey = `${date.getFullYear()}-${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
-    acc[dayKey] = (acc[dayKey] || 0) + calcRevenue(r.tabs);
-    return acc;
-  }, {});
-
-  const sheetDay = XLSX.utils.json_to_sheet(
-    Object.entries(revenueByDay)
-      .sort(([a], [b]) => new Date(a) - new Date(b)) // sắp xếp ngày tăng dần
-      .map(([day, revenue]) => ({
-        Ngày: day,
+    const sheetMonth = XLSX.utils.json_to_sheet(
+      Object.entries(revenueByMonth).map(([month, revenue]) => ({
+        Tháng: month,
         "Doanh thu (K)": revenue
       }))
-  );
-  XLSX.utils.book_append_sheet(wb, sheetDay, "Doanh thu theo ngày");
+    );
+    XLSX.utils.book_append_sheet(wb, sheetMonth, "Doanh thu theo tháng");
 
-  // Lưu file
-  XLSX.writeFile(wb, `Stats_${new Date().toISOString().slice(0,10)}.xlsx`);
-};
+    const revenueByDay = rentalsGrouped.reduce((acc, r) => {
+      const date = new Date(r.createdAt);
+      const dayKey = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,"0")}-${date.getDate().toString().padStart(2,"0")}`;
+      acc[dayKey] = (acc[dayKey] || 0) + calcRevenue(r.tabs);
+      return acc;
+    }, {});
+
+    const sheetDay = XLSX.utils.json_to_sheet(
+      Object.entries(revenueByDay)
+        .sort(([a],[b]) => new Date(a)-new Date(b))
+        .map(([day, revenue]) => ({
+          Ngày: day,
+          "Doanh thu (K)": revenue
+        }))
+    );
+    XLSX.utils.book_append_sheet(wb, sheetDay, "Doanh thu theo ngày");
+
+    XLSX.writeFile(wb, `Stats_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
 
   const data = {
     labels: sortedMonths,
@@ -143,14 +139,14 @@ const exportExcel = () => {
         data: sortedMonths.map(m => revenueByMonth[m]),
         backgroundColor: "rgba(30,144,255,0.6)",
         borderRadius: 6
-      },
-    ],
+      }
+    ]
   };
 
   const options = {
     plugins: {
       legend: { display: true },
-      tooltip: { 
+      tooltip: {
         callbacks: {
           label: (context) => `${context.dataset.label}: ${context.raw},000₫`
         }
@@ -167,25 +163,43 @@ const exportExcel = () => {
   return (
     <div>
       <h2>Thống kê Doanh thu</h2>
-      <button onClick={exportExcel} style={{ marginBottom: '15px', padding: '6px 12px' }}>
+      <button onClick={exportExcel} style={{ marginBottom:'15px', padding:'6px 12px' }}>
         📥 Xuất Excel
       </button>
-      <Bar data={data} options={options} />
 
-      <div style={{ marginTop: '20px' }}>
-        {sortedMonths.map((month) => (
-          <div key={month} style={{ marginBottom: '5px' }}>
-            <strong>{month}:</strong> {revenueByMonth[month]},000₫
-          </div>
-        ))}
+      <div style={{ display: "flex", gap: "40px" }}>
+        {/* Biểu đồ */}
+        <div style={{ flex: 2 }}>
+          <Bar data={data} options={options} />
+        </div>
+
+        {/* Doanh số % thay đổi */}
+        <div style={{ flex: 1 }}>
+          <h3>Doanh số so với tháng trước</h3>
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {revenueChanges.map(({ month, revenue, change }) => (
+              <li key={month} style={{ marginBottom:"8px" }}>
+                <strong>{month}:</strong> {revenue},000₫{" "}
+                {change !== null && (
+                  <span style={{
+                    color: change >=0 ? "green":"red",
+                    fontWeight:"bold"
+                  }}>
+                    {change>=0 ? "↑" : "↓"} {Math.abs(change).toFixed(1)}%
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div style={{ marginTop: '30px' }}>
+      <div style={{ marginTop:'30px' }}>
         <h3>Top 5 Users có nhiều rental nhất</h3>
         <ol>
-          {topUsers.map(([username, count]) => (
+          {topUsers.map(([username,count]) => (
             <li key={username}>
-              {username}: {count} rental{count > 1 ? 's' : ''}
+              {username}: {count} rental{count>1?'s':''}
             </li>
           ))}
         </ol>
