@@ -84,6 +84,20 @@ const Home = () => {
           </div>
         </div>
       </div>
+            {/* Nút chat Zalo nổi góc màn hình */}
+      <a
+        href="https://zalo.me/0972734444"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="zalo-chat-button"
+      >
+        <img
+          src="/images/zalologo1.png"
+          alt="Zalo Chat"
+          className="zalo-chat-icon"
+        />
+      </a>
+
     </div>
   );
 };

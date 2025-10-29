@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const API_BASE = "https://api.tabtreo.com";
 
@@ -18,11 +20,13 @@ function RoomGroups() {
         });
 
         const groupMap = {};
+
         (res.data || []).forEach((g) => {
           g.rooms.forEach((room, i) => {
             const username = g.usernames?.[i] || "";
             const phone = g.phones?.[i] || "";
-            const shortRoom = room.split(" ").slice(0, -1).join(" ");
+            const createdAt = room.createdAt || null;
+            const shortRoom = room.roomCode.split(" ").slice(0, -1).join(" ");
             const remaining = g.remainingTimes?.[i];
             const key = `${g.group}-${username}-${phone}`;
 
@@ -37,8 +41,12 @@ function RoomGroups() {
               };
             }
 
-            groupMap[key].rooms.push(shortRoom);
+            groupMap[key].rooms.push({
+              roomCode: shortRoom,
+              createdAt
+            });
             groupMap[key].remainingTimes.push(remaining);
+
             if (g.expired) groupMap[key].expired = true;
           });
         });
@@ -47,8 +55,10 @@ function RoomGroups() {
           Object.values(groupMap).map((g) => ({
             ...g,
             count: g.rooms.length,
+            minRemaining: Math.min(...(g.remainingTimes.filter(t => t != null)))
           }))
         );
+
       } catch (err) {
         console.error("Fetch rooms error:", err);
       } finally {
@@ -59,15 +69,6 @@ function RoomGroups() {
     fetchRooms();
   }, []);
 
-  const filteredGroups = groups.filter((g) => {
-    const matchFilter =
-      filter === "all" ? true : filter === "active" ? !g.expired : g.expired;
-    const matchSearch = g.rooms.some((r) =>
-      r.toLowerCase().includes(search.toLowerCase())
-    );
-    return matchFilter && (search === "" || matchSearch);
-  });
-
   const formatTime = (minutes) => {
     if (minutes == null) return "-";
     const days = Math.floor(minutes / 1440);
@@ -75,6 +76,53 @@ function RoomGroups() {
     const mins = minutes % 60;
     return `${days}d ${hrs}h ${mins}m`;
   };
+
+  // ✅ Export Excel
+  const exportToExcel = () => {
+    const exportData = [];
+
+    groups.forEach((g, stt) => {
+      g.rooms.forEach((room, i) => {
+        exportData.push({
+          STT: stt + 1,
+          GroupKey: g.group,
+          Phone: g.phone,
+          RoomCode: room.roomCode,
+          "Thời gian còn lại": formatTime(g.remainingTimes[i]),
+          "Ngày tạo": room.createdAt
+            ? new Date(room.createdAt).toLocaleString("vi-VN")
+            : ""
+        });
+      });
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "RoomGroups");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array"
+    });
+
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    saveAs(blob, `RoomGroups_${new Date().toLocaleDateString("vi-VN")}.xlsx`);
+  };
+
+  const filteredGroups = groups
+    .filter((g) => {
+      const matchFilter =
+        filter === "all" ? true : filter === "active" ? !g.expired : g.expired;
+
+      const matchSearch = g.rooms.some((r) =>
+        r.roomCode.toLowerCase().includes(search.toLowerCase())
+      );
+
+      return matchFilter && (search === "" || matchSearch);
+    })
+    .sort((a, b) => a.minRemaining - b.minRemaining);
 
   const containerStyle = {
     padding: "16px",
@@ -98,6 +146,16 @@ function RoomGroups() {
     gap: "10px",
     justifyContent: "center",
     marginBottom: "20px",
+  };
+
+  const buttonStyle = {
+    padding: "8px 12px",
+    fontSize: "14px",
+    backgroundColor: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer"
   };
 
   const inputStyle = {
@@ -151,7 +209,9 @@ function RoomGroups() {
 
   return (
     <div style={containerStyle}>
-      <h2 style={titleStyle}>📋 Danh sách Rentals</h2>
+      <h2 style={titleStyle}>
+        👥 Quản lý Groups ({filteredGroups.length})
+      </h2>
 
       <div style={controlsWrapper}>
         <input
@@ -170,6 +230,11 @@ function RoomGroups() {
           <option value="active">Còn hạn</option>
           <option value="expired">Hết hạn</option>
         </select>
+
+        {/* ✅ NÚT EXPORT */}
+        <button onClick={exportToExcel} style={buttonStyle}>
+          📤 Xuất Excel
+        </button>
       </div>
 
       {filteredGroups.length === 0 ? (
@@ -181,6 +246,7 @@ function RoomGroups() {
           <table style={tableStyle}>
             <thead>
               <tr>
+                <th style={thStyle}>STT</th>
                 <th style={thStyle}>GroupKey</th>
                 <th style={thStyle}>Phone</th>
                 <th style={thStyle}>RoomCode</th>
@@ -190,16 +256,39 @@ function RoomGroups() {
             <tbody>
               {filteredGroups.map((g, idx) => (
                 <tr key={idx} style={g.expired ? expiredRow : {}}>
+                  <td style={tdStyle}>{idx + 1}</td>
                   <td style={tdStyle}>{g.group}</td>
                   <td style={tdStyle}>{g.phone}</td>
                   <td style={tdStyle}>
-                    {g.rooms.map((r, i) => (
-                      <div key={i}>{r}</div>
+                    {g.rooms.map((room, i) => (
+                      <div key={i} style={{
+                        marginBottom: "6px",
+                        padding: "6px",
+                        backgroundColor: "#f5f8ff",
+                        borderRadius: "6px",
+                        border: "1px solid #e1e7ff"
+                      }}>
+                        <div style={{ fontWeight: "600", color: "#1a3e72" }}>
+                          {room.roomCode}
+                        </div>
+                        {room.createdAt && (
+                          <div style={{ fontSize: "12px", color: "#666" }}>
+                            🕒 {new Date(room.createdAt).toLocaleString("vi-VN")}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </td>
+
                   <td style={tdStyle}>
                     {g.remainingTimes.map((t, i) => (
-                      <div key={i}>{formatTime(t)}</div>
+                      <div key={i} style={{
+                        marginBottom: "6px",
+                        fontWeight: "bold",
+                        color: t > 0 ? "#007b55" : "red"
+                      }}>
+                        {formatTime(t)}
+                      </div>
                     ))}
                   </td>
                 </tr>

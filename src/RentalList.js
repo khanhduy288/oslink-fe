@@ -187,38 +187,105 @@ const getRemainingHours = (rental) => {
         </div>
       ))}
 
-      {/* Modal gia hạn */}
-      {extendModal.show && (
-        <div className="qr-modal" onClick={closeExtendModal}>
-          <div className="qr-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Gia hạn đơn ID: {extendModal.rental.id}</h3>
-            <label>Thời gian gia hạn (tháng):</label>
-            <select
-              value={extendModal.months}
-              onChange={(e) => setExtendModal({ ...extendModal, months: Number(e.target.value) })}
-            >
-              {[...Array(12)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1} tháng</option>
-              ))}
-            </select>
+{/* Modal gia hạn */}
+{extendModal.show && (
+  <div className="qr-modal" onClick={closeExtendModal}>
+    <div className="qr-content" onClick={(e) => e.stopPropagation()}>
+      <h3>Gia hạn đơn ID: {extendModal.rental.id}</h3>
+      <label>Thời gian gia hạn (tháng):</label>
+      <select
+        value={extendModal.months}
+        onChange={(e) => setExtendModal({ ...extendModal, months: Number(e.target.value) })}
+      >
+        {[...Array(12)].map((_, i) => (
+          <option key={i + 1} value={i + 1}>{i + 1} tháng</option>
+        ))}
+      </select>
 
-            <p>
-              Tạm tính:
-              <strong>{calculatePrice(extendModal.months) / 1000} K</strong>
-            </p>
+      <p>
+        Tạm tính: <strong>{calculatePrice(extendModal.months) / 1000} K</strong>
+      </p>
 
-            <div style={{ textAlign: "center", margin: "20px 0" }}>
-              <p>Quét mã QR để thanh toán</p>
-              <img src="/images/qrthanhtoan.png" alt="QR thanh toán" style={{ width: "220px", border: "1px solid #ccc", borderRadius: "8px" }} />
-            </div>
+      <div style={{ textAlign: "center", margin: "20px 0" }}>
+        <p>Quét mã QR để thanh toán</p>
 
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
-              <button onClick={handleConfirmExtend} style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px 20px", borderRadius: "5px" }}>Xác nhận</button>
-              <button onClick={closeExtendModal} style={{ backgroundColor: "#f44336", color: "white", padding: "10px 20px", borderRadius: "5px" }}>Đóng</button>
-            </div>
-          </div>
+        <img
+          src="/images/qrthanhtoan.png"
+          alt="QR thanh toán"
+          style={{
+            width: "350px",
+            height: "350px",
+            maxWidth: "95%",
+            objectFit: "contain",
+            border: "2px solid #ccc",
+            borderRadius: "16px",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+            background: "#fff",
+            padding: "8px"
+          }}
+        />
+
+        {/* ✅ Nội dung chuyển khoản (đã thêm số tháng) */}
+        <div style={{
+          marginTop: "10px",
+          background: "#f6faff",
+          padding: "10px",
+          borderRadius: "8px",
+          border: "1px solid #d4e3ff",
+          display: "inline-block",
+          fontSize: "14px"
+        }}>
+          <strong>Nội dung CK:</strong>{" "}
+          <span style={{ color: "#007bff", fontWeight: "600" }}>
+            Gia hạn {extendModal.months}T{" "}
+            {extendModal.rental.roomCode
+              ? extendModal.rental.roomCode.split(" ").slice(0, -1).join("_")
+              : "Room"}
+          </span>
+          <button
+            onClick={() => {
+              const txt = `Gia hạn ${extendModal.months}T ${
+                extendModal.rental.roomCode
+                  ? extendModal.rental.roomCode.split(" ").slice(0, -1).join("_")
+                  : "Room"
+              }`;
+              navigator.clipboard.writeText(txt);
+              toast.success("Đã copy nội dung!");
+            }}
+            style={{
+              marginLeft: "8px",
+              padding: "4px 8px",
+              fontSize: "12px",
+              borderRadius: "6px",
+              border: "none",
+              cursor: "pointer",
+              background: "#007bff",
+              color: "#fff"
+            }}
+          >
+            Copy
+          </button>
         </div>
-      )}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+        <button
+          onClick={handleConfirmExtend}
+          style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px 20px", borderRadius: "5px" }}
+        >
+          Xác nhận
+        </button>
+        <button
+          onClick={closeExtendModal}
+          style={{ backgroundColor: "#f44336", color: "white", padding: "10px 20px", borderRadius: "5px" }}
+        >
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       <ToastContainer />
     </div>

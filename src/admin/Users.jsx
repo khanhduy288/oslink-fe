@@ -30,17 +30,21 @@ function Users() {
     }
   };
 
-  // Lọc theo số điện thoại
   useEffect(() => {
     if (searchPhone.trim() === "") {
       setFilteredUsers(users);
     } else {
       const lower = searchPhone.toLowerCase();
       setFilteredUsers(
-        users.filter((u) => u.phone?.toLowerCase().includes(lower))
+        users.filter(
+          (u) =>
+            u.phone?.toLowerCase().includes(lower) ||
+            u.username?.toLowerCase().includes(lower)
+        )
       );
     }
   }, [searchPhone, users]);
+
 
   const exportExcel = () => {
     if (!users || users.length === 0) return;
@@ -189,12 +193,14 @@ function Users() {
 
   return (
     <div style={container}>
-      <h2 style={title}>👤 Quản lý Users</h2>
+      <h2 style={title}>
+        👤 Quản lý Users ({filteredUsers.length})
+      </h2>
 
       <div style={controls}>
         <input
           type="text"
-          placeholder="🔍 Tìm theo số điện thoại..."
+          placeholder="🔍 Tìm theo SDT or Username..."
           value={searchPhone}
           onChange={(e) => setSearchPhone(e.target.value)}
           style={input}

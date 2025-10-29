@@ -8,7 +8,7 @@ function RentalForm() {
 
   const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
-  const [packageType, setPackageType] = useState("normal"); // 👈 Thêm gói thường/vip
+  const [packageType, setPackageType] = useState("normal"); // gói thường/vip
   const [showQR, setShowQR] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
@@ -20,10 +20,9 @@ function RentalForm() {
     { tabs: 5, discount: 150000, price: 600000 },
   ];
 
+  // Tính tổng tiền
   const calculatePrice = () => {
-    if (packageType === "vip") {
-      return tabs * vipPrice * months;
-    }
+    if (packageType === "vip") return tabs * vipPrice * months;
 
     const applicableCombo = [...comboPrices].reverse().find(combo => tabs >= combo.tabs);
     if (applicableCombo) {
@@ -35,6 +34,21 @@ function RentalForm() {
     }
   };
 
+  // Lấy giá mỗi tab để gửi lên BE
+  const getPricePerTab = () => {
+    if (packageType === "vip") return vipPrice;
+
+    const applicableCombo = [...comboPrices].reverse().find(combo => tabs >= combo.tabs);
+    if (applicableCombo) {
+      const comboCount = Math.floor(tabs / applicableCombo.tabs);
+      const remainderTabs = tabs % applicableCombo.tabs;
+      const totalPrice = comboCount * applicableCombo.price + remainderTabs * basePrice;
+      return Math.ceil(totalPrice / tabs);
+    } else {
+      return basePrice;
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setShowQR(true);
@@ -42,43 +56,46 @@ function RentalForm() {
 
   const handleCloseQR = () => setShowQR(false);
 
-  const handleConfirmPayment = async () => {
-    const now = Date.now();
-    const waitTime = 180000; // 3 phút
-    const diff = now - lastSubmitTime;
+const handleConfirmPayment = async () => {
+  const now = Date.now();
+  const waitTime = 180000; // 3 phút
+  const diff = now - lastSubmitTime;
 
-    if (diff < waitTime) {
-      const remaining = Math.ceil((waitTime - diff) / 1000);
-      alert(`Vui lòng chờ ${remaining} giây trước khi tạo đơn tiếp theo!`);
-      return;
-    }
+  if (diff < waitTime) {
+    const remaining = Math.ceil((waitTime - diff) / 1000);
+    alert(`Vui lòng chờ ${remaining} giây trước khi tạo đơn tiếp theo!`);
+    return;
+  }
 
-    if (!token) {
-      alert("Bạn chưa đăng nhập!");
-      return;
-    }
+  if (!token) {
+    alert("Bạn chưa đăng nhập!");
+    return;
+  }
 
-    if (loading) return;
+  if (loading) return;
+  setLoading(true);
 
-    setLoading(true);
+  // Tính giá per tab theo gói
+  const pricePerTab = packageType === "vip" ? 250000 : 150000;
 
-    try {
-      await axios.post(
-        "https://api.tabtreo.com/rentals",
-        { username, tabs, months, packageType },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  try {
+    await axios.post(
+      "https://api.tabtreo.com/rentals",
+      { username, tabs, months, pricePerTab },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      setLastSubmitTime(Date.now());
-      alert(`Tạo ${tabs} tab (${packageType === "vip" ? "VIP" : "Thường"}) thành công!`);
-      setShowQR(false);
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLastSubmitTime(Date.now());
+    alert(`Tạo ${tabs} tab thành công!`);
+    setShowQR(false);
+  } catch (err) {
+    console.error(err);
+    alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="form-container">
@@ -87,7 +104,9 @@ function RentalForm() {
 
         <div className="price-table">
           <h3>💰 Giá cơ bản</h3>
-          <p><strong>150.000 VND</strong> / 1 Tab / 1 tháng <span className="highlight">(Gói Thường)</span></p>
+          <p>
+            <strong>150.000 VND</strong> / 1 Tab / 1 tháng <span className="highlight">(Gói Thường)</span>
+          </p>
 
           <h3>🎁 Combo siêu tiết kiệm</h3>
           <ul>
@@ -149,7 +168,7 @@ function RentalForm() {
               style={{ width: "250px", height: "250px", margin: "20px auto", display: "block" }}
             />
             <div style={{ textAlign: "center", marginBottom: "15px" }}>
-              <p><strong>💵 Số tiền cần chuyển:</strong> {calculatePrice().toLocaleString()} VND</p>
+              <p><strong>💵 Số tiền cần chuyển:</strong> {(getPricePerTab() * tabs * months).toLocaleString()} VND</p>
               <p>
                 <strong>📝 Nội dung CK:</strong>{" "}
                 {packageType === "vip" ? `${username} vip` : username}

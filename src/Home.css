@@ -123,3 +123,55 @@
 .warning-content button:hover {
   background: #0056b3;
 }
+.zalo-chat-button {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  width: 60px;
+  height: 60px;
+  z-index: 9999;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.zalo-chat-button:hover {
+  transform: scale(1.12);
+}
+
+.zalo-chat-icon {
+  width: 48px;
+  height: 48px;
+}
+/* Hiệu ứng rung rung */
+@keyframes zaloShake {
+  0% { transform: translate(0, 0) rotate(0); }
+  20% { transform: translate(-2px, 2px) rotate(-3deg); }
+  40% { transform: translate(2px, -2px) rotate(3deg); }
+  60% { transform: translate(-2px, 2px) rotate(-3deg); }
+  80% { transform: translate(2px, -2px) rotate(3deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+
+.zalo-chat-button {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  width: 60px;
+  height: 60px;
+  z-index: 9999;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  animation: zaloShake 1.2s infinite ease-in-out;
+}
+
