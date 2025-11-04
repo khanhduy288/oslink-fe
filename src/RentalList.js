@@ -46,6 +46,57 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
+// Gửi yêu cầu gia hạn đơn hiện tại
+const handleConfirmExtend = async (rental, months) => {
+  if (!rental) return;
+  const extendTimeInMinutes = months * 30 * 24 * 60;
+
+  try {
+    await axios.post(
+      `${BACKEND_URL}/rentals/${rental.id}/request-extend`,
+      { requestedExtendMonths: months, extendTimeInMinutes },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.success("Gửi yêu cầu gia hạn thành công!");
+    fetchRentals();
+  } catch (err) {
+    console.error(err);
+    toast.error("Không thể gửi yêu cầu gia hạn!");
+  }
+};
+
+// Gửi yêu cầu đổi tab
+const handleRequestChangeTab = async (rentalId) => {
+  try {
+    await axios.patch(
+      `${BACKEND_URL}/rentals/${rentalId}`,
+      { status: "pending_change_tab" },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.success("Đã gửi yêu cầu đổi tab, chờ admin duyệt");
+    fetchRentals();
+  } catch (err) {
+    console.error(err);
+    toast.error("Gửi yêu cầu đổi tab thất bại!");
+  }
+};
+
+// Hủy yêu cầu đổi tab
+const handleCancelChangeTab = async (rentalId) => {
+  try {
+    await axios.patch(
+      `${BACKEND_URL}/rentals/${rentalId}`,
+      { status: "active" },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.info("Đã hủy yêu cầu đổi tab");
+    fetchRentals();
+  } catch (err) {
+    console.error(err);
+    toast.error("Hủy yêu cầu thất bại!");
+  }
+};
+
 // ✅ Hàm tính thời gian còn lại: trả về dạng "X ngày Y giờ Z phút"
   const getRemainingTime = (rental) => {
     if (!rental.expiresAt) return "0 phút";
@@ -118,33 +169,6 @@ function RentalList() {
     setExtendModal({ show: false, months: 1 });
   };
 
-  const handleConfirmExtend = async () => {
-    const months = extendModal.months;
-    const extendTimeInMinutes = months * 30 * 24 * 60;
-
-    try {
-      await Promise.all(
-        selectedRentals.map((id) =>
-          axios.post(
-            `${BACKEND_URL}/rentals/${id}/request-extend`,
-            {
-              requestedExtendMonths: months,
-              extendTimeInMinutes,
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
-        )
-      );
-
-      toast.success("Gửi yêu cầu gia hạn combo thành công!");
-      setSelectedRentals([]);
-      setExtendModal({ show: false, months: 1 });
-      fetchRentals();
-    } catch (error) {
-      console.error("Lỗi khi gửi yêu cầu gia hạn combo:", error);
-      toast.error("Không thể gửi yêu cầu. Vui lòng thử lại!");
-    }
-  };
 
   if (loading) return <p>Đang tải danh sách thuê...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -225,23 +249,44 @@ function RentalList() {
 
           {showDetail[rental.id] && (
             <div className="card-detail">
-              <p>
-                <strong>Username:</strong> {rental.username}
-              </p>
-              <p>
-                <strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ
-              </p>
-              <p>
-                <strong>Ngày tạo:</strong>{" "}
-                {dayjs(rental.createdAt)
-                  .tz("Asia/Bangkok")
-                  .format("DD/MM/YYYY HH:mm:ss")}
-              </p>
-              <p>
-                <strong>Status:</strong> {rental.status}
-              </p>
+              <p><strong>Username:</strong> {rental.username}</p>
+              <p><strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ</p>
+              <p><strong>Status:</strong> {rental.status}</p>
+
+              <div style={{ marginTop: "10px", display: "flex", gap: "6px" }}>
+                {rental.status === "active" && (
+                  <>
+                    <button
+                      className="action-btn extend"
+                      onClick={() => openExtendModal(rental)} // Mở modal gia hạn
+                    >
+                      Gia hạn
+                    </button>
+
+                    <button
+                      className="action-btn change-tab"
+                      onClick={() => handleRequestChangeTab(rental.id)}
+                    >
+                      Đổi tab
+                    </button>
+                  </>
+                )}
+
+                {rental.status === "pending_change_tab" && (
+                  <>
+                    <span>Đang chờ đổi tab...</span>
+                    <button
+                      className="action-btn cancel"
+                      onClick={() => handleCancelChangeTab(rental.id)}
+                    >
+                      Hủy yêu cầu
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           )}
+
         </div>
       ))}
 
