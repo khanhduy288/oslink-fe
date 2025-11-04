@@ -13,6 +13,7 @@ import Contact from "./Contact";
 import './App.css';
 import GuideImagePage from "./GuideImagePage";
 import GuideVideoPage from "./GuideVideoPage";
+import UserLogs from "./UserLogs"; // thêm import
 
 // Admin pages
 import Dashboard from "./admin/Dashboard";
@@ -94,6 +95,9 @@ function App() {
               <Link to="/" className="nav-link" onClick={handleLinkClick}>Trang chủ</Link>
               <Link to="/list" className="nav-link" onClick={handleLinkClick}>Đơn Hàng</Link>
               <Link to="/rent" className="nav-link" onClick={handleLinkClick}>Thuê Tab</Link>
+              <Link to="/user/logs" className="nav-link" onClick={handleLinkClick}>
+                Gần đây
+              </Link>
               <Link to="/register" className="nav-link" onClick={handleLinkClick}>Đăng ký</Link>
 
               {/* Admin menu chỉ hiện nếu userLevel > 10 */}
@@ -146,6 +150,7 @@ function App() {
               <Route path="/login" element={<Login setUsername={setUsername} />} /> 
               <Route path="/register" element={<Register />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/user/logs" element={<UserLogs />} />
 
               {/* Admin routes chỉ cho userLevel > 10 */}
               {userLevel > 10 && (
