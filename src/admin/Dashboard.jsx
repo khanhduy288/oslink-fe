@@ -21,6 +21,7 @@ function Dashboard() {
           <Link to="users">Quản lý Users</Link>
           <Link to="room-groups">Danh sách Group</Link> 
           <Link to="settings">Cấu hình Tool</Link>
+          <Link to="logs">Lịch sử hoạt động</Link>
         </nav>
       </aside>
 

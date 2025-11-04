@@ -77,16 +77,17 @@ function RoomGroups() {
     return `${days}d ${hrs}h ${mins}m`;
   };
 
-  // ✅ Export Excel
+  // ✅ Sửa lại hàm exportToExcel
   const exportToExcel = () => {
     const exportData = [];
 
     groups.forEach((g, stt) => {
       g.rooms.forEach((room, i) => {
+        // Nếu là dòng đầu tiên của group thì hiển thị group info
         exportData.push({
-          STT: stt + 1,
-          GroupKey: g.group,
-          Phone: g.phone,
+          STT: i === 0 ? stt + 1 : "",
+          GroupKey: i === 0 ? g.group : "",
+          Phone: i === 0 ? g.phone : "",
           RoomCode: room.roomCode,
           "Thời gian còn lại": formatTime(g.remainingTimes[i]),
           "Ngày tạo": room.createdAt
@@ -96,8 +97,21 @@ function RoomGroups() {
       });
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    // ✅ Thêm style format (tự căn độ rộng, border, font)
+    const worksheet = XLSX.utils.json_to_sheet(exportData, { origin: "A1" });
     const workbook = XLSX.utils.book_new();
+
+    // Auto width columns theo dữ liệu
+    const colWidths = Object.keys(exportData[0]).map((key) => ({
+      wch: Math.max(
+        key.length,
+        ...exportData.map((r) =>
+          r[key] ? r[key].toString().length + 2 : 5
+        )
+      ),
+    }));
+    worksheet["!cols"] = colWidths;
+
     XLSX.utils.book_append_sheet(workbook, worksheet, "RoomGroups");
 
     const excelBuffer = XLSX.write(workbook, {
@@ -108,8 +122,10 @@ function RoomGroups() {
     const blob = new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     });
+
     saveAs(blob, `RoomGroups_${new Date().toLocaleDateString("vi-VN")}.xlsx`);
   };
+
 
   const filteredGroups = groups
     .filter((g) => {

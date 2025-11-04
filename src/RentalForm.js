@@ -165,22 +165,101 @@ const handleConfirmPayment = async () => {
             <img
               src="/images/qrthanhtoan.png"
               alt="QR Payment"
-              style={{ width: "250px", height: "250px", margin: "20px auto", display: "block" }}
+              style={{
+                width: "250px",
+                height: "250px",
+                margin: "20px auto",
+                display: "block",
+                border: "2px solid #ccc",
+                borderRadius: "12px",
+                background: "#fff",
+                padding: "6px",
+              }}
             />
-            <div style={{ textAlign: "center", marginBottom: "15px" }}>
-              <p><strong>💵 Số tiền cần chuyển:</strong> {(getPricePerTab() * tabs * months).toLocaleString()} VND</p>
-              <p>
-                <strong>📝 Nội dung CK:</strong>{" "}
+
+            {/* 🏦 Thông tin ngân hàng */}
+            <div
+              style={{
+                marginTop: "10px",
+                background: "#f6faff",
+                padding: "12px",
+                borderRadius: "8px",
+                border: "1px solid #d4e3ff",
+                textAlign: "center",
+              }}
+            >
+              <strong>MBank + Viettinbank:</strong>{" "}
+              <span style={{ color: "#007bff", fontWeight: "600" }}>0981263234</span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText("0981263234");
+                  alert("Đã copy STK!");
+                }}
+                style={{
+                  marginLeft: "8px",
+                  padding: "4px 8px",
+                  fontSize: "12px",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  background: "#007bff",
+                  color: "#fff",
+                }}
+              >
+                Copy STK
+              </button>
+            </div>
+
+            {/* 💬 Nội dung CK */}
+            <div
+              style={{
+                marginTop: "10px",
+                background: "#f6faff",
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1px solid #d4e3ff",
+                display: "inline-block",
+                fontSize: "14px",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              <strong>Nội dung CK:</strong>{" "}
+              <span style={{ color: "#007bff", fontWeight: "600" }}>
                 {packageType === "vip" ? `${username} vip` : username}
+              </span>
+              <button
+                onClick={() => {
+                  const txt = packageType === "vip" ? `${username} vip` : username;
+                  navigator.clipboard.writeText(txt);
+                  alert("Đã copy nội dung CK!");
+                }}
+                style={{
+                  marginLeft: "8px",
+                  padding: "4px 8px",
+                  fontSize: "12px",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  background: "#007bff",
+                  color: "#fff",
+                }}
+              >
+                Copy ND
+              </button>
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: "15px" }}>
+              <p>
+                <strong>💵 Số tiền cần chuyển:</strong>{" "}
+                {(getPricePerTab() * tabs * months).toLocaleString()} VND
               </p>
-              <p>🏧 Phương thức thanh toán: Vietinbank | Momo | ZaloPay</p>
-              <p><strong>STK:</strong> 0981263234 - <strong>Trần Văn Đông</strong></p>
               <p style={{ color: "red", fontWeight: "bold" }}>
                 ⚠️ Lưu ý: Bank xong bấm xác nhận gửi bill cho support!
               </p>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "space-around" }}>
+            <div style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}>
               <button
                 onClick={handleConfirmPayment}
                 disabled={loading}
@@ -191,7 +270,7 @@ const handleConfirmPayment = async () => {
                   padding: "10px 25px",
                   borderRadius: "5px",
                   cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.5 : 1,
+                  opacity: loading ? 0.6 : 1,
                   fontWeight: "bold",
                 }}
               >
@@ -212,12 +291,21 @@ const handleConfirmPayment = async () => {
                 Đóng
               </button>
             </div>
-            <p style={{ textAlign: "center", marginTop: "10px", fontSize: "14px", color: "#555" }}>
-              ⚠️ Quá trình cấp TAB mất khoảng 3 phút / 1 tab. Nhiều TAB sẽ cấp từng tab.
+
+            <p
+              style={{
+                textAlign: "center",
+                marginTop: "10px",
+                fontSize: "14px",
+                color: "#555",
+              }}
+            >
+              ⏱️ Quá trình cấp TAB mất khoảng 3 phút / 1 tab. Nhiều TAB sẽ cấp dần từng tab.
             </p>
           </div>
         </div>
       )}
+
     </div>
   );
 }

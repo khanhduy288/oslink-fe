@@ -21,6 +21,7 @@ import Stats from "./admin/Stats";
 import Users from "./admin/Users";
 import Settings from "./admin/Settings";
 import RoomGroups from "./admin/RoomGroups";
+import AdminLogs from "./admin/AdminLogs";
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -154,6 +155,7 @@ function App() {
                   <Route path="users" element={<Users />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="room-groups" element={<RoomGroups />} />   {/* ✅ mới */}
+                  <Route path="logs" element={<AdminLogs />} /> {/* ✅ Thêm trang log */}
                 </Route>
               )}
 

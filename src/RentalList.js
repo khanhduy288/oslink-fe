@@ -46,13 +46,27 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
-  const getRemainingHours = (rental) => {
-    if (!rental.expiresAt) return 0;
+// ✅ Hàm tính thời gian còn lại: trả về dạng "X ngày Y giờ Z phút"
+  const getRemainingTime = (rental) => {
+    if (!rental.expiresAt) return "0 phút";
+
     const rentalEnd = dayjs(rental.expiresAt).tz("Asia/Bangkok");
     const now = dayjs().tz("Asia/Bangkok");
-    const diff = rentalEnd.diff(now, "minute");
-    return diff > 0 ? (diff / 60).toFixed(1) : 0;
+    const diffMinutes = rentalEnd.diff(now, "minute");
+
+    if (diffMinutes <= 0) return "Hết hạn";
+
+    const days = Math.floor(diffMinutes / (24 * 60));
+    const hours = Math.floor((diffMinutes % (24 * 60)) / 60);
+    const minutes = diffMinutes % 60;
+
+    let result = "";
+    if (days > 0) result += `${days}d `;
+    if (hours > 0) result += `${hours}h `;
+    if (minutes > 0) result += `${minutes}m`;
+    return result.trim();
   };
+
 
   const isExpired = (rental) => {
     const created = dayjs.utc(rental.createdAt).tz("Asia/Bangkok");
@@ -83,8 +97,22 @@ function RentalList() {
       toast.info("Hãy chọn ít nhất 1 đơn để gia hạn!");
       return;
     }
+
+    // ✅ Kiểm tra nếu có đơn chưa được xác nhận
+    const invalidRentals = rentals.filter(
+      (r) => selectedRentals.includes(r.id) && r.status !== "active"
+    );
+
+    if (invalidRentals.length > 0) {
+      toast.warning(
+        `Có ${invalidRentals.length} đơn chưa được xác nhận hoặc đang chờ duyệt. Vui lòng chỉ chọn các đơn đang hoạt động (active)!`
+      );
+      return;
+    }
+
     setExtendModal({ show: true, months: 1 });
   };
+
 
   const closeExtendModal = () => {
     setExtendModal({ show: false, months: 1 });
@@ -180,7 +208,7 @@ function RentalList() {
               )}
             </div>
             <div>
-              <strong>Còn lại:</strong> {getRemainingHours(rental)} giờ
+              <strong>Còn lại:</strong> {getRemainingTime(rental)}
             </div>
             <button
               className="toggle-detail-btn"
@@ -260,6 +288,40 @@ function RentalList() {
                 }}
               />
 
+              {/* 🏦 Thông tin STK để khách copy */}
+              <div
+                style={{
+                  marginTop: "14px",
+                  background: "#f6faff",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid #d4e3ff",
+                  textAlign: "center",
+                }}
+              >
+                <strong>MBank + Viettinbank:</strong>{" "}
+                <span style={{ color: "#007bff", fontWeight: "600" }}>0981263234</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText("0981263234");
+                    toast.success("Đã copy STK!");
+                  }}
+                  style={{
+                    marginLeft: "8px",
+                    padding: "4px 8px",
+                    fontSize: "12px",
+                    borderRadius: "6px",
+                    border: "none",
+                    cursor: "pointer",
+                    background: "#007bff",
+                    color: "#fff",
+                  }}
+                >
+                  Copy STK
+                </button>
+              </div>
+
+              {/* 💬 Nội dung chuyển khoản */}
               <div
                 style={{
                   marginTop: "10px",
@@ -277,7 +339,7 @@ function RentalList() {
                 </span>
                 <button
                   onClick={() => {
-                    const txt = `Gia hạn combo ${selectedCount}T ${extendModal.months}T`;
+                    const txt = `Gia hạn combo ${selectedCount}T (${extendModal.months}T)`;
                     navigator.clipboard.writeText(txt);
                     toast.success("Đã copy nội dung!");
                   }}
@@ -292,7 +354,7 @@ function RentalList() {
                     color: "#fff",
                   }}
                 >
-                  Copy
+                  Copy ND
                 </button>
               </div>
             </div>
@@ -330,6 +392,7 @@ function RentalList() {
           </div>
         </div>
       )}
+
 
       <ToastContainer />
     </div>
