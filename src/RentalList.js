@@ -98,19 +98,19 @@ function RentalList() {
       return;
     }
 
-    // ✅ Kiểm tra nếu có đơn chưa được xác nhận
-    const invalidRentals = rentals.filter(
-      (r) => selectedRentals.includes(r.id) && r.status !== "active"
+  // ✅ Kiểm tra nếu có đơn chưa được xác nhận (không phải active hoặc expired)
+  const invalidRentals = rentals.filter(
+    (r) => selectedRentals.includes(r.id) && !["active", "expired"].includes(r.status)
+  );
+
+  if (invalidRentals.length > 0) {
+    toast.warning(
+      `Có ${invalidRentals.length} đơn chưa được xác nhận hoặc đang chờ duyệt. Vui lòng chỉ chọn các đơn đang hoạt động hoặc đã hết hạn!`
     );
+    return;
+  }
 
-    if (invalidRentals.length > 0) {
-      toast.warning(
-        `Có ${invalidRentals.length} đơn chưa được xác nhận hoặc đang chờ duyệt. Vui lòng chỉ chọn các đơn đang hoạt động (active)!`
-      );
-      return;
-    }
-
-    setExtendModal({ show: true, months: 1 });
+  setExtendModal({ show: true, months: 1 });
   };
 
 
