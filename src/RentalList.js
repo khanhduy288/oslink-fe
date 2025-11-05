@@ -46,6 +46,22 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
+
+const handleRequestChangeTab = async (rentalId) => {
+  try {
+    await axios.patch(
+      `${BACKEND_URL}/rentals/${rentalId}`,
+      { status: "pending_change_tab" },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.success("Đã gửi yêu cầu đổi tab, chờ admin duyệt");
+    fetchRentals();
+  } catch (err) {
+    console.error(err);
+    toast.error("Gửi yêu cầu đổi tab thất bại!");
+  }
+};
+
 // ✅ Hàm tính thời gian còn lại: trả về dạng "X ngày Y giờ Z phút"
   const getRemainingTime = (rental) => {
     if (!rental.expiresAt) return "0 phút";
@@ -225,23 +241,29 @@ function RentalList() {
 
           {showDetail[rental.id] && (
             <div className="card-detail">
-              <p>
-                <strong>Username:</strong> {rental.username}
-              </p>
-              <p>
-                <strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ
-              </p>
-              <p>
-                <strong>Ngày tạo:</strong>{" "}
-                {dayjs(rental.createdAt)
-                  .tz("Asia/Bangkok")
-                  .format("DD/MM/YYYY HH:mm:ss")}
-              </p>
-              <p>
-                <strong>Status:</strong> {rental.status}
-              </p>
+              <p><strong>Username:</strong> {rental.username}</p>
+              <p><strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ</p>
+              <p><strong>Ngày tạo:</strong> {dayjs(rental.createdAt).tz("Asia/Bangkok").format("DD/MM/YYYY HH:mm:ss")}</p>
+              <p><strong>Status:</strong> {rental.status}</p>
+
+              {/* ✅ Nút gửi yêu cầu đổi tab */}
+              <button
+                onClick={() => handleRequestChangeTab(rental.id)}
+                style={{
+                  marginTop: "10px",
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  border: "none",
+                  backgroundColor: "#007bff",
+                  color: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                Đổi tab
+              </button>
             </div>
           )}
+
         </div>
       ))}
 
