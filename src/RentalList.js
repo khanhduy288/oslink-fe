@@ -99,29 +99,36 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
 
   let total = 0;
 
-  // Lọc các đơn 150k
-  const normalTabs = selectedRentalObjects.filter(r => r.pricePerTab === basePrice).length;
-  let remainingTabs = normalTabs;
+  // Chuẩn hóa giá: nếu pricePerTab < basePrice → nâng lên basePrice
+  const normalizedObjects = selectedRentalObjects.map(r => ({
+    ...r,
+    pricePerTab: r.pricePerTab < basePrice ? basePrice : r.pricePerTab,
+  }));
 
-  // Tính combo cho các đơn 150k
-  for (const combo of comboPrices.sort((a, b) => b.tabs - a.tabs)) {
-    const count = Math.floor(remainingTabs / combo.tabs);
+  // Tách các tab giá basePrice
+  let normalTabs = normalizedObjects.filter(r => r.pricePerTab === basePrice).length;
+
+  // Tính combo cho các tab bình thường
+  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
+  for (const combo of sortedCombos) {
+    const count = Math.floor(normalTabs / combo.tabs);
     total += count * combo.price;
-    remainingTabs %= combo.tabs;
+    normalTabs %= combo.tabs;
   }
 
-  // Còn lại tính giá bình thường
-  total += remainingTabs * basePrice;
+  // Còn lại tab lẻ tính giá basePrice
+  total += normalTabs * basePrice;
 
-  // Thêm các đơn VIP / giá khác
-  const vipTotal = selectedRentalObjects
+  // Tab VIP / giá khác (không áp dụng combo)
+  const vipTotal = normalizedObjects
     .filter(r => r.pricePerTab !== basePrice)
-    .reduce((sum, r) => sum + r.pricePerTab * r.tabs, 0);
+    .reduce((sum, r) => sum + r.pricePerTab, 0);
 
   total += vipTotal;
 
   return total * months;
 };
+
 
 
 
@@ -184,9 +191,17 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
   if (rentals.length === 0) return <p>Bạn chưa có đơn thuê nào.</p>;
 
   const selectedCount = selectedRentals.length;
-  const selectedRentalObjects = selectedRentals.map(id => rentals.find(r => r.id === id));
+  // Lấy các rental được chọn, loại bỏ undefined
+  const selectedRentalObjects = selectedRentals
+    .map(id => rentals.find(r => r.id === id))
+    .filter(Boolean);
+
+  // Tổng số tab = số rental (vì mỗi rental 1 tab)
   const totalTabs = selectedRentalObjects.length;
+
+  // Tính tổng tiền
   const totalPrice = calculateTotalPrice(selectedRentalObjects, extendModal.months);
+
 
 
 
