@@ -25,7 +25,6 @@ function RentalList() {
   const comboPrices = [
     { tabs: 3, discount: 50000, price: 400000 },
     { tabs: 5, discount: 150000, price: 600000 },
-    { tabs: 10, discount: 400000, price: 1100000 },
   ];
 
   useEffect(() => {
