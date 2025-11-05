@@ -48,7 +48,7 @@ const getPricePerTab = () => {
   let remainingTabs = tabs;
   let total = 0;
 
-  const sortedCombos = comboPrices.sort((a, b) => b.tabs - a.tabs);
+  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
   for (const combo of sortedCombos) {
     while (remainingTabs >= combo.tabs) {
       total += combo.price;
