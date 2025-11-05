@@ -21,11 +21,6 @@ function RentalList() {
   const token = localStorage.getItem("token");
   const BACKEND_URL = "https://api.tabtreo.com";
 
-  const basePrice = 150000;
-  const comboPrices = [
-    { tabs: 3, discount: 50000, price: 400000 },
-    { tabs: 5, discount: 150000, price: 600000 },
-  ];
 
   useEffect(() => {
     if (!token) {
@@ -95,17 +90,31 @@ const handleRequestChangeTab = async (rentalId) => {
     );
   };
 
-  const calculateComboPrice = (count) => {
-    const combo = comboPrices.find((c) => c.tabs === count);
-    if (combo) return combo.price;
-    if (count > 10) {
-      // Nếu chọn nhiều hơn 10 tab → chia combo
-      const numCombos = Math.floor(count / 10);
-      const remainder = count % 10;
-      return numCombos * 1100000 + calculateComboPrice(remainder);
-    }
-    return count * basePrice; // không đủ combo thì giá gốc
-  };
+const calculateTotalPrice = (selectedRentals, months = 1) => {
+  const basePrice = 150000;
+  const comboPrices = [
+    { tabs: 5, price: 600000 },
+    { tabs: 3, price: 400000 },
+  ];
+
+  // Mỗi đơn = 1 tab
+  const totalTabs = selectedRentals.length;
+
+  let remainingTabs = totalTabs;
+  let total = 0;
+
+  // Áp dụng combo lớn trước
+  for (const combo of comboPrices.sort((a, b) => b.tabs - a.tabs)) {
+    const count = Math.floor(remainingTabs / combo.tabs);
+    total += count * combo.price;
+    remainingTabs %= combo.tabs;
+  }
+
+  // Còn lại tính basePrice
+  total += remainingTabs * basePrice;
+
+  return total * months;
+};
 
   const openExtendModal = () => {
     if (selectedRentals.length === 0) {
@@ -166,7 +175,11 @@ const handleRequestChangeTab = async (rentalId) => {
   if (rentals.length === 0) return <p>Bạn chưa có đơn thuê nào.</p>;
 
   const selectedCount = selectedRentals.length;
-  const totalPrice = calculateComboPrice(selectedCount) * extendModal.months;
+  const selectedRentalObjects = selectedRentals.map(id => rentals.find(r => r.id === id));
+  const totalTabs = selectedRentalObjects.length;
+  const totalPrice = calculateTotalPrice(selectedRentalObjects, extendModal.months);
+
+
 
   return (
     <div className="rental-card-container">
@@ -286,9 +299,7 @@ const handleRequestChangeTab = async (rentalId) => {
             </select>
 
             <p>
-              Tổng tiền:{" "}
-              <strong>{totalPrice.toLocaleString()} VND</strong>{" "}
-              ({selectedCount} tab)
+              Tổng tiền: <strong>{totalPrice.toLocaleString()} VND</strong> ({totalTabs} tab)
             </p>
 
             <div style={{ textAlign: "center", margin: "20px 0" }}>

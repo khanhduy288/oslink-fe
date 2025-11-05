@@ -20,34 +20,47 @@ function RentalForm() {
     { tabs: 5, discount: 150000, price: 600000 },
   ];
 
-  // Tính tổng tiền
-  const calculatePrice = () => {
-    if (packageType === "vip") return tabs * vipPrice * months;
+const calculatePrice = () => {
+  if (packageType === "vip") return tabs * vipPrice * months;
 
-    const applicableCombo = [...comboPrices].reverse().find(combo => tabs >= combo.tabs);
-    if (applicableCombo) {
-      const comboCount = Math.floor(tabs / applicableCombo.tabs);
-      const remainderTabs = tabs % applicableCombo.tabs;
-      return comboCount * applicableCombo.price * months + remainderTabs * basePrice * months;
-    } else {
-      return tabs * basePrice * months;
+  let remainingTabs = tabs;
+  let total = 0;
+  
+  // Áp dụng combo lớn trước, sau đó combo nhỏ, sau đó tab lẻ
+  const sortedCombos = comboPrices.sort((a, b) => b.tabs - a.tabs);
+
+  for (const combo of sortedCombos) {
+    while (remainingTabs >= combo.tabs) {
+      total += combo.price;
+      remainingTabs -= combo.tabs;
     }
-  };
+  }
 
-  // Lấy giá mỗi tab để gửi lên BE
-  const getPricePerTab = () => {
-    if (packageType === "vip") return vipPrice;
+  total += remainingTabs * basePrice;
 
-    const applicableCombo = [...comboPrices].reverse().find(combo => tabs >= combo.tabs);
-    if (applicableCombo) {
-      const comboCount = Math.floor(tabs / applicableCombo.tabs);
-      const remainderTabs = tabs % applicableCombo.tabs;
-      const totalPrice = comboCount * applicableCombo.price + remainderTabs * basePrice;
-      return Math.ceil(totalPrice / tabs);
-    } else {
-      return basePrice;
+  return total * months;
+};
+
+
+const getPricePerTab = () => {
+  if (packageType === "vip") return vipPrice;
+
+  let remainingTabs = tabs;
+  let total = 0;
+
+  const sortedCombos = comboPrices.sort((a, b) => b.tabs - a.tabs);
+  for (const combo of sortedCombos) {
+    while (remainingTabs >= combo.tabs) {
+      total += combo.price;
+      remainingTabs -= combo.tabs;
     }
-  };
+  }
+
+  total += remainingTabs * basePrice;
+
+  return Math.ceil(total / tabs);
+};
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,26 +70,12 @@ function RentalForm() {
   const handleCloseQR = () => setShowQR(false);
 
 const handleConfirmPayment = async () => {
-  const now = Date.now();
-  const waitTime = 180000; // 3 phút
-  const diff = now - lastSubmitTime;
-
-  if (diff < waitTime) {
-    const remaining = Math.ceil((waitTime - diff) / 1000);
-    alert(`Vui lòng chờ ${remaining} giây trước khi tạo đơn tiếp theo!`);
-    return;
-  }
-
-  if (!token) {
-    alert("Bạn chưa đăng nhập!");
-    return;
-  }
-
+  if (!token) { alert("Bạn chưa đăng nhập!"); return; }
   if (loading) return;
   setLoading(true);
 
-  // Tính giá per tab theo gói
-  const pricePerTab = packageType === "vip" ? 250000 : 150000;
+  const pricePerTab = getPricePerTab(); // ✅ dùng hàm mới tính
+  const totalPrice = pricePerTab * tabs * months;
 
   try {
     await axios.post(
@@ -86,7 +85,7 @@ const handleConfirmPayment = async () => {
     );
 
     setLastSubmitTime(Date.now());
-    alert(`Tạo ${tabs} tab thành công!`);
+    alert(`Tạo ${tabs} tab thành công! Tổng: ${totalPrice.toLocaleString()} VND`);
     setShowQR(false);
   } catch (err) {
     console.error(err);
@@ -95,6 +94,7 @@ const handleConfirmPayment = async () => {
     setLoading(false);
   }
 };
+
 
 
   return (
