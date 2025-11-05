@@ -31,39 +31,41 @@ function AdminLogs() {
   );
 
   return (
-    <div className="logs-page">
+    <div className="adminlogs-container">
       <h2>Lịch sử hoạt động</h2>
 
       <input
         type="text"
-        placeholder="Tìm kiếm theo admin hoặc nội dung..."
+        placeholder="Tìm kiếm theo username hoặc nội dung..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="search-input"
       />
 
-      <table className="logs-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Hành động</th>
-            <th>Chi tiết</th>
-            <th>Thời gian</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredLogs.map((log) => (
-            <tr key={log.id}>
-              <td>{log.id}</td>
-              <td>{log.username || "—"}</td>
-              <td>{log.action}</td>
-              <td>{log.details}</td>
-              <td>{log.createdAt}</td>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Hành động</th>
+              <th>Chi tiết</th>
+              <th>Thời gian</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredLogs.map((log) => (
+              <tr key={log.id}>
+                <td>{log.id}</td>
+                <td>{log.username || "—"}</td>
+                <td>{log.action}</td>
+                <td>{log.details}</td>
+                <td>{log.createdAt}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {filteredLogs.length === 0 && <p className="no-data">Không có dữ liệu</p>}
     </div>

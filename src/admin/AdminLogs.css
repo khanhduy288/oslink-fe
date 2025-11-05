@@ -1,47 +1,124 @@
-.logs-page {
-  padding: 20px;
+/* Container chính */
+.adminlogs-container {
+  width: 100%;
+  padding: 5px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
   background: #f8f9fa;
   border-radius: 12px;
 }
 
-.logs-page h2 {
-  margin-bottom: 20px;
+/* Tiêu đề */
+.adminlogs-container h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  font-weight: 600;
   color: #333;
 }
 
+/* Input tìm kiếm */
 .search-input {
-  width: 100%;
-  padding: 10px 14px;
+  width: 50%;
+  padding: 8px 12px;
   margin-bottom: 15px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
 }
 
-.logs-table {
+.search-input:focus {
+  border-color: #007bff;
+}
+
+/* Wrapper table để scroll nếu cần */
+.table-wrapper {
   width: 100%;
-  border-collapse: collapse;
+  overflow-x: auto;
+}
+
+/* Table */
+.adminlogs-container table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: separate;
+  border-spacing: 0;
   background: white;
   border-radius: 10px;
-  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  word-break: break-word;
 }
 
-.logs-table th, .logs-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #eee;
+/* Header */
+.adminlogs-container th {
+  background: #007bff;
+  color: white;
+  text-transform: uppercase;
+  padding: 10px;
   text-align: left;
 }
 
-.logs-table th {
-  background: #343a40;
-  color: white;
+/* Min-width cho cột ID và User */
+.adminlogs-container th:first-child,
+.adminlogs-container td:first-child,
+.adminlogs-container th:nth-child(2),
+.adminlogs-container td:nth-child(2) {
+  min-width: 70px;
 }
 
-.logs-table tr:hover {
-  background: #f1f1f1;
+/* Bo góc header */
+.adminlogs-container th:first-child {
+  border-top-left-radius: 10px;
+}
+.adminlogs-container th:last-child {
+  border-top-right-radius: 10px;
 }
 
+/* Rows */
+.adminlogs-container td {
+  padding: 10px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.adminlogs-container tr:nth-child(even) td {
+  background-color: #f9f9f9;
+}
+
+.adminlogs-container tr:hover td {
+  background-color: #e0f0ff;
+}
+
+/* Không có dữ liệu */
 .no-data {
   text-align: center;
-  padding: 20px;
+  padding: 15px;
   color: #888;
+  font-style: italic;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .adminlogs-container h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .search-input {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .adminlogs-container th,
+  .adminlogs-container td {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
 }
