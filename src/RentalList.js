@@ -90,31 +90,40 @@ const handleRequestChangeTab = async (rentalId) => {
     );
   };
 
-const calculateTotalPrice = (selectedRentals, months = 1) => {
-  const basePrice = 150000;
+const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
   const comboPrices = [
     { tabs: 5, price: 600000 },
     { tabs: 3, price: 400000 },
   ];
+  const basePrice = 150000;
 
-  // Mỗi đơn = 1 tab
-  const totalTabs = selectedRentals.length;
-
-  let remainingTabs = totalTabs;
   let total = 0;
 
-  // Áp dụng combo lớn trước
+  // Lọc các đơn 150k
+  const normalTabs = selectedRentalObjects.filter(r => r.pricePerTab === basePrice).length;
+  let remainingTabs = normalTabs;
+
+  // Tính combo cho các đơn 150k
   for (const combo of comboPrices.sort((a, b) => b.tabs - a.tabs)) {
     const count = Math.floor(remainingTabs / combo.tabs);
     total += count * combo.price;
     remainingTabs %= combo.tabs;
   }
 
-  // Còn lại tính basePrice
+  // Còn lại tính giá bình thường
   total += remainingTabs * basePrice;
+
+  // Thêm các đơn VIP / giá khác
+  const vipTotal = selectedRentalObjects
+    .filter(r => r.pricePerTab !== basePrice)
+    .reduce((sum, r) => sum + r.pricePerTab * r.tabs, 0);
+
+  total += vipTotal;
 
   return total * months;
 };
+
+
 
   const openExtendModal = () => {
     if (selectedRentals.length === 0) {
