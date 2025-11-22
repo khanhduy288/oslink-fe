@@ -17,6 +17,7 @@ function Dashboard() {
         <h2>Admin Panel</h2>
         <nav>
           <Link to="rentals">Quản lý Rentals</Link>
+          <Link to="combo-renew">Gia hạn Combo</Link>
           <Link to="stats">Thống kê</Link>
           <Link to="users">Quản lý Users</Link>
           <Link to="room-groups">Danh sách Group</Link> 
