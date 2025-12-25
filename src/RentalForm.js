@@ -108,30 +108,27 @@ const handleConfirmPayment = async () => {
   if (loading) return;
   setLoading(true);
 
-  // ✅ TỔNG TIỀN SAU KHI ÁP VOUCHER
   const finalTotal = totalAfterDiscount;
-
-  // ✅ GIÁ / TAB SAU KHI GIẢM
   const finalPricePerTab = Math.ceil(finalTotal / (tabs * months));
 
   try {
-    await axios.post(
-      "https://api.tabtreo.com/rentals",
-      {
-        username,
-        tabs,
-        months,
-        pricePerTab: finalPricePerTab,
-        voucherCode: voucherCode || null,
-        voucherDiscount,
-        totalPrice: finalTotal
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    for (let i = 0; i < tabs; i++) {
+      await axios.post(
+        "https://api.tabtreo.com/rentals",
+        {
+          username,
+          tabs: 1, // gửi 1 tab mỗi lần
+          months,
+          pricePerTab: finalPricePerTab,
+          voucherCode: voucherCode || null,
+          voucherDiscount,
+          totalPrice: finalPricePerTab * months,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    }
 
-    alert(
-      `Tạo ${tabs} tab thành công! Tổng: ${finalTotal.toLocaleString()} VND`
-    );
+    alert(`Tạo ${tabs} đơn thuê thành công! Tổng: ${finalTotal.toLocaleString()} VND`);
     setShowQR(false);
   } catch (err) {
     console.error(err);
