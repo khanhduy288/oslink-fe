@@ -12,7 +12,10 @@ function RentalForm() {
   const [showQR, setShowQR] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
-
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherDiscount, setVoucherDiscount] = useState(0);
+  const [voucherLoading, setVoucherLoading] = useState(false);
+  const [voucherError, setVoucherError] = useState("");
   const basePrice = 150000;
   const vipPrice = 250000;
   const comboPrices = [
@@ -27,7 +30,8 @@ const calculatePrice = () => {
   let total = 0;
   
   // Áp dụng combo lớn trước, sau đó combo nhỏ, sau đó tab lẻ
-  const sortedCombos = comboPrices.sort((a, b) => b.tabs - a.tabs);
+  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
+
 
   for (const combo of sortedCombos) {
     while (remainingTabs >= combo.tabs) {
@@ -41,6 +45,33 @@ const calculatePrice = () => {
   return total * months;
 };
 
+const totalBeforeDiscount = calculatePrice();
+const discountAmount = Math.floor(
+  (totalBeforeDiscount * voucherDiscount) / 100
+);
+const totalAfterDiscount = totalBeforeDiscount - discountAmount;
+
+const applyVoucher = async () => {
+  if (!voucherCode.trim()) return;
+
+  setVoucherLoading(true);
+  setVoucherError("");
+
+  try {
+    const res = await axios.post(
+      "https://api.tabtreo.com/vouchers/validate",
+      { code: voucherCode },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    setVoucherDiscount(res.data.discountPercent);
+  } catch (err) {
+    setVoucherDiscount(0);
+    setVoucherError(err.response?.data?.message || "Voucher không hợp lệ");
+  } finally {
+    setVoucherLoading(false);
+  }
+};
 
 const getPricePerTab = () => {
   if (packageType === "vip") return vipPrice;
@@ -70,22 +101,37 @@ const getPricePerTab = () => {
   const handleCloseQR = () => setShowQR(false);
 
 const handleConfirmPayment = async () => {
-  if (!token) { alert("Bạn chưa đăng nhập!"); return; }
+  if (!token) {
+    alert("Bạn chưa đăng nhập!");
+    return;
+  }
   if (loading) return;
   setLoading(true);
 
-  const pricePerTab = getPricePerTab(); // ✅ dùng hàm mới tính
-  const totalPrice = pricePerTab * tabs * months;
+  // ✅ TỔNG TIỀN SAU KHI ÁP VOUCHER
+  const finalTotal = totalAfterDiscount;
+
+  // ✅ GIÁ / TAB SAU KHI GIẢM
+  const finalPricePerTab = Math.ceil(finalTotal / (tabs * months));
 
   try {
     await axios.post(
       "https://api.tabtreo.com/rentals",
-      { username, tabs, months, pricePerTab },
+      {
+        username,
+        tabs,
+        months,
+        pricePerTab: finalPricePerTab,
+        voucherCode: voucherCode || null,
+        voucherDiscount,
+        totalPrice: finalTotal
+      },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    setLastSubmitTime(Date.now());
-    alert(`Tạo ${tabs} tab thành công! Tổng: ${totalPrice.toLocaleString()} VND`);
+    alert(
+      `Tạo ${tabs} tab thành công! Tổng: ${finalTotal.toLocaleString()} VND`
+    );
     setShowQR(false);
   } catch (err) {
     console.error(err);
@@ -94,6 +140,7 @@ const handleConfirmPayment = async () => {
     setLoading(false);
   }
 };
+
 
 
 
@@ -150,9 +197,40 @@ const handleConfirmPayment = async () => {
               </option>
             ))}
           </select>
+            {/* 🎟️ Voucher */}
+          <label>Mã voucher (nếu có)</label>
+
+          <div className="voucher-input">
+            <input
+              type="text"
+              placeholder="Nhập mã giảm giá"
+              value={voucherCode}
+              onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+            />
+            <button
+              type="button"
+              onClick={applyVoucher}
+              disabled={voucherLoading}
+            >
+              {voucherLoading ? "Đang kiểm tra..." : "Áp dụng"}
+            </button>
+          </div>
+
+          {voucherError && (
+            <p className="voucher-error">❌ {voucherError}</p>
+          )}
+
+          {voucherDiscount > 0 && (
+            <p className="voucher-success">
+              ✅ Giảm {voucherDiscount}% (-{discountAmount.toLocaleString()} VND)
+            </p>
+          )}
 
           <p>
-            Tạm tính: <strong>{calculatePrice().toLocaleString()} VND</strong>
+            Tạm tính:{" "}
+            <strong>
+              {totalAfterDiscount.toLocaleString()} VND
+            </strong>
           </p>
           <button type="submit">Thuê Tab</button>
         </form>
@@ -252,7 +330,7 @@ const handleConfirmPayment = async () => {
             <div style={{ textAlign: "center", marginTop: "15px" }}>
               <p>
                 <strong>💵 Số tiền cần chuyển:</strong>{" "}
-                {(getPricePerTab() * tabs * months).toLocaleString()} VND
+                {totalAfterDiscount.toLocaleString()} VND
               </p>
               <p style={{ color: "red", fontWeight: "bold" }}>
                 ⚠️ Lưu ý: Bank xong bấm xác nhận gửi bill cho support!

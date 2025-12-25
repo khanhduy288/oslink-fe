@@ -24,6 +24,7 @@ import Settings from "./admin/Settings";
 import RoomGroups from "./admin/RoomGroups";
 import AdminLogs from "./admin/AdminLogs";
 import ComboRenew from "./admin/ComboRenew";
+import VoucherPage from "./admin/VoucherPage";
 
 
 function App() {
@@ -160,6 +161,7 @@ function App() {
                   <Route path="settings" element={<Settings />} />
                   <Route path="room-groups" element={<RoomGroups />} />   {/* ✅ mới */}
                   <Route path="combo-renew" element={<ComboRenew />} />
+                  <Route path="vouchers" element={<VoucherPage />} /> {/* 👈 */}
                   <Route path="logs" element={<AdminLogs />} /> {/* ✅ Thêm trang log */}
                 </Route>
               )}

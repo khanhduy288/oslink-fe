@@ -18,6 +18,7 @@ function Dashboard() {
         <nav>
           <Link to="rentals">Quản lý Rentals</Link>
           <Link to="combo-renew">Gia hạn Combo</Link>
+          <Link to="vouchers">Quản lý Voucher</Link>
           <Link to="stats">Thống kê</Link>
           <Link to="users">Quản lý Users</Link>
           <Link to="room-groups">Danh sách Group</Link> 

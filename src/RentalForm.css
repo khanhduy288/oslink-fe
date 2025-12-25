@@ -202,3 +202,43 @@
     height: 180px;
   }
 }
+.voucher-input {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.voucher-input input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.voucher-input button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  background: #4f46e5;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.voucher-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.voucher-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.voucher-success {
+  color: #16a34a;
+  font-size: 13px;
+  margin-top: 4px;
+}

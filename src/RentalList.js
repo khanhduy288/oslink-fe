@@ -14,13 +14,14 @@ function RentalList() {
   const [rentals, setRentals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedRentals, setSelectedRentals] = useState([]); // ✅ lưu các đơn được chọn
+  const [selectedRentals, setSelectedRentals] = useState([]);
   const [extendModal, setExtendModal] = useState({ show: false, months: 1 });
   const [showDetail, setShowDetail] = useState({});
-
+  const [voucher, setVoucher] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const token = localStorage.getItem("token");
   const BACKEND_URL = "https://api.tabtreo.com";
-
 
   useEffect(() => {
     if (!token) {
@@ -40,43 +41,36 @@ function RentalList() {
       .finally(() => setLoading(false));
   };
 
+  const handleRequestChangeTab = async (rentalId) => {
+    try {
+      await axios.patch(
+        `${BACKEND_URL}/rentals/${rentalId}`,
+        { status: "pending_change_tab" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Đã gửi yêu cầu đổi tab, chờ admin duyệt");
+      fetchRentals();
+    } catch (err) {
+      console.error(err);
+      toast.error("Gửi yêu cầu đổi tab thất bại!");
+    }
+  };
 
-const handleRequestChangeTab = async (rentalId) => {
-  try {
-    await axios.patch(
-      `${BACKEND_URL}/rentals/${rentalId}`,
-      { status: "pending_change_tab" },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    toast.success("Đã gửi yêu cầu đổi tab, chờ admin duyệt");
-    fetchRentals();
-  } catch (err) {
-    console.error(err);
-    toast.error("Gửi yêu cầu đổi tab thất bại!");
-  }
-};
-
-// ✅ Hàm tính thời gian còn lại: trả về dạng "X ngày Y giờ Z phút"
   const getRemainingTime = (rental) => {
     if (!rental.expiresAt) return "0 phút";
-
     const rentalEnd = dayjs(rental.expiresAt).tz("Asia/Bangkok");
     const now = dayjs().tz("Asia/Bangkok");
     const diffMinutes = rentalEnd.diff(now, "minute");
-
     if (diffMinutes <= 0) return "Hết hạn";
-
     const days = Math.floor(diffMinutes / (24 * 60));
     const hours = Math.floor((diffMinutes % (24 * 60)) / 60);
     const minutes = diffMinutes % 60;
-
     let result = "";
     if (days > 0) result += `${days}d `;
     if (hours > 0) result += `${hours}h `;
     if (minutes > 0) result += `${minutes}m`;
     return result.trim();
   };
-
 
   const isExpired = (rental) => {
     const created = dayjs.utc(rental.createdAt).tz("Asia/Bangkok");
@@ -90,47 +84,38 @@ const handleRequestChangeTab = async (rentalId) => {
     );
   };
 
-const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
-  const comboPrices = [
-    { tabs: 5, price: 600000 },
-    { tabs: 3, price: 400000 },
-  ];
-  const basePrice = 150000;
+  const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
+    const comboPrices = [
+      { tabs: 5, price: 600000 },
+      { tabs: 3, price: 400000 },
+    ];
+    const basePrice = 150000;
+    let total = 0;
 
-  let total = 0;
+    const normalizedObjects = selectedRentalObjects.map((r) => ({
+      ...r,
+      pricePerTab: r.pricePerTab < basePrice ? basePrice : r.pricePerTab,
+    }));
 
-  // Chuẩn hóa giá: nếu pricePerTab < basePrice → nâng lên basePrice
-  const normalizedObjects = selectedRentalObjects.map(r => ({
-    ...r,
-    pricePerTab: r.pricePerTab < basePrice ? basePrice : r.pricePerTab,
-  }));
+    let normalTabs = normalizedObjects.filter((r) => r.pricePerTab === basePrice).length;
 
-  // Tách các tab giá basePrice
-  let normalTabs = normalizedObjects.filter(r => r.pricePerTab === basePrice).length;
+    const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
+    for (const combo of sortedCombos) {
+      const count = Math.floor(normalTabs / combo.tabs);
+      total += count * combo.price;
+      normalTabs %= combo.tabs;
+    }
 
-  // Tính combo cho các tab bình thường
-  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
-  for (const combo of sortedCombos) {
-    const count = Math.floor(normalTabs / combo.tabs);
-    total += count * combo.price;
-    normalTabs %= combo.tabs;
-  }
+    total += normalTabs * basePrice;
 
-  // Còn lại tab lẻ tính giá basePrice
-  total += normalTabs * basePrice;
+    const vipTotal = normalizedObjects
+      .filter((r) => r.pricePerTab !== basePrice)
+      .reduce((sum, r) => sum + r.pricePerTab, 0);
 
-  // Tab VIP / giá khác (không áp dụng combo)
-  const vipTotal = normalizedObjects
-    .filter(r => r.pricePerTab !== basePrice)
-    .reduce((sum, r) => sum + r.pricePerTab, 0);
+    total += vipTotal;
 
-  total += vipTotal;
-
-  return total * months;
-};
-
-
-
+    return total * months;
+  };
 
   const openExtendModal = () => {
     if (selectedRentals.length === 0) {
@@ -138,25 +123,42 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
       return;
     }
 
-  // ✅ Kiểm tra nếu có đơn chưa được xác nhận (không phải active hoặc expired)
-  const invalidRentals = rentals.filter(
-    (r) => selectedRentals.includes(r.id) && !["active", "expired"].includes(r.status)
-  );
-
-  if (invalidRentals.length > 0) {
-    toast.warning(
-      `Có ${invalidRentals.length} đơn chưa được xác nhận hoặc đang chờ duyệt. Vui lòng chỉ chọn các đơn đang hoạt động hoặc đã hết hạn!`
+    const invalidRentals = rentals.filter(
+      (r) => selectedRentals.includes(r.id) && !["active", "expired"].includes(r.status)
     );
-    return;
-  }
 
-  setExtendModal({ show: true, months: 1 });
+    if (invalidRentals.length > 0) {
+      toast.warning(
+        `Có ${invalidRentals.length} đơn chưa được xác nhận hoặc đang chờ duyệt. Vui lòng chỉ chọn các đơn đang hoạt động hoặc đã hết hạn!`
+      );
+      return;
+    }
+
+    setExtendModal({ show: true, months: 1 });
+    setVoucher("");
+    setDiscount(0);
   };
-
 
   const closeExtendModal = () => {
     setExtendModal({ show: false, months: 1 });
   };
+
+const handleApplyVoucher = async () => {
+  try {
+    const res = await axios.post(
+      `${BACKEND_URL}/vouchers/validate`,
+      { code: voucher },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setDiscountPercent(res.data.discountPercent); // <-- lưu %
+    toast.success(`Voucher hợp lệ: giảm ${res.data.discountPercent}%`);
+  } catch (err) {
+    setDiscountPercent(0); // reset
+    toast.error(err.response?.data?.message || "Voucher không hợp lệ");
+  }
+};
+
+
 
   const handleConfirmExtend = async () => {
     const months = extendModal.months;
@@ -170,6 +172,9 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
             {
               requestedExtendMonths: months,
               extendTimeInMinutes,
+              months: extendModal.months,
+              voucherCode: voucher || null,
+              discount,
             },
             { headers: { Authorization: `Bearer ${token}` } }
           )
@@ -179,6 +184,8 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
       toast.success("Gửi yêu cầu gia hạn combo thành công!");
       setSelectedRentals([]);
       setExtendModal({ show: false, months: 1 });
+      setVoucher("");
+      setDiscount(0);
       fetchRentals();
     } catch (error) {
       console.error("Lỗi khi gửi yêu cầu gia hạn combo:", error);
@@ -190,20 +197,17 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (rentals.length === 0) return <p>Bạn chưa có đơn thuê nào.</p>;
 
-  const selectedCount = selectedRentals.length;
-  // Lấy các rental được chọn, loại bỏ undefined
   const selectedRentalObjects = selectedRentals
-    .map(id => rentals.find(r => r.id === id))
+    .map((id) => rentals.find((r) => r.id === id))
     .filter(Boolean);
-
-  // Tổng số tab = số rental (vì mỗi rental 1 tab)
   const totalTabs = selectedRentalObjects.length;
-
-  // Tính tổng tiền
   const totalPrice = calculateTotalPrice(selectedRentalObjects, extendModal.months);
+const totalPriceBeforeDiscount = calculateTotalPrice(selectedRentalObjects, extendModal.months);
+const totalPriceAfterDiscount = discountPercent
+  ? Math.round(totalPriceBeforeDiscount * (100 - discountPercent) / 100)
+  : totalPriceBeforeDiscount;
 
-
-
+const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
 
   return (
     <div className="rental-card-container">
@@ -277,12 +281,22 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
 
           {showDetail[rental.id] && (
             <div className="card-detail">
-              <p><strong>Username:</strong> {rental.username}</p>
-              <p><strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ</p>
-              <p><strong>Ngày tạo:</strong> {dayjs(rental.createdAt).tz("Asia/Bangkok").format("DD/MM/YYYY HH:mm:ss")}</p>
-              <p><strong>Status:</strong> {rental.status}</p>
+              <p>
+                <strong>Username:</strong> {rental.username}
+              </p>
+              <p>
+                <strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ
+              </p>
+              <p>
+                <strong>Ngày tạo:</strong>{" "}
+                {dayjs(rental.createdAt)
+                  .tz("Asia/Bangkok")
+                  .format("DD/MM/YYYY HH:mm:ss")}
+              </p>
+              <p>
+                <strong>Status:</strong> {rental.status}
+              </p>
 
-              {/* ✅ Nút gửi yêu cầu đổi tab */}
               <button
                 onClick={() => handleRequestChangeTab(rental.id)}
                 style={{
@@ -299,7 +313,6 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
               </button>
             </div>
           )}
-
         </div>
       ))}
 
@@ -322,9 +335,38 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
               ))}
             </select>
 
-            <p>
-              Tổng tiền: <strong>{totalPrice.toLocaleString()} VND</strong> ({totalTabs} tab)
-            </p>
+            <div style={{ margin: "10px 0" }}>
+              <label>Mã voucher:</label>
+              <input
+                type="text"
+                value={voucher}
+                onChange={(e) => setVoucher(e.target.value)}
+                placeholder="Nhập mã voucher nếu có"
+                style={{ marginLeft: "8px", padding: "4px 8px" }}
+              />
+              <button
+                onClick={handleApplyVoucher}
+                style={{
+                  marginLeft: "8px",
+                  padding: "4px 8px",
+                  background: "#007bff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Áp dụng
+              </button>
+            </div>
+              {discountAmount > 0 && (
+                <p style={{ color: "green" }}>Đã giảm: {discountAmount.toLocaleString()} VND</p>
+              )}
+
+              <p>
+                Tổng tiền: <strong>{totalPriceAfterDiscount.toLocaleString()} VND</strong> ({totalTabs} tab)
+              </p>
+
 
             <div style={{ textAlign: "center", margin: "20px 0" }}>
               <p>Quét mã QR để thanh toán</p>
@@ -344,7 +386,6 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
                 }}
               />
 
-              {/* 🏦 Thông tin STK để khách copy */}
               <div
                 style={{
                   marginTop: "14px",
@@ -377,7 +418,6 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
                 </button>
               </div>
 
-              {/* 💬 Nội dung chuyển khoản */}
               <div
                 style={{
                   marginTop: "10px",
@@ -391,11 +431,11 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
               >
                 <strong>Nội dung CK:</strong>{" "}
                 <span style={{ color: "#007bff", fontWeight: "600" }}>
-                  Gia hạn combo {selectedCount}T ({extendModal.months}T)
+                  Gia hạn combo {selectedRentals.length}T ({extendModal.months}T)
                 </span>
                 <button
                   onClick={() => {
-                    const txt = `Gia hạn combo ${selectedCount}T (${extendModal.months}T)`;
+                    const txt = `Gia hạn combo ${selectedRentals.length}T (${extendModal.months}T)`;
                     navigator.clipboard.writeText(txt);
                     toast.success("Đã copy nội dung!");
                   }}
@@ -448,7 +488,6 @@ const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
           </div>
         </div>
       )}
-
 
       <ToastContainer />
     </div>

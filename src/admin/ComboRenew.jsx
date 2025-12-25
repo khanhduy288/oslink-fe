@@ -21,6 +21,7 @@ function ComboRenew() {
   const [selectedRentals, setSelectedRentals] = useState([]);
   const [extendModal, setExtendModal] = useState({ show: false, months: 1 });
   const [detailModal, setDetailModal] = useState(null);
+  const [compensateDays, setCompensateDays] = useState(1);
 
   const token = localStorage.getItem("token");
   const API_BASE = "https://api.tabtreo.com"; 
@@ -30,6 +31,80 @@ function ComboRenew() {
     const interval = setInterval(fetchRentals, 5000);
     return () => clearInterval(interval);
   }, []);
+
+
+  
+const compensateTime = async (rentalIds, days) => {
+  try {
+    const minutes = days * 24 * 60;
+
+    // Chỉ lấy đơn còn hạn
+    const validIds = rentals
+      .filter(r =>
+        rentalIds.includes(r.id) &&
+        r.status === "active" &&
+        dayjs(r.expiresAt).isAfter(dayjs())
+      )
+      .map(r => r.id);
+
+    if (validIds.length === 0) {
+      return toast.info("Không có đơn còn hạn để bù giờ");
+    }
+
+    await Promise.all(
+      validIds.map(id =>
+        axios.patch(
+          `${API_BASE}/rentals/${id}/compensate`,
+          { compensateMinutes: minutes },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+      )
+    );
+
+    toast.success(`✅ Đã bù ${days} ngày cho ${validIds.length} đơn còn hạn`);
+    fetchRentals();
+  } catch (err) {
+    console.error(err);
+    toast.error("❌ Bù thời gian thất bại");
+  }
+};
+
+const toggleSelectAll = (e) => {
+  if (e.target.checked) {
+    const validIds = rentals
+      .filter(r =>
+        r.status === "active" &&
+        dayjs(r.expiresAt).isAfter(dayjs())
+      )
+      .map(r => r.id);
+
+    setSelectedRentals(validIds);
+  } else {
+    setSelectedRentals([]);
+  }
+};
+
+const handleCompensateSelected = () => {
+  const validIds = rentals
+    .filter(r =>
+      selectedRentals.includes(r.id) &&
+      r.status === "active" &&
+      dayjs(r.expiresAt).isAfter(dayjs())
+    )
+    .map(r => r.id);
+
+  if (validIds.length === 0)
+    return toast.info("Không có đơn active còn hạn");
+
+  if (
+    !window.confirm(
+      `Bù ${compensateDays} ngày cho ${validIds.length} đơn đã chọn?`
+    )
+  )
+    return;
+
+  compensateTime(validIds, compensateDays);
+};
 
 // --- Thêm hàm tính thời gian còn lại ---
 const getRemainingTime = (rental) => {
@@ -265,6 +340,34 @@ const handleConfirmExtendCombo = async () => {
         <button className="btn-extend-combo" onClick={openExtendModal} disabled={selectedRentals.length===0}>
           Gia hạn combo ({selectedRentals.length} đơn)
         </button>
+        <div className="admin-toolbar">
+          {/* checkbox chọn tất cả */}
+          <label>
+            <input type="checkbox" onChange={toggleSelectAll} />
+            Chọn tất cả
+          </label>
+
+          {/* bù giờ */}
+          <div className="compensate-box">
+            <select
+              value={compensateDays}
+              onChange={e => setCompensateDays(Number(e.target.value))}
+            >
+              <option value={1}>Bù 1 ngày</option>
+              <option value={2}>Bù 2 ngày</option>
+              <option value={3}>Bù 3 ngày</option>
+            </select>
+
+            <button
+              className="btn-compensate"
+              onClick={handleCompensateSelected}
+              disabled={selectedRentals.length === 0}
+            >
+              Bù giờ (bảo trì)
+            </button>
+          </div>
+        </div>
+
       </div>
 
       <div className="card-list">
@@ -301,6 +404,14 @@ const handleConfirmExtendCombo = async () => {
             <p><strong>Hết Hạn Lúc:</strong> {detailModal.expiresAt || "-"}</p>
             <p><strong>Giá/Tab:</strong> {detailModal.pricePerTab?.toLocaleString() || 0} VND</p>
             <p><strong>Status:</strong> {detailModal.status}</p>
+            <div style={{marginTop:"10px"}}>
+              <strong>Bù thời gian:</strong>
+              <div style={{display:"flex", gap:"8px", marginTop:"6px"}}>
+                <button onClick={()=>compensateTime([detailModal.id], 1)}>+1 ngày</button>
+                <button onClick={()=>compensateTime([detailModal.id], 2)}>+2 ngày</button>
+                <button onClick={()=>compensateTime([detailModal.id], 3)}>+3 ngày</button>
+              </div>
+            </div>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={()=>setDetailModal(null)}>Đóng</button>
               <button className="btn-save" onClick={()=>{ setEditingRental(detailModal); setDetailModal(null); }}>Sửa</button>
