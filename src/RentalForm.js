@@ -8,14 +8,15 @@ function RentalForm() {
 
   const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
-  const [packageType, setPackageType] = useState("normal"); // gói thường/vip
-  const [showQR, setShowQR] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const [packageType, setPackageType] = useState("normal");
   const [voucherCode, setVoucherCode] = useState("");
   const [voucherDiscount, setVoucherDiscount] = useState(0);
   const [voucherLoading, setVoucherLoading] = useState(false);
   const [voucherError, setVoucherError] = useState("");
+
+  const [showQR, setShowQR] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const basePrice = 150000;
   const vipPrice = 250000;
   const comboPrices = [
@@ -23,180 +24,142 @@ function RentalForm() {
     { tabs: 5, discount: 150000, price: 600000 },
   ];
 
-const calculatePrice = () => {
-  if (packageType === "vip") return tabs * vipPrice * months;
+  const calculatePrice = () => {
+    if (packageType === "vip") return tabs * vipPrice * months;
 
-  let remainingTabs = tabs;
-  let total = 0;
-  
-  // Áp dụng combo lớn trước, sau đó combo nhỏ, sau đó tab lẻ
-  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
-
-
-  for (const combo of sortedCombos) {
-    while (remainingTabs >= combo.tabs) {
-      total += combo.price;
-      remainingTabs -= combo.tabs;
+    let remainingTabs = tabs;
+    let total = 0;
+    const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
+    for (const combo of sortedCombos) {
+      while (remainingTabs >= combo.tabs) {
+        total += combo.price;
+        remainingTabs -= combo.tabs;
+      }
     }
-  }
+    total += remainingTabs * basePrice;
+    return total * months;
+  };
 
-  total += remainingTabs * basePrice;
+  const totalBeforeDiscount = calculatePrice();
+  const discountAmount = Math.floor((totalBeforeDiscount * voucherDiscount) / 100);
+  const totalAfterDiscount = totalBeforeDiscount - discountAmount;
 
-  return total * months;
-};
-
-const totalBeforeDiscount = calculatePrice();
-const discountAmount = Math.floor(
-  (totalBeforeDiscount * voucherDiscount) / 100
-);
-const totalAfterDiscount = totalBeforeDiscount - discountAmount;
-
-const applyVoucher = async () => {
-  if (!voucherCode.trim()) return;
-
-  setVoucherLoading(true);
-  setVoucherError("");
-
-  try {
-    const res = await axios.post(
-      "https://api.tabtreo.com/vouchers/validate",
-      { code: voucherCode },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    setVoucherDiscount(res.data.discountPercent);
-  } catch (err) {
-    setVoucherDiscount(0);
-    setVoucherError(err.response?.data?.message || "Voucher không hợp lệ");
-  } finally {
-    setVoucherLoading(false);
-  }
-};
-
-const getPricePerTab = () => {
-  if (packageType === "vip") return vipPrice;
-
-  let remainingTabs = tabs;
-  let total = 0;
-
-  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
-  for (const combo of sortedCombos) {
-    while (remainingTabs >= combo.tabs) {
-      total += combo.price;
-      remainingTabs -= combo.tabs;
+  const applyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    setVoucherLoading(true);
+    setVoucherError("");
+    try {
+      const res = await axios.post(
+        "https://api.tabtreo.com/vouchers/validate",
+        { code: voucherCode },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setVoucherDiscount(res.data.discountPercent);
+    } catch (err) {
+      setVoucherDiscount(0);
+      setVoucherError(err.response?.data?.message || "Voucher không hợp lệ");
+    } finally {
+      setVoucherLoading(false);
     }
-  }
-
-  total += remainingTabs * basePrice;
-
-  return Math.ceil(total / tabs);
-};
-
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setShowQR(true);
+    if (!token) {
+      alert("Bạn chưa đăng nhập!");
+      return;
+    }
+    setShowQR(true); // hiện modal QR thay vì gửi API trực tiếp
   };
 
   const handleCloseQR = () => setShowQR(false);
 
-const handleConfirmPayment = async () => {
-  if (!token) {
-    alert("Bạn chưa đăng nhập!");
-    return;
-  }
-  if (loading) return;
-  setLoading(true);
+  const handleConfirmPayment = async () => {
+    if (loading) return;
+    setLoading(true);
+    const finalTotal = totalAfterDiscount;
+    const finalPricePerTab = Math.ceil(finalTotal / tabs);
 
-  const finalTotal = totalAfterDiscount;
-  const finalPricePerTab = Math.ceil(finalTotal / (tabs * months));
-
-  try {
-    for (let i = 0; i < tabs; i++) {
-      await axios.post(
-        "https://api.tabtreo.com/rentals",
-        {
-          username,
-          tabs: 1, // gửi 1 tab mỗi lần
-          months,
-          pricePerTab: finalPricePerTab,
-          voucherCode: voucherCode || null,
-          voucherDiscount,
-          totalPrice: finalPricePerTab * months,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    try {
+      for (let i = 0; i < tabs; i++) {
+        await axios.post(
+          "https://api.tabtreo.com/rentals",
+          {
+            username,
+            tabs: 1,
+            months,
+            pricePerTab: finalPricePerTab,
+            voucherCode: voucherCode || null,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+      alert(`Tạo ${tabs} đơn thuê thành công! Tổng: ${finalTotal.toLocaleString()} VND`);
+      setShowQR(false);
+    } catch (err) {
+      alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
+    } finally {
+      setLoading(false);
     }
-
-    alert(`Tạo ${tabs} đơn thuê thành công! Tổng: ${finalTotal.toLocaleString()} VND`);
-    setShowQR(false);
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
+  };
 
   return (
-    <div className="form-container">
-      <section style={{ marginBottom: "40px" }}>
-        <h2>Thuê Tab</h2>
+    <div className="rental-container">
+      <h2 className="title">Thuê Tab</h2>
 
-        <div className="price-table">
-          <h3>💰 Giá cơ bản</h3>
-          <p>
-            <strong>150.000 VND</strong> / 1 Tab / 1 tháng <span className="highlight">(Gói Thường)</span>
-          </p>
+      {/* Gói thuê */}
+      <div className="package-cards">
+        <div
+          className={`package-card normal ${packageType === "normal" ? "active" : ""}`}
+          onClick={() => setPackageType("normal")}
+        >
+          <div className="badge">Tiết kiệm</div>
+          <h3>GÓI THƯỜNG</h3>
+          <p className="price">150.000 VND / 1 Tab / 1 tháng</p>
+          <div className="combo">
+            <p>3 Tab ⚡ Giảm 50K → 400K</p>
+            <p>5 Tab ⚡ Giảm 150K → 600K</p>
+          </div>
+          <button className="select-btn">Chọn gói</button>
+        </div>
 
-          <h3>🎁 Combo siêu tiết kiệm</h3>
-          <ul>
-            <li>3 Tab 👉 Giảm <strong>50K</strong> → chỉ <strong>400K</strong></li>
-            <li>5 Tab 👉 Giảm <strong>150K</strong> → chỉ <strong>600K</strong></li>
+        <div
+          className={`package-card vip ${packageType === "vip" ? "active" : ""}`}
+          onClick={() => setPackageType("vip")}
+        >
+          <div className="badge">Ưu đãi lớn</div>
+          <h3>GÓI VIP</h3>
+          <p className="price">250.000 VND / 1 Tab / 1 tháng</p>
+          <ul className="vip-features">
+            <li>Ưu tiên cấp Tab nhanh</li>
+            <li>Hỗ trợ riêng</li>
           </ul>
+          <button className="select-btn">Chọn gói</button>
+        </div>
+      </div>
 
-          <h3>🌟 Gói VIP</h3>
-          <p><strong>250.000 VND</strong> / 1 Tab / 1 tháng</p>
-          <p>Ưu tiên cấp Tab nhanh ⚡ + hỗ trợ riêng 🎧</p>
-
-          <div style={{ marginTop: "10px" }}>
-            <p>🔥 <strong>Càng thuê nhiều – Giá càng rẻ – Ưu đãi càng lớn!</strong></p>
-            <p>⏱️ Quá trình cấp Tab: <strong>~3 phút / 1 Tab</strong></p>
-            <p>💬 Cần hỗ trợ tải game? <strong>Liên hệ Zalo Support</strong></p>
+      {/* Form thuê */}
+      <form className="rental-form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Số lượng Tab (tối đa 10)</label>
+          <div className="stepper">
+            <button type="button" onClick={() => setTabs(Math.max(1, tabs - 1))}>-</button>
+            <input type="number" value={tabs} readOnly />
+            <button type="button" onClick={() => setTabs(Math.min(10, tabs + 1))}>+</button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <label>Chọn loại gói</label>
-          <select value={packageType} onChange={(e) => setPackageType(e.target.value)}>
-            <option value="normal">Gói Thường</option>
-            <option value="vip">Gói VIP</option>
-          </select>
-
-          <label>Số lượng Tab (tối đa 10)</label>
-          <input
-            type="number"
-            value={tabs}
-            min={1}
-            max={10}
-            onChange={(e) => setTabs(Math.min(10, Number(e.target.value)))}
-            required
-          />
-
+        <div className="form-group">
           <label>Thời gian thuê (tháng)</label>
           <select value={months} onChange={(e) => setMonths(Number(e.target.value))}>
             {[...Array(12)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1} tháng
-              </option>
+              <option key={i + 1} value={i + 1}>{i + 1} tháng</option>
             ))}
           </select>
-            {/* 🎟️ Voucher */}
-          <label>Mã voucher (nếu có)</label>
+        </div>
 
+        <div className="form-group">
+          <label>Mã voucher (nếu có)</label>
           <div className="voucher-input">
             <input
               type="text"
@@ -204,182 +167,85 @@ const handleConfirmPayment = async () => {
               value={voucherCode}
               onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
             />
-            <button
-              type="button"
-              onClick={applyVoucher}
-              disabled={voucherLoading}
-            >
+            <button type="button" onClick={applyVoucher}>
               {voucherLoading ? "Đang kiểm tra..." : "Áp dụng"}
             </button>
           </div>
-
-          {voucherError && (
-            <p className="voucher-error">❌ {voucherError}</p>
-          )}
-
+          {voucherError && <p className="voucher-error">{voucherError}</p>}
           {voucherDiscount > 0 && (
-            <p className="voucher-success">
-              ✅ Giảm {voucherDiscount}% (-{discountAmount.toLocaleString()} VND)
-            </p>
+            <p className="voucher-success">Giảm {voucherDiscount}% (-{discountAmount.toLocaleString()} VND)</p>
           )}
-
-          <p>
-            Tạm tính:{" "}
-            <strong>
-              {totalAfterDiscount.toLocaleString()} VND
-            </strong>
-          </p>
-          <button type="submit">Thuê Tab</button>
-        </form>
-      </section>
-
-      {showQR && (
-        <div className="qr-modal" onClick={handleCloseQR}>
-          <div className="qr-content" onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ textAlign: "center" }}>Quét QR hoặc chuyển khoản</h3>
-            <img
-              src="/images/qrthanhtoan.png"
-              alt="QR Payment"
-              style={{
-                width: "250px",
-                height: "250px",
-                margin: "20px auto",
-                display: "block",
-                border: "2px solid #ccc",
-                borderRadius: "12px",
-                background: "#fff",
-                padding: "6px",
-              }}
-            />
-
-            {/* 🏦 Thông tin ngân hàng */}
-            <div
-              style={{
-                marginTop: "10px",
-                background: "#f6faff",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "1px solid #d4e3ff",
-                textAlign: "center",
-              }}
-            >
-              <strong>MBank + Viettinbank:</strong>{" "}
-              <span style={{ color: "#007bff", fontWeight: "600" }}>0981263234</span>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText("0981263234");
-                  alert("Đã copy STK!");
-                }}
-                style={{
-                  marginLeft: "8px",
-                  padding: "4px 8px",
-                  fontSize: "12px",
-                  borderRadius: "6px",
-                  border: "none",
-                  cursor: "pointer",
-                  background: "#007bff",
-                  color: "#fff",
-                }}
-              >
-                Copy STK
-              </button>
-            </div>
-
-            {/* 💬 Nội dung CK */}
-            <div
-              style={{
-                marginTop: "10px",
-                background: "#f6faff",
-                padding: "10px",
-                borderRadius: "8px",
-                border: "1px solid #d4e3ff",
-                display: "inline-block",
-                fontSize: "14px",
-                textAlign: "center",
-                width: "100%",
-              }}
-            >
-              <strong>Nội dung CK:</strong>{" "}
-              <span style={{ color: "#007bff", fontWeight: "600" }}>
-                {packageType === "vip" ? `${username} vip` : username}
-              </span>
-              <button
-                onClick={() => {
-                  const txt = packageType === "vip" ? `${username} vip` : username;
-                  navigator.clipboard.writeText(txt);
-                  alert("Đã copy nội dung CK!");
-                }}
-                style={{
-                  marginLeft: "8px",
-                  padding: "4px 8px",
-                  fontSize: "12px",
-                  borderRadius: "6px",
-                  border: "none",
-                  cursor: "pointer",
-                  background: "#007bff",
-                  color: "#fff",
-                }}
-              >
-                Copy ND
-              </button>
-            </div>
-
-            <div style={{ textAlign: "center", marginTop: "15px" }}>
-              <p>
-                <strong>💵 Số tiền cần chuyển:</strong>{" "}
-                {totalAfterDiscount.toLocaleString()} VND
-              </p>
-              <p style={{ color: "red", fontWeight: "bold" }}>
-                ⚠️ Lưu ý: Bank xong bấm xác nhận gửi bill cho support!
-              </p>
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "space-around", marginTop: "10px" }}>
-              <button
-                onClick={handleConfirmPayment}
-                disabled={loading}
-                style={{
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 25px",
-                  borderRadius: "5px",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  opacity: loading ? 0.6 : 1,
-                  fontWeight: "bold",
-                }}
-              >
-                {loading ? "Đang xử lý..." : "Xác nhận"}
-              </button>
-              <button
-                onClick={handleCloseQR}
-                style={{
-                  backgroundColor: "#f44336",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 25px",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                }}
-              >
-                Đóng
-              </button>
-            </div>
-
-            <p
-              style={{
-                textAlign: "center",
-                marginTop: "10px",
-                fontSize: "14px",
-                color: "#555",
-              }}
-            >
-              ⏱️ Quá trình cấp TAB mất khoảng 3 phút / 1 tab. Nhiều TAB sẽ cấp dần từng tab.
-            </p>
-          </div>
         </div>
-      )}
+
+        <p className="total">Tạm tính: {totalAfterDiscount.toLocaleString()} VND</p>
+
+        <button type="submit" className="rent-btn">Thuê Tab</button>
+      </form>
+
+{/* Modal QR */}
+{showQR && (
+  <div className="qr-modal" onClick={handleCloseQR}>
+    <div className="qr-content" onClick={(e) => e.stopPropagation()}>
+      <h3>Quét QR hoặc chuyển khoản</h3>
+
+      <img
+        src="/images/qrthanhtoan.png"
+        alt="QR Payment"
+      />
+
+      <div className="qr-info-box">
+        <strong>MBank + Viettinbank:</strong>{" "}
+        <span>0981263234</span>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText("0981263234");
+            alert("Đã copy STK!");
+          }}
+        >
+          Copy STK
+        </button>
+      </div>
+
+      <div className="qr-info-box">
+        <strong>Nội dung CK:</strong>{" "}
+        <span>{packageType === "vip" ? `${username} vip` : username}</span>
+        <button
+          onClick={() => {
+            const txt = packageType === "vip" ? `${username} vip` : username;
+            navigator.clipboard.writeText(txt);
+            alert("Đã copy nội dung CK!");
+          }}
+        >
+          Copy ND
+        </button>
+      </div>
+
+      <div className="qr-info-box">
+        <strong>💵 Số tiền cần chuyển:</strong> {totalAfterDiscount.toLocaleString()} VND
+        <p style={{ color: "red", fontWeight: "bold", marginTop: "6px" }}>
+          ⚠️ Lưu ý: Bank xong bấm xác nhận gửi bill cho support!
+        </p>
+      </div>
+
+      <div className="qr-buttons">
+        <button
+          className="confirm-btn"
+          onClick={handleConfirmPayment}
+          disabled={loading}
+        >
+          {loading ? "Đang xử lý..." : "Xác nhận"}
+        </button>
+        <button className="close-btn" onClick={handleCloseQR}>
+          Đóng
+        </button>
+      </div>
+
+      <p className="qr-note">
+        ⏱️ Quá trình cấp TAB mất khoảng 3 phút / 1 tab. Nhiều TAB sẽ cấp dần từng tab.
+      </p>
+    </div>
+  </div>
+)}
 
     </div>
   );

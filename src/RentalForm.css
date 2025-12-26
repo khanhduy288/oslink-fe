@@ -1,244 +1,391 @@
-.form-container {
+/* Container */
+.rental-container {
   max-width: 420px;
-  margin: 30px auto;
-  padding: 18px;
-  border: 1px solid #dce3ec;
-  border-radius: 10px;
-  background-color: #f3f6fa; /* nhẹ hơn để card trắng nổi bật */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.form-container h2 {
-  text-align: center;
-  margin-bottom: 18px;
-  color: #1E90FF;
-  font-size: 20px;
-}
-
-.form-container form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.form-container label {
-  font-weight: 600;
-  font-size: 14.5px;
-}
-
-.form-container input,
-.form-container select {
-  padding: 7px 10px;
-  font-size: 15px;
-  border: 1px solid #c8d5e0;
-  border-radius: 6px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.form-container input:focus,
-.form-container select:focus {
-  outline: none;
-  border-color: #1E90FF;
-  background-color: #fff;
-}
-
-.form-container button {
-  padding: 9px;
-  font-size: 16px;
-  background-color: #1E90FF;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.25s;
-}
-
-.form-container button:hover {
-  background-color: #1874d1;
-}
-
-/* 🌟 Bảng giá gọn gàng, có phân tầng rõ */
-.price-table {
-  background: #ffffff;
+  margin: 0 auto;
+  padding: 20px;
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  background: #0D1117;
   border-radius: 12px;
-  padding: 15px 18px;
-  box-shadow: 0 4px 14px rgba(30, 144, 255, 0.1);
-  margin: 20px 0;
-  color: #333;
-  font-size: 14.5px;
-  line-height: 1.6;
-  border: 1px solid #e2ecf9;
 }
 
-.price-table h3 {
-  margin-top: 12px;
-  margin-bottom: 6px;
-  color: #1976d2;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.price-table p {
-  margin: 5px 0;
-}
-
-.price-table ul {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 5px;
-}
-
-.price-table li {
-  background: #f7faff;
-  border-left: 4px solid #1E90FF;
-  padding: 7px 10px;
-  border-radius: 6px;
-  margin-bottom: 5px;
-  font-weight: 500;
-  transition: background 0.2s;
-}
-
-.price-table li:hover {
-  background: #eaf3ff;
-}
-
-.price-table strong {
-  color: #111;
-}
-
-.price-table .highlight {
-  background: linear-gradient(90deg, #fff7b3, #ffef99);
-  padding: 3px 7px;
-  border-radius: 5px;
-  font-weight: 600;
-  color: #333;
-}
-
-/* 🧾 QR Modal */
-.qr-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.qr-content {
-  background-color: #fff;
-  padding: 22px 26px;
-  border-radius: 20px;
-  max-width: 380px;
-  width: 90%;
+/* Title */
+.title {
   text-align: center;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  animation: slideUp 0.3s ease-in-out;
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
 }
 
-.qr-content img {
-  width: 220px;
-  height: 220px;
-  margin: 10px auto 15px;
-  display: block;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* Package cards */
+.package-cards {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.qr-content button {
-  margin-top: 12px;
-  padding: 8px 15px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 6px;
+.package-card {
+  flex: 1;
+  padding: 15px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.25s;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
 }
 
-.qr-content button:hover {
-  background-color: #0056b3;
+.package-card.active {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  transform: scale(1.03);
+  border: 2px solid #fff;
 }
 
-/* 🔄 Animation mở QR */
-@keyframes slideUp {
-  from {
-    transform: translateY(40px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* Badge */
+.badge {
+  position: absolute;
+  top: 10px;
+  right: -10px; /* đẩy ra ngoài 1 chút */
+  background: gold;
+  color: #000;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  transform: rotate(45deg); /* nghiêng 45 độ */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  text-align: center;
 }
 
-/* 📱 Responsive cho mobile */
-@media (max-width: 480px) {
-  .form-container {
-    margin: 20px 10px;
-    padding: 15px;
-  }
 
-  .price-table {
-    padding: 12px 14px;
-    font-size: 14px;
-  }
-
-  .qr-content {
-    max-width: 90%;
-    padding: 18px 20px;
-  }
-
-  .qr-content img {
-    width: 180px;
-    height: 180px;
-  }
+/* Normal card */
+.package-card.normal {
+  background: linear-gradient(135deg, #1E3A8A, #3B82F6);
 }
+
+/* VIP card */
+.package-card.vip {
+  background: linear-gradient(135deg, #D4AF37, #FFD700);
+  color: #000;
+}
+
+.package-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.price {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.combo p {
+  font-size: 13px;
+  margin: 3px 0;
+}
+
+.vip-features {
+  font-size: 13px;
+  margin: 0 0 10px 0;
+  padding-left: 18px;
+}
+
+.select-btn {
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.select-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Form */
+.rental-form {
+  background: #1B1F2B;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+/* Form groups */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Stepper */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepper button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: #3B82F6;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.stepper button:hover {
+  background: #2563eb;
+}
+
+.stepper input {
+  width: 50px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background: #0D1117;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Select custom */
+select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background: #0D1117;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Voucher */
 .voucher-input {
   display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 6px;
 }
 
 .voucher-input input {
   flex: 1;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 6px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
+  border: 1px solid #555;
+  background: #0D1117;
+  color: #fff;
 }
 
 .voucher-input button {
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 6px;
   border: none;
-  background: #4f46e5;
-  color: white;
+  background: #3B82F6;
+  color: #fff;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: bold;
 }
 
-.voucher-input button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.voucher-input button:hover {
+  background: #2563eb;
 }
 
 .voucher-error {
-  color: #dc2626;
-  font-size: 13px;
+  color: #f44336;
+  font-size: 12px;
   margin-top: 4px;
 }
 
 .voucher-success {
-  color: #16a34a;
-  font-size: 13px;
+  color: #4caf50;
+  font-size: 12px;
   margin-top: 4px;
+}
+
+/* Total & Rent Button */
+.total {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.rent-btn {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3B82F6, #1E3A8A);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.rent-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1E40AF);
+}
+
+/* Modal QR */
+.qr-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.qr-content {
+  background: #1B1F2B;
+  padding: 25px;
+  border-radius: 12px;
+  width: 320px;
+  max-width: 90%;
+  border: 2px solid #3B82F6;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  text-align: center;
+}
+
+.qr-content img {
+  border: 2px solid #555;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+}
+
+.qr-content button {
+  padding: 8px 15px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin: 5px;
+  transition: 0.2s;
+}
+
+.qr-content button:hover {
+  opacity: 0.85;
+}
+
+.qr-info {
+  margin-top: 10px;
+  background: #0D1117;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #3B82F6;
+  font-size: 14px;
+}
+/* Modal nền tối */
+.qr-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Nội dung modal */
+.qr-content {
+  background: #0D1117; /* nền tối */
+  color: #fff; /* chữ trắng */
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 350px;
+  text-align: center;
+}
+
+/* QR Image */
+.qr-content img {
+  width: 250px;
+  height: 250px;
+  margin: 20px auto;
+  display: block;
+  border: 2px solid #3B82F6;
+  border-radius: 12px;
+  background: #1B1F2B;
+  padding: 6px;
+}
+
+/* Info box (STK, Nội dung CK) */
+.qr-info-box {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #3B82F6;
+  background: #1B1F2B;
+  text-align: center;
+  word-wrap: break-word; /* tự xuống dòng nếu quá dài */
+}
+
+.qr-info-box span {
+  color: #3B82F6;
+  font-weight: 600;
+}
+
+.qr-info-box button {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #3B82F6;
+  color: #fff;
+}
+
+/* Buttons confirm & close */
+.qr-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.qr-buttons button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.qr-buttons .confirm-btn {
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+}
+
+.qr-buttons .close-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+}
+
+/* Lưu ý nhỏ */
+.qr-note {
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 12px;
 }

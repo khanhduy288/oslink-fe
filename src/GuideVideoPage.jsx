@@ -21,7 +21,7 @@ const guideData = [
       {
         id: 2,
         title: "Tải Game",
-        src: "https://www.youtube.com/shorts/_Wsq1XeYwt0", // ✅ URL YouTube
+        src: "https://www.youtube.com/embed/_Wsq1XeYwt0", // ✅ URL YouTube
       },
     ],
   },
