@@ -3,6 +3,7 @@ import { FaLaptop, FaVideo, FaListAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import { FaMobileAlt, FaDollarSign, FaCheckCircle, FaHeadset } from "react-icons/fa";
+import BottomNav from "./BottomNav";
 
 const POPUP_DELAY_HOURS = 1; // sau 1h lại hiện popup
 
@@ -139,6 +140,9 @@ const Home = () => {
           className="zalo-chat-icon"
         />
       </a>
+
+      {/* Bottom Navigation chỉ trên mobile */}
+      <BottomNav />
     </div>
   );
 };
