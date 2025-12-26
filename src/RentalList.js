@@ -196,7 +196,6 @@ const handleApplyVoucher = async () => {
 
   if (loading) return <p>Đang tải danh sách thuê...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (rentals.length === 0) return <p>Bạn chưa có đơn thuê nào.</p>;
 
   const selectedRentalObjects = selectedRentals
     .map((id) => rentals.find((r) => r.id === id))
@@ -211,6 +210,7 @@ const totalPriceAfterDiscount = discountPercent
 const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
 
   return (
+    
     <div className="rental-card-container">
       <div style={{ marginBottom: "10px" }}>
         <button
@@ -222,7 +222,12 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
         </button>
       </div>
 
-      {rentals.map((rental) => (
+      {rentals.length === 0 ? (
+          <p style={{ textAlign: "center", marginTop: "30px", color: "#666" }}>
+            Bạn chưa có đơn thuê nào
+          </p>
+        ) : (
+          rentals.map((rental) => (
         <div
           key={rental.id}
           className={`rental-card ${isExpired(rental) ? "expired" : ""}`}
@@ -315,7 +320,8 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
             </div>
           )}
         </div>
-      ))}
+        ))
+)}
 
       {extendModal.show && (
         <div className="qr-modal" onClick={closeExtendModal}>
@@ -342,8 +348,8 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
                 type="text"
                 value={voucher}
                 onChange={(e) => setVoucher(e.target.value)}
-                placeholder="Nhập mã voucher nếu có"
-                style={{ marginLeft: "8px", padding: "4px 8px" }}
+                placeholder="Voucher nếu có"
+                style={{ marginLeft: "3px", padding: "4px 8px" }}
               />
               <button
                 onClick={handleApplyVoucher}
@@ -375,9 +381,9 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
                 src="/images/qrthanhtoan.png"
                 alt="QR thanh toán"
                 style={{
-                  width: "350px",
-                  height: "350px",
-                  maxWidth: "95%",
+                  width: "200px",
+                  height: "200px",
+                  maxWidth: "80%",
                   objectFit: "contain",
                   border: "2px solid #ccc",
                   borderRadius: "16px",
@@ -389,15 +395,16 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
 
               <div
                 style={{
-                  marginTop: "14px",
-                  background: "#f6faff",
-                  padding: "12px",
-                  borderRadius: "8px",
+                  marginTop: "8px",
+                  background: "#2e4b6eff",
+                  fontSize: "14px",
+                  padding: "4px 8px",
+                  borderRadius: "6px",
                   border: "1px solid #d4e3ff",
                   textAlign: "center",
                 }}
               >
-                <strong>MBank + Viettinbank:</strong>{" "}
+                <strong>MBank & Viettinbank:</strong>{" "}
                 <span style={{ color: "#007bff", fontWeight: "600" }}>0981263234</span>
                 <button
                   onClick={() => {
@@ -415,14 +422,14 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
                     color: "#fff",
                   }}
                 >
-                  Copy STK
+                  Copy
                 </button>
               </div>
 
               <div
                 style={{
                   marginTop: "10px",
-                  background: "#f6faff",
+                  background: "#1b3a5fff",
                   padding: "10px",
                   borderRadius: "8px",
                   border: "1px solid #d4e3ff",

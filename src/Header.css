@@ -1,15 +1,43 @@
+/* --- HEADER GENERAL --- */
+.sticky-menu {
+  width: 100%;
+  background-color: #222222;
+  background-size: cover;
+  background-position: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
 .app-nav-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
 }
 
+/* --- LOGO --- */
+.logo-link .logo {
+  height: 60px; /* tăng logo */
+  max-width: 150px;
+  object-fit: contain;
+  display: block;
+  position: relative;
+  z-index: 10;
+  margin-left: 20px; /* cách hamburger */
+}
+
+/* --- NAV LINKS DESKTOP --- */
 .nav-left {
   display: flex;
   align-items: center;
 }
-
 .nav-link {
   margin-right: 20px;
   text-decoration: none;
@@ -17,7 +45,6 @@
   font-weight: 500;
   position: relative;
 }
-
 .nav-link:hover::after {
   content: '';
   position: absolute;
@@ -28,13 +55,14 @@
   left: 0;
 }
 
+/* --- HAMBURGER --- */
 .hamburger {
   display: none;
   flex-direction: column;
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 0;
+  z-index: 11;
 }
-
 .hamburger div {
   width: 25px;
   height: 3px;
@@ -42,29 +70,26 @@
   margin: 4px 0;
   transition: 0.4s;
 }
-
 .hamburger.open div:nth-child(1) {
   transform: rotate(-45deg) translate(-5px, 6px);
 }
-
 .hamburger.open div:nth-child(2) {
   opacity: 0;
 }
-
 .hamburger.open div:nth-child(3) {
   transform: rotate(45deg) translate(-5px, -6px);
 }
 
+/* --- USERNAME / LOGOUT --- */
 .username-display {
   display: flex;
   align-items: center;
+  color: white;
 }
-
 .logout-container {
   display: flex;
   align-items: center;
 }
-
 .logout-btn {
   margin-left: 10px;
   background: none;
@@ -73,33 +98,76 @@
   font-size: 1.2rem;
   cursor: pointer;
 }
-
 .logout-btn:hover {
   transform: scale(1.2);
 }
 
+/* --- MOBILE STYLES --- */
 @media screen and (max-width: 768px) {
+
+  /* Inner container giữ logo + hamburger */
   .app-nav-inner {
-    flex-direction: column; /* xếp theo cột */
-    align-items: flex-start; /* căn trái */
-  }
-
-  .nav-left {
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%; /* đảm bảo chiếm full chiều ngang */
-  }
-
-  .nav-link {
-    margin: 8px 0; /* khoảng cách giữa các link */
-  }
-
-  .username-display {
-    align-self: flex-end; /* vẫn đặt tên user / nút logout ở góc phải */
-    margin-top: 10px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px 15px;
+    position: relative;
   }
 
   .hamburger {
     display: flex;
+    margin-left: 0;
+    z-index: 11;
+  }
+
+  .logo-link {
+    order: 2; /* logo bên phải hamburger */
+    margin-left: 10px;
+  }
+
+  /* MOBILE MENU */
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    position: fixed; /* full màn hình */
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 180px; /* tăng chiều cao menu */
+    background-color: #111; /* nền tối */
+    border-top-left-radius: 20px; /* bo góc trên */
+    border-top-right-radius: 20px;
+    padding-top: 20px; /* khoảng cách icon + link lên trên */
+    padding-bottom: 20px;
+    overflow-y: auto;
+    overflow-x: hidden; /* chặn scroll ngang */
+    z-index: 10;
+    box-sizing: border-box;
+  }
+
+  /* Bỏ viền dưới các link */
+  .mobile-menu .nav-link {
+    display: block;
+    font-size: 16px;
+    color: #bbb;
+    padding: 10px 20px;
+    border-bottom: none; /* bỏ viền */
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-menu .nav-link:hover {
+    color: #4a90e2;
+    background-color: rgba(74,144,226,0.1);
+  }
+
+  /* Username/logout */
+  .username-display {
+    position: absolute;
+    right: 20px;
+    top: 12px;
+    color: white;
+    z-index: 12;
   }
 }

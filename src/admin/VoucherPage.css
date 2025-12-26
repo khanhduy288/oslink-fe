@@ -102,7 +102,11 @@
 /* ================== ACTIONS ================== */
 .actions {
   display: flex;
+  align-items: center;
+  justify-content: flex-start; /* sát lề trái */
   gap: 6px;
+  flex-wrap: wrap;             /* không tràn */
+  max-width: 100%;
 }
 
 .voucher-page .actions button {
@@ -111,9 +115,39 @@
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  background: #e5e7eb;
-  color: #111827;
+  font-weight: 500;
   transition: 0.15s;
+  white-space: nowrap; /* không bể chữ */
+}
+
+/* SỬA */
+.actions .edit {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.actions .edit:hover {
+  background: #c7d2fe;
+}
+
+/* KÍCH HOẠT */
+.actions .toggle {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.actions .toggle:hover {
+  background: #bbf7d0;
+}
+
+/* XOÁ */
+.actions .danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.actions .danger:hover {
+  background: #fecaca;
 }
 
 .voucher-page .actions button:hover {

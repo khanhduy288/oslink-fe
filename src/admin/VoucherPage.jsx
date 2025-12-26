@@ -147,8 +147,8 @@ function VoucherPage() {
                   </span>
                 </td>
                 <td className="actions">
-                  <button onClick={() => openEdit(v)}>Sửa</button>
-                  <button onClick={() => toggleVoucher(v)}>
+                  <button className="edit" onClick={() => openEdit(v)}>Sửa</button>
+                  <button className="toggle" onClick={() => toggleVoucher(v)}>
                     {v.is_active ? "Khoá" : "Mở"}
                   </button>
                   <button className="danger" onClick={() => deleteVoucher(v.id)}>

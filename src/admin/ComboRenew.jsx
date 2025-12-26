@@ -282,6 +282,7 @@ const handleConfirmExtendCombo = async () => {
     await Promise.all(
       selectedRentals.map(id =>
         axios.post(`${API_BASE}/rentals/${id}/request-extend`, {
+          months,
           requestedExtendMonths: months,
           extendTimeInMinutes: months * 30 * 24 * 60
         }, { headers: { Authorization: `Bearer ${token}` } })
@@ -300,7 +301,7 @@ const handleConfirmExtendCombo = async () => {
     );
 
     // 4️⃣ Cập nhật UI
-    toast.success("✅ Đã gửi yêu cầu và xác nhận gia hạn thành công!");
+    toast.success(" Đã gửi yêu cầu và xác nhận gia hạn thành công!");
     setSelectedRentals([]);
     setExtendModal({ show:false, months:1 });
     fetchRentals();

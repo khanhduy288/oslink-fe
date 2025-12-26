@@ -1,13 +1,13 @@
 .home-container {
   text-align: center;
-  padding: 30px 20px;
+  padding: 20px 15px;
   background: #f8f9fa;
   min-height: 100vh;
 }
 
 .home-title {
-  font-size: 28px;
-  margin-bottom: 30px;
+  font-size: 23px;
+  margin-bottom: 20px;
   color: #222;
   font-weight: 700;
 }
@@ -16,8 +16,8 @@
 .card-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
-  padding: 0 20px;
+  gap: 20px;
+  padding: 0 15px;
 }
 
 @media (max-width: 900px) {
@@ -37,7 +37,7 @@
 /* --- CARD CHUNG --- */
 .card-box {
   border-radius: 16px;
-  padding: 20px;
+  padding: 10px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -165,7 +165,7 @@
 /* --- ZALO CHAT BUTTON --- */
 .zalo-chat-button {
   position: fixed;
-  bottom: 18px;
+  bottom: 135px;
   right: 18px;
   width: 60px;
   height: 60px;
