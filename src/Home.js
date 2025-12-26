@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaLaptop, FaVideo, FaListAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
+import { FaMobileAlt, FaDollarSign, FaCheckCircle, FaHeadset } from "react-icons/fa";
 
 const POPUP_DELAY_HOURS = 1; // sau 1h lại hiện popup
 
@@ -97,6 +98,32 @@ const Home = () => {
         >
           Trình duyệt của bạn không hỗ trợ video.
         </video>
+      </div>
+      {/* Phần lý do chọn chúng tôi */}
+      <div className="why-choose-section">
+        <h3>Lý do chọn chúng tôi</h3>
+        <div className="why-choose-grid">
+          <div className="why-choose-card">
+            <FaMobileAlt size={40} color="#fff" className="why-icon"/>
+            <h4>Ổn định & Mượt mà</h4>
+            <p>App và tab game chạy ổn định, mượt mà trên cả Android và iOS.</p>
+          </div>
+          <div className="why-choose-card">
+            <FaDollarSign size={40} color="#fff" className="why-icon"/>
+            <h4>Chi phí hợp lý</h4>
+            <p>Giá thuê hợp lý, rõ ràng, không phát sinh phí ẩn.</p>
+          </div>
+          <div className="why-choose-card">
+            <FaCheckCircle size={40} color="#fff" className="why-icon"/>
+            <h4>Hỗ trợ test</h4>
+            <p>Test trước khi thuê, đảm bảo phù hợp nhu cầu.</p>
+          </div>
+          <div className="why-choose-card">
+            <FaHeadset size={40} color="#fff" className="why-icon"/>
+            <h4>Hỗ trợ nhanh chóng</h4>
+            <p>Hỗ trợ qua Zalo/Hotline, phản hồi trong 1 giờ.</p>
+          </div>
+        </div>
       </div>
 
       {/* Nút chat Zalo nổi góc màn hình */}

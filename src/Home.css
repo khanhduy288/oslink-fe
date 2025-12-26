@@ -205,3 +205,80 @@
     height: auto;
   }
 }
+/* --- LÝ DO CHỌN CHÚNG TÔI --- */
+.why-choose-section {
+  margin-top: 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #4a90e2, #50e3c2); /* nền xanh gradient đẹp */
+  padding: 50px 20px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.why-choose-section h3 {
+  font-size: 24px;
+  margin-bottom: 35px;
+  font-weight: 700;
+}
+
+.why-choose-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  padding: 0 20px;
+}
+
+.why-choose-card {
+  background: rgba(255,255,255,0.1);
+  padding: 25px 20px;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.why-choose-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  background: rgba(255,255,255,0.2);
+}
+
+.why-choose-card h4 {
+  font-size: 18px;
+  margin: 15px 0 10px 0;
+  color: #fff;
+}
+
+.why-choose-card p {
+  font-size: 14px;
+  color: #f0f0f0;
+  line-height: 1.5;
+}
+
+.why-icon {
+  background: rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .why-choose-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .why-choose-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .why-choose-card {
+    min-height: auto;
+  }
+}
