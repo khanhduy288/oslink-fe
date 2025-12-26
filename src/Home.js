@@ -36,14 +36,14 @@ const Home = () => {
         <div className="warning-popup">
           <div className="warning-content">
             <h3>⚠️ LƯU Ý QUAN TRỌNG</h3>
-            <ul style={{ textAlign: "left", paddingLeft: "20px", marginBottom: "15px" }}>
+            <ul className="warning-list">
               <li>✅ App treo game hỗ trợ trên cả Android và iOS, chạy mượt, ổn định !</li>
               <li>❌ Không đổi tên TAB sau khi thuê để tránh tình trạng mất TAB.</li>
               <li>💸 Không hoàn lại tiền trong mọi trường hợp.</li>
               <li>🧪 Hãy test trước khi thuê – liên hệ Support để được hỗ trợ test trong 1 giờ.</li>
               <li>📺 Xem video hướng dẫn tại mục “Hướng dẫn” để biết cách: thuê TAB, tải app, tải game và sử dụng các tính năng trong game.</li>
             </ul>
-            <p style={{ fontWeight: "bold", marginBottom: "15px" }}>⏰ Thời gian làm việc: 8h00 – 22h00</p>
+            <p className="work-time">⏰ Thời gian làm việc: 8h00 – 22h00</p>
             <button onClick={closeWarning}>Đóng</button>
           </div>
         </div>
@@ -84,7 +84,22 @@ const Home = () => {
           </div>
         </div>
       </div>
-            {/* Nút chat Zalo nổi góc màn hình */}
+
+      {/* Video giới thiệu sản phẩm */}
+      <div className="intro-video-section">
+        <h3>🎬 Video giới thiệu sản phẩm</h3>
+        <video
+          src="/images/video3.mp4"
+          controls
+          loop
+          muted
+          className="intro-video"
+        >
+          Trình duyệt của bạn không hỗ trợ video.
+        </video>
+      </div>
+
+      {/* Nút chat Zalo nổi góc màn hình */}
       <a
         href="https://zalo.me/0972734444"
         target="_blank"
@@ -97,7 +112,6 @@ const Home = () => {
           className="zalo-chat-icon"
         />
       </a>
-
     </div>
   );
 };
