@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./RentalForm.css";
+import BottomNav from "./BottomNav";
 
 function RentalForm() {
   const username = localStorage.getItem("username") || "guest";
@@ -246,7 +247,7 @@ function RentalForm() {
     </div>
   </div>
 )}
-
+      <BottomNav />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "./RentalList.css";
+import BottomNav from "./BottomNav";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -486,10 +487,13 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
               </button>
             </div>
           </div>
+          
         </div>
+        
       )}
-
+        <BottomNav />
       <ToastContainer />
+      
     </div>
   );
 }

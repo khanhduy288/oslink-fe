@@ -1,4 +1,5 @@
 import React from "react";
+import BottomNav from "./BottomNav";
 
 const contacts = [
   { number: "0972 734 444", link: "https://zalo.me/0972734444" },
@@ -55,6 +56,7 @@ const Contact = () => {
           </div>
         </div>
       ))}
+      <BottomNav />
     </div>
   );
 };

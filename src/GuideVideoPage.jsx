@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import BottomNav from "./BottomNav";
 
 const guideData = [
   {
@@ -163,6 +164,7 @@ const GuideVideoPage = () => {
           />
         </div>
       )}
+      <BottomNav />
     </div>
   );
 };
