@@ -1,0 +1,105 @@
+.app-nav-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  margin-right: 20px;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  position: relative;
+}
+
+.nav-link:hover::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  bottom: -2px;
+  left: 0;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  margin: 4px 0;
+  transition: 0.4s;
+}
+
+.hamburger.open div:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger.open div:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open div:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.username-display {
+  display: flex;
+  align-items: center;
+}
+
+.logout-container {
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  transform: scale(1.2);
+}
+
+@media screen and (max-width: 768px) {
+  .app-nav-inner {
+    flex-direction: column; /* xếp theo cột */
+    align-items: flex-start; /* căn trái */
+  }
+
+  .nav-left {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%; /* đảm bảo chiếm full chiều ngang */
+  }
+
+  .nav-link {
+    margin: 8px 0; /* khoảng cách giữa các link */
+  }
+
+  .username-display {
+    align-self: flex-end; /* vẫn đặt tên user / nút logout ở góc phải */
+    margin-top: 10px;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
