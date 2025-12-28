@@ -251,10 +251,10 @@ select {
 
 .qr-content {
   background: #1B1F2B;
-  padding: 25px;
+  padding: 15px;
   border-radius: 12px;
   width: 320px;
-  max-width: 90%;
+  max-width: 95%;
   border: 2px solid #3B82F6;
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   text-align: center;
@@ -309,7 +309,7 @@ select {
 .qr-content {
   background: #0D1117; /* nền tối */
   color: #fff; /* chữ trắng */
-  padding: 20px;
+  padding: 10px;
   border-radius: 12px;
   max-width: 90%;
   width: 350px;
@@ -318,9 +318,9 @@ select {
 
 /* QR Image */
 .qr-content img {
-  width: 250px;
-  height: 250px;
-  margin: 20px auto;
+  width: 180px;
+  height: 180px;
+  margin: 10px auto;
   display: block;
   border: 2px solid #3B82F6;
   border-radius: 12px;
