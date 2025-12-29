@@ -198,7 +198,7 @@
   margin-top: 15px;
 }
 
-.btn-save {
+.btn-save1 {
   background-color: #28a745;
   color:white;
   border:none;
@@ -208,7 +208,7 @@
   transition: all 0.2s;
 }
 
-.btn-cancel {
+.btn-cancel1 {
   background-color: #6c757d;
   color:white;
   border:none;

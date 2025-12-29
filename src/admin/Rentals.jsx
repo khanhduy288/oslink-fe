@@ -409,8 +409,8 @@ const filteredRentals = rentals.filter(r => {
             </label>
 
             <div className="modal-actions">
-              <button className="btn-save" onClick={handleEditSubmit}>Lưu</button>
-              <button className="btn-cancel" onClick={handleEditCancel}>Hủy</button>
+              <button className="btn-save1" onClick={handleEditSubmit}>Lưu</button>
+              <button className="btn-cancel1" onClick={handleEditCancel}>Hủy</button>
             </div>
           </div>
         </div>

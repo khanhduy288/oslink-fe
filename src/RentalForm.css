@@ -160,7 +160,7 @@
 }
 
 /* Select custom */
-select {
+.rental-container .select {
   width: 100%;
   padding: 8px;
   border-radius: 6px;

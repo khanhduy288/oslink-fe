@@ -81,7 +81,7 @@
 }
 
 /* ================== STATUS ================== */
-.status {
+.voucher-page .status {
   display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
@@ -89,18 +89,18 @@
   font-weight: 500;
 }
 
-.status.active {
+.voucher-page .status.active {
   background: #dcfce7;
   color: #166534;
 }
 
-.status.inactive {
+.voucher-page .status.inactive {
   background: #fee2e2;
   color: #991b1b;
 }
 
 /* ================== ACTIONS ================== */
-.actions {
+.voucher-page .actions {
   display: flex;
   align-items: center;
   justify-content: flex-start; /* sát lề trái */
@@ -121,32 +121,32 @@
 }
 
 /* SỬA */
-.actions .edit {
+.voucher-page .actions .edit {
   background: #e0e7ff;
   color: #3730a3;
 }
 
-.actions .edit:hover {
+.voucher-page .actions .edit:hover {
   background: #c7d2fe;
 }
 
 /* KÍCH HOẠT */
-.actions .toggle {
+.voucher-page .actions .toggle {
   background: #dcfce7;
   color: #166534;
 }
 
-.actions .toggle:hover {
+.voucher-page .actions .toggle:hover {
   background: #bbf7d0;
 }
 
 /* XOÁ */
-.actions .danger {
+.voucher-page .actions .danger {
   background: #fee2e2;
   color: #991b1b;
 }
 
-.actions .danger:hover {
+.voucher-page .actions .danger:hover {
   background: #fecaca;
 }
 
@@ -154,17 +154,17 @@
   background: #d1d5db;
 }
 
-.actions .danger {
+.voucher-page .actions .danger {
   background: #fee2e2;
   color: #991b1b;
 }
 
-.actions .danger:hover {
+.voucher-page .actions .danger:hover {
   background: #fecaca;
 }
 
 /* ================== MODAL ================== */
-.modal-backdrop {
+.voucher-page .modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
@@ -174,7 +174,7 @@
   z-index: 999;
 }
 
-.modal {
+.voucher-page .modal {
   background: #ffffff;
   width: 360px;
   padding: 20px;
@@ -194,14 +194,14 @@
   }
 }
 
-.modal h3 {
+.voucher-page .modal h3 {
   margin: 0 0 14px;
   font-size: 18px;
   font-weight: 600;
 }
 
 /* ================== INPUT ================== */
-.modal input {
+.voucher-page .modal input {
   width: 100%;
   box-sizing: border-box;   /* 🔥 QUAN TRỌNG */
   padding: 9px 10px;
@@ -223,14 +223,14 @@
 }
 
 /* ================== MODAL ACTIONS ================== */
-.modal-actions {
+.voucher-page .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 8px;
 }
 
-.modal-actions button {
+.voucher-page .modal-actions button {
   padding: 8px 14px;
   border-radius: 8px;
   font-size: 14px;
@@ -238,11 +238,11 @@
   border: none;
 }
 
-.modal-actions button:first-child {
+.voucher-page .modal-actions button:first-child {
   background: #e5e7eb;
 }
 
-.modal-actions button:first-child:hover {
+.voucher-page .modal-actions button:first-child:hover {
   background: #d1d5db;
 }
 
@@ -258,7 +258,7 @@
     font-size: 13px;
   }
 
-  .actions {
+  .voucher-page .actions {
     flex-direction: column;
   }
 }
