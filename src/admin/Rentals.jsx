@@ -192,7 +192,9 @@ const handleCreateSubmit = async () => {
   // --- Lọc danh sách theo trạng thái ---
 const filteredRentals = rentals.filter(r => {
   const matchesStatus = filterStatus === "all" || r.status === filterStatus;
-  const matchesUsername = r.username.toLowerCase().includes(filterUsername.toLowerCase());
+  const matchesUsername = (r.username || "")
+    .toLowerCase()
+    .includes(filterUsername.toLowerCase());
   return matchesStatus && matchesUsername;
 });
 
@@ -269,7 +271,7 @@ const filteredRentals = rentals.filter(r => {
           {filteredRentals.map((r) => (
             <tr key={r.id}>
               <td>{r.id}</td>
-              <td>{r.username}</td>
+              <td>{r.username || "User đã bị xóa"}</td>
               <td>{formatMinutesToHours(r.rentalTime)}</td>
               <td>
                 <span className={`status ${r.status}`}>
