@@ -242,22 +242,28 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 999;
+  align-items: flex-start; /* QUAN TRỌNG */
+  padding: 20px 0;         /* QUAN TRỌNG */
+  overflow-y: auto;        /* QUAN TRỌNG */
+  z-index: 1000;
 }
 
 .qr-content {
-  background: #1B1F2B;
+  background: #0D1117;
+  color: #fff;
+  width: 100%;
+  max-width: 600px;   /* desktop nhìn vẫn đẹp */
+  min-height: 100%;
   padding: 15px;
   border-radius: 12px;
-  width: 320px;
-  max-width: 95%;
-  border: 2px solid #3B82F6;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   text-align: center;
+}
+
+.qr-content {
+  overflow-y: auto;
 }
 
 .qr-content img {
@@ -291,30 +297,7 @@
   border: 1px solid #3B82F6;
   font-size: 14px;
 }
-/* Modal nền tối */
-.qr-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
 
-/* Nội dung modal */
-.qr-content {
-  background: #0D1117; /* nền tối */
-  color: #fff; /* chữ trắng */
-  padding: 10px;
-  border-radius: 12px;
-  max-width: 90%;
-  width: 350px;
-  text-align: center;
-}
 
 /* QR Image */
 .qr-content img {
