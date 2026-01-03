@@ -125,25 +125,26 @@
     margin-left: 10px;
   }
 
-  /* MOBILE MENU */
-  .mobile-menu {
-    display: flex;
-    flex-direction: column;
-    position: fixed; /* full màn hình */
-    top: 0;
-    left: 0;
-    width: 100%;
-    min-height: 180px; /* tăng chiều cao menu */
-    background-color: #111; /* nền tối */
-    border-top-left-radius: 20px; /* bo góc trên */
-    border-top-right-radius: 20px;
-    padding-top: 20px; /* khoảng cách icon + link lên trên */
-    padding-bottom: 20px;
-    overflow-y: auto;
-    overflow-x: hidden; /* chặn scroll ngang */
-    z-index: 10;
-    box-sizing: border-box;
-  }
+/* MOBILE MENU */
+.mobile-menu {
+  display: flex;
+  flex-direction: column;
+
+  position: fixed;
+  top: 70px;                 /* 👈 QUAN TRỌNG: đẩy xuống dưới header */
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 70px); /* 👈 full màn hình trừ header */
+
+  background-color: #111;
+  padding: 10px 0 20px 0;
+
+  overflow-y: auto;          /* 👈 scroll dọc */
+  overflow-x: hidden;
+
+  z-index: 9;                /* thấp hơn hamburger */
+  box-sizing: border-box;
+}
 
   /* Bỏ viền dưới các link */
   .mobile-menu .nav-link {
