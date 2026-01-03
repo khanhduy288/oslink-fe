@@ -195,7 +195,7 @@ function RentalForm() {
       />
 
       <div className="qr-info-box">
-        <strong>MBank + Viettinbank:</strong>{" "}
+        <strong>Viettinbank:</strong>{" "}
         <span>0981263234</span>
         <button
           onClick={() => {

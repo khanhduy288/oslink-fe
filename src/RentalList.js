@@ -404,7 +404,7 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
                   textAlign: "center",
                 }}
               >
-                <strong>MBank & Viettinbank:</strong>{" "}
+                <strong>Viettinbank:</strong>{" "}
                 <span style={{ color: "#007bff", fontWeight: "600" }}>0981263234</span>
                 <button
                   onClick={() => {
