@@ -255,12 +255,16 @@
   background: #0D1117;
   color: #fff;
   width: 100%;
-  max-width: 600px;   /* desktop nhìn vẫn đẹp */
-  min-height: 100%;
+  max-width: 600px;
+
+  max-height: 90vh;        /* QUAN TRỌNG */
+  overflow-y: auto;        /* QUAN TRỌNG */
+
   padding: 15px;
   border-radius: 12px;
   text-align: center;
 }
+
 
 .qr-content {
   overflow-y: auto;
@@ -371,4 +375,36 @@
   font-size: 13px;
   color: #aaa;
   margin-top: 12px;
+}
+@media (max-height: 600px) {
+  .qr-content {
+    max-height: 95vh;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  /* QR nhỏ lại */
+  .qr-content img {
+    width: 120px;
+    height: 120px;
+    margin: 6px auto;
+    padding: 4px;
+  }
+
+  /* Text nhỏ gọn */
+  .qr-info-box {
+    padding: 2px;
+    font-size: 12px;
+  }
+
+  .qr-note {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  /* Nút confirm / đóng */
+  .qr-buttons button {
+    padding: 8px;
+    font-size: 14px;
+  }
 }
