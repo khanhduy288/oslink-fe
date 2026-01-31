@@ -344,3 +344,17 @@
   border: 2px solid #ff9800;
   background-color: #fff3e0;
 }
+.rental-card.expired {
+  border: 2px solid red;
+  background-color: #ffe5e5;
+}
+
+.rental-card.warning {
+  border: 2px solid orange;
+  background-color: #fff8e1;
+}
+
+.rental-card.near-expiry {
+  border: 2px solid #ff9800;
+  background-color: #fff3e0;
+}

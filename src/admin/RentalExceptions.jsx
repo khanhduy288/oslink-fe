@@ -24,24 +24,44 @@ function RentalExceptions() {
   const token = localStorage.getItem("token");
   const headers = { Authorization: `Bearer ${token}` };
 
+  // Hàm tính thời gian còn lại
+  const calcTimeLeft = (expiryDate) => {
+    const now = new Date();
+    const diff = expiryDate - now;
+    if (diff <= 0) return { expired: true, days: 0, hours: 0, minutes: 0 };
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    return { expired: false, days, hours, minutes };
+  };
+
   const loadData = async () => {
     try {
       const res = await axios.get(API, { headers });
-      const now = new Date();
 
       const filteredData = res.data
-        .filter((i) => filter === "all" || i.rentType === filter) // filter tuần/tháng
+        .filter((i) => filter === "all" || i.rentType === filter)
         .map((i) => {
-          const days = i.rentType === "week" ? 7 : 30;
+          const daysRent = i.rentType === "week" ? 7 : 30;
           const createdAt = new Date(i.time || i.createdAt);
           const expiryDate = new Date(
-            createdAt.getTime() + days * 24 * 60 * 60 * 1000
+            createdAt.getTime() + daysRent * 24 * 60 * 60 * 1000
           );
-          const expired = now > expiryDate;
-          const timeLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          const nearExpiry = !expired && timeLeft <= 3;
-          const warning = !expired && timeLeft === 1; // còn 1 ngày -> vàng
-          return { ...i, expiryDate, expired, nearExpiry, warning, timeLeft, showDetail: false };
+
+          const { expired, days, hours, minutes } = calcTimeLeft(expiryDate);
+
+          const warning = !expired && days === 0 && hours < 24; // còn <1 ngày
+          const nearExpiry = !expired && days <= 3;
+
+          return {
+            ...i,
+            expiryDate,
+            expired,
+            warning,
+            nearExpiry,
+            timeLeft: { days, hours, minutes },
+            showDetail: false,
+          };
         })
         .filter((i) =>
           i.customerName.toLowerCase().includes(search.toLowerCase())
@@ -149,8 +169,7 @@ function RentalExceptions() {
                 <strong>Khách:</strong> {i.customerName}
               </div>
               <div className="hide-mobile">
-                <strong>Kiểu thuê:</strong>{" "}
-                {i.rentType === "week" ? "Tuần" : "Tháng"}
+                <strong>Kiểu thuê:</strong> {i.rentType === "week" ? "Tuần" : "Tháng"}
               </div>
               <div className="hide-mobile">
                 <strong>Số máy:</strong> {i.machineCount}
@@ -159,66 +178,41 @@ function RentalExceptions() {
                 <strong>Giá:</strong> {i.price.toLocaleString()}
               </div>
               <div>
-                <strong>Trạng thái:</strong>{" "}
-                {i.status === "rent" ? "🟢 Thuê" : "🔴 Stop"}
+                <strong>Trạng thái:</strong> {i.status === "rent" ? "🟢 Thuê" : "🔴 Stop"}
               </div>
-              <button
-                className="toggle-detail-btn"
-                onClick={() => toggleDetail(i.id)}
-              >
+
+              {/* Hiển thị thời gian còn lại ngay ngoài card */}
+              {!i.expired && (
+                <div style={{ marginTop: "5px", fontWeight: "bold" }}>
+                  ⏳ Còn: {i.timeLeft.days}d {i.timeLeft.hours}h {i.timeLeft.minutes}m
+                </div>
+              )}
+
+              {i.expired && (
+                <div style={{ marginTop: "5px", fontWeight: "bold", color: "red" }}>
+                  ⛔ Đã hết hạn
+                </div>
+              )}
+
+              <button className="toggle-detail-btn" onClick={() => toggleDetail(i.id)}>
                 {i.showDetail ? "Ẩn chi tiết" : "Xem chi tiết"}
               </button>
             </div>
 
             {i.showDetail && (
               <div className="card-detail show">
+                <div><strong>ID:</strong> {i.id}</div>
+                <div><strong>Thời gian tạo:</strong> {new Date(i.time).toLocaleString()}</div>
+                <div><strong>Kiểu thuê:</strong> {i.rentType === "week" ? "Tuần" : "Tháng"}</div>
+                <div><strong>Số máy:</strong> {i.machineCount}</div>
+                <div><strong>Giá:</strong> {i.price.toLocaleString()}</div>
+                <div><strong>Thành tiền:</strong> {(i.price * i.machineCount).toLocaleString()}</div>
                 <div>
-                  <strong>ID:</strong> {i.id}
+                  <strong>Hết hạn:</strong> {i.expiryDate.toLocaleDateString()} {i.expired && "(Đã hết hạn)"}
                 </div>
-                <div>
-                  <strong>Thời gian tạo:</strong>{" "}
-                  {new Date(i.time).toLocaleString()}
-                </div>
-                <div>
-                  <strong>Kiểu thuê:</strong>{" "}
-                  {i.rentType === "week" ? "Tuần" : "Tháng"}
-                </div>
-                <div>
-                  <strong>Số máy:</strong> {i.machineCount}
-                </div>
-                <div>
-                  <strong>Giá:</strong> {i.price.toLocaleString()}
-                </div>
-                <div>
-                  <strong>Thành tiền:</strong>{" "}
-                  {(i.price * i.machineCount).toLocaleString()}
-                </div>
-                <div>
-                  <strong>Hết hạn:</strong>{" "}
-                  {i.expiryDate.toLocaleDateString()}{" "}
-                  {i.expired && "(Đã hết hạn)"}
-                </div>
-                {i.timeLeft <= 3 && !i.expired && (
-                  <div>
-                    <strong>Cảnh báo:</strong>{" "}
-                    {i.timeLeft === 1
-                      ? "Còn 1 ngày ⚠️"
-                      : `Còn ${i.timeLeft} ngày ⚠️`}
-                  </div>
-                )}
                 <div className="action-buttons">
-                  <button
-                    className="action-btn edit"
-                    onClick={() => openEditModal(i)}
-                  >
-                    ✏️ Sửa
-                  </button>
-                  <button
-                    className="action-btn delete"
-                    onClick={() => deleteItem(i.id)}
-                  >
-                    ❌ Xóa
-                  </button>
+                  <button className="action-btn edit" onClick={() => openEditModal(i)}>✏️ Sửa</button>
+                  <button className="action-btn delete" onClick={() => deleteItem(i.id)}>❌ Xóa</button>
                 </div>
               </div>
             )}
@@ -235,9 +229,7 @@ function RentalExceptions() {
             <label>Tên khách</label>
             <input
               value={form.customerName}
-              onChange={(e) =>
-                setForm({ ...form, customerName: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, customerName: e.target.value })}
             />
 
             <label>Kiểu thuê</label>
@@ -253,18 +245,14 @@ function RentalExceptions() {
             <input
               type="number"
               value={form.machineCount}
-              onChange={(e) =>
-                setForm({ ...form, machineCount: Number(e.target.value) })
-              }
+              onChange={(e) => setForm({ ...form, machineCount: Number(e.target.value) })}
             />
 
             <label>Giá</label>
             <input
               type="number"
               value={form.price}
-              onChange={(e) =>
-                setForm({ ...form, price: Number(e.target.value) })
-              }
+              onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
             />
 
             <label>Thành tiền</label>
@@ -274,15 +262,8 @@ function RentalExceptions() {
             />
 
             <div className="modal-actions">
-              <button onClick={submitForm} className="confirm-btn">
-                💾 Xác nhận
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="cancel-btn"
-              >
-                ❌ Hủy
-              </button>
+              <button onClick={submitForm} className="confirm-btn">💾 Xác nhận</button>
+              <button onClick={() => setShowModal(false)} className="cancel-btn">❌ Hủy</button>
             </div>
           </div>
         </div>
