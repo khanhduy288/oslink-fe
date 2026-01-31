@@ -11,6 +11,7 @@ const emptyForm = {
   machineCount: 1,
   price: 0,
   status: "rent",
+  createdAt: new Date().toISOString().slice(0,16), // yyyy-mm-ddTHH:mm
 };
 
 function RentalExceptions() {
@@ -43,14 +44,14 @@ function RentalExceptions() {
         .filter((i) => filter === "all" || i.rentType === filter)
         .map((i) => {
           const daysRent = i.rentType === "week" ? 7 : 30;
-          const createdAt = new Date(i.time || i.createdAt);
+          const createdAt = new Date(i.createdAt || i.time || i.createdAt);
           const expiryDate = new Date(
             createdAt.getTime() + daysRent * 24 * 60 * 60 * 1000
           );
 
           const { expired, days, hours, minutes } = calcTimeLeft(expiryDate);
 
-          const warning = !expired && days === 0 && hours < 24; // còn <1 ngày
+          const warning = !expired && days === 0 && hours < 24;
           const nearExpiry = !expired && days <= 3;
 
           return {
@@ -98,6 +99,9 @@ function RentalExceptions() {
       machineCount: item.machineCount,
       price: item.price,
       status: item.status,
+      createdAt: item.createdAt
+        ? new Date(item.createdAt).toISOString().slice(0,16)
+        : new Date().toISOString().slice(0,16),
     });
     setShowModal(true);
   };
@@ -169,7 +173,8 @@ function RentalExceptions() {
                 <strong>Khách:</strong> {i.customerName}
               </div>
               <div className="hide-mobile">
-                <strong>Kiểu thuê:</strong> {i.rentType === "week" ? "Tuần" : "Tháng"}
+                <strong>Kiểu thuê:</strong>{" "}
+                {i.rentType === "week" ? "Tuần" : "Tháng"}
               </div>
               <div className="hide-mobile">
                 <strong>Số máy:</strong> {i.machineCount}
@@ -178,13 +183,14 @@ function RentalExceptions() {
                 <strong>Giá:</strong> {i.price.toLocaleString()}
               </div>
               <div>
-                <strong>Trạng thái:</strong> {i.status === "rent" ? "🟢 Thuê" : "🔴 Stop"}
+                <strong>Trạng thái:</strong>{" "}
+                {i.status === "rent" ? "🟢 Thuê" : "🔴 Stop"}
               </div>
 
-              {/* Hiển thị thời gian còn lại ngay ngoài card */}
               {!i.expired && (
                 <div style={{ marginTop: "5px", fontWeight: "bold" }}>
-                  ⏳ Còn: {i.timeLeft.days}d {i.timeLeft.hours}h {i.timeLeft.minutes}m
+                  ⏳ Còn: {i.timeLeft.days}d {i.timeLeft.hours}h{" "}
+                  {i.timeLeft.minutes}m
                 </div>
               )}
 
@@ -194,7 +200,10 @@ function RentalExceptions() {
                 </div>
               )}
 
-              <button className="toggle-detail-btn" onClick={() => toggleDetail(i.id)}>
+              <button
+                className="toggle-detail-btn"
+                onClick={() => toggleDetail(i.id)}
+              >
                 {i.showDetail ? "Ẩn chi tiết" : "Xem chi tiết"}
               </button>
             </div>
@@ -202,13 +211,19 @@ function RentalExceptions() {
             {i.showDetail && (
               <div className="card-detail show">
                 <div><strong>ID:</strong> {i.id}</div>
-                <div><strong>Thời gian tạo:</strong> {new Date(i.time).toLocaleString()}</div>
-                <div><strong>Kiểu thuê:</strong> {i.rentType === "week" ? "Tuần" : "Tháng"}</div>
+                <div>
+                  <strong>Ngày bắt đầu thuê:</strong>{" "}
+                  {new Date(i.createdAt).toLocaleString()}
+                </div>
+                <div>
+                  <strong>Kiểu thuê:</strong>{" "}
+                  {i.rentType === "week" ? "Tuần" : "Tháng"}
+                </div>
                 <div><strong>Số máy:</strong> {i.machineCount}</div>
                 <div><strong>Giá:</strong> {i.price.toLocaleString()}</div>
                 <div><strong>Thành tiền:</strong> {(i.price * i.machineCount).toLocaleString()}</div>
                 <div>
-                  <strong>Hết hạn:</strong> {i.expiryDate.toLocaleDateString()} {i.expired && "(Đã hết hạn)"}
+                  <strong>Hết hạn:</strong> {i.expiryDate.toLocaleString()} {i.expired && "(Đã hết hạn)"}
                 </div>
                 <div className="action-buttons">
                   <button className="action-btn edit" onClick={() => openEditModal(i)}>✏️ Sửa</button>
@@ -220,7 +235,6 @@ function RentalExceptions() {
         ))}
       </div>
 
-      {/* MODAL */}
       {showModal && (
         <div className="overlay">
           <div className="modal">
@@ -228,6 +242,7 @@ function RentalExceptions() {
 
             <label>Tên khách</label>
             <input
+              type="text"
               value={form.customerName}
               onChange={(e) => setForm({ ...form, customerName: e.target.value })}
             />
@@ -253,6 +268,13 @@ function RentalExceptions() {
               type="number"
               value={form.price}
               onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+            />
+
+            <label>Ngày giờ bắt đầu thuê</label>
+            <input
+              type="datetime-local"
+              value={form.createdAt}
+              onChange={(e) => setForm({ ...form, createdAt: e.target.value })}
             />
 
             <label>Thành tiền</label>
