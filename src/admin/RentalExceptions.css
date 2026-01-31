@@ -330,14 +330,17 @@
     width: 100%;
   }
 }
-/* Khi còn dưới 3 ngày */
-.rental-card.near-expiry {
-  background-color: #fff8e1; /* vàng nhạt */
-  border: 1px solid #ffeb3b; /* vàng đậm viền */
+.rental-card.expired {
+  border: 2px solid red;
+  background-color: #ffe5e5;
 }
 
-/* Khi hết hạn */
-.rental-card.expired {
-  background-color: #ffe6e6; /* hồng nhạt */
-  border: 1px solid #f44336; /* đỏ */
+.rental-card.warning {
+  border: 2px solid orange;
+  background-color: #fff8e1;
+}
+
+.rental-card.near-expiry {
+  border: 2px solid #ff9800;
+  background-color: #fff3e0;
 }

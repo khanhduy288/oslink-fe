@@ -16,6 +16,7 @@ const emptyForm = {
 function RentalExceptions() {
   const [items, setItems] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -23,36 +24,39 @@ function RentalExceptions() {
   const token = localStorage.getItem("token");
   const headers = { Authorization: `Bearer ${token}` };
 
-const loadData = async () => {
-  try {
-    const res = await axios.get(API, { headers });
-    const now = new Date();
+  const loadData = async () => {
+    try {
+      const res = await axios.get(API, { headers });
+      const now = new Date();
 
-    const filteredData = res.data
-      .filter((i) => filter === "all" || i.rentType === filter) // filter tuần/tháng
-      .map((i) => {
-        const days = i.rentType === "week" ? 7 : 30;
-        const createdAt = new Date(i.time || i.createdAt);
-        const expiryDate = new Date(
-          createdAt.getTime() + days * 24 * 60 * 60 * 1000
+      const filteredData = res.data
+        .filter((i) => filter === "all" || i.rentType === filter) // filter tuần/tháng
+        .map((i) => {
+          const days = i.rentType === "week" ? 7 : 30;
+          const createdAt = new Date(i.time || i.createdAt);
+          const expiryDate = new Date(
+            createdAt.getTime() + days * 24 * 60 * 60 * 1000
+          );
+          const expired = now > expiryDate;
+          const timeLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+          const nearExpiry = !expired && timeLeft <= 3;
+          const warning = !expired && timeLeft === 1; // còn 1 ngày -> vàng
+          return { ...i, expiryDate, expired, nearExpiry, warning, timeLeft, showDetail: false };
+        })
+        .filter((i) =>
+          i.customerName.toLowerCase().includes(search.toLowerCase())
         );
-        const expired = now > expiryDate;
-        const timeLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-        const nearExpiry = !expired && timeLeft <= 3;
-        return { ...i, expiryDate, expired, nearExpiry, showDetail: false };
-      });
 
-    setItems(filteredData);
-  } catch (err) {
-    toast.error("Không tải được dữ liệu");
-    console.error(err);
-  }
-};
-
+      setItems(filteredData);
+    } catch (err) {
+      toast.error("Không tải được dữ liệu");
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     loadData();
-  }, [filter]);
+  }, [filter, search]);
 
   const toggleDetail = (id) => {
     setItems((prev) =>
@@ -114,6 +118,15 @@ const loadData = async () => {
           <option value="week">Thuê tuần</option>
           <option value="month">Thuê tháng</option>
         </select>
+
+        <input
+          type="text"
+          placeholder="Tìm theo tên khách..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ marginLeft: "10px", padding: "4px" }}
+        />
+
         <button onClick={openCreateModal}>➕ Tạo rental</button>
       </div>
 
@@ -122,7 +135,13 @@ const loadData = async () => {
           <div
             key={i.id}
             className={`rental-card ${
-              i.expired ? "expired" : i.nearExpiry ? "near-expiry" : ""
+              i.expired
+                ? "expired"
+                : i.warning
+                ? "warning"
+                : i.nearExpiry
+                ? "near-expiry"
+                : ""
             }`}
           >
             <div className="card-summary">
@@ -179,6 +198,14 @@ const loadData = async () => {
                   {i.expiryDate.toLocaleDateString()}{" "}
                   {i.expired && "(Đã hết hạn)"}
                 </div>
+                {i.timeLeft <= 3 && !i.expired && (
+                  <div>
+                    <strong>Cảnh báo:</strong>{" "}
+                    {i.timeLeft === 1
+                      ? "Còn 1 ngày ⚠️"
+                      : `Còn ${i.timeLeft} ngày ⚠️`}
+                  </div>
+                )}
                 <div className="action-buttons">
                   <button
                     className="action-btn edit"
@@ -235,7 +262,9 @@ const loadData = async () => {
             <input
               type="number"
               value={form.price}
-              onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+              onChange={(e) =>
+                setForm({ ...form, price: Number(e.target.value) })
+              }
             />
 
             <label>Thành tiền</label>
