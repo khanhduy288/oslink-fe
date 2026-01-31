@@ -25,6 +25,7 @@ import RoomGroups from "./admin/RoomGroups";
 import AdminLogs from "./admin/AdminLogs";
 import ComboRenew from "./admin/ComboRenew";
 import VoucherPage from "./admin/VoucherPage";
+import RentalExceptions from "./admin/RentalExceptions";
 
 import Header from "./Header";
 
@@ -71,6 +72,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/list" element={<RentalList />} />
+              
               <Route path="/rent" element={<RentalForm />} />
               <Route path="/guide" element={<GuidePage />} />
               <Route path="/guide/images" element={<GuideImagePage />} />
@@ -83,6 +85,7 @@ function App() {
               {userLevel > 10 && (
                 <Route path="/admin" element={<Dashboard />}>
                   <Route path="rentals" element={<Rentals />} />
+                  <Route path="rental-exceptions" element={<RentalExceptions />} />
                   <Route path="stats" element={<Stats />} />
                   <Route path="users" element={<Users />} />
                   <Route path="settings" element={<Settings />} />
