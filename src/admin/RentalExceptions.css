@@ -1,0 +1,343 @@
+/* Container chính */
+.list-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Title */
+.list-container h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+/* Toolbar */
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-toolbar select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.admin-toolbar button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #2196f3;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.admin-toolbar button:hover {
+  background-color: #1976d2;
+}
+
+/* Card container */
+.rental-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Card */
+.rental-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+  overflow: hidden;
+}
+
+.rental-card.expired {
+  background-color: #ffe6e6;
+  border: 1px solid #f44336;
+}
+
+/* Card summary */
+.card-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-summary div {
+  font-size: 14px;
+  color: #333;
+}
+
+.toggle-detail-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #3498db;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.toggle-detail-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Detail section */
+.card-detail {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding-top 0.3s ease, margin-top 0.3s ease;
+}
+
+.card-detail.show {
+  max-height: 500px;
+  opacity: 1;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.action-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.action-btn.extend {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+.action-btn.extend:hover {
+  background-color: #1e8449;
+}
+
+.action-btn.change-tab {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.action-btn.change-tab:hover {
+  background-color: #2980b9;
+}
+
+.action-btn.cancel {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.action-btn.cancel:hover {
+  background-color: #c0392b;
+}
+
+/* Status badge */
+.status {
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .card-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .toggle-detail-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .action-btn {
+    width: 48%;
+  }
+
+  /* Ẩn một số trường trên mobile */
+  .hide-mobile {
+    display: none;
+  }
+}
+
+/* Optional: shadow hover */
+.rental-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+/* MODAL OVERLAY */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* MODAL BOX */
+.modal {
+  background-color: #fff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  animation: fadeIn 0.2s ease-in-out;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+/* Modal title */
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Labels */
+.modal label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Inputs & Select */
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+/* Disabled input (Thành tiền) */
+.modal input[disabled] {
+  background: #f0f0f0;
+  color: #555;
+}
+
+/* Modal action buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.confirm-btn {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.confirm-btn:hover {
+  background-color: #45a049;
+}
+
+.cancel-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background-color: #da190b;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive modal */
+@media screen and (max-width: 500px) {
+  .modal {
+    width: 95%;
+    padding: 15px 18px;
+  }
+
+  .modal h3 {
+    font-size: 1.1rem;
+  }
+
+  .modal input,
+  .modal select {
+    font-size: 0.9rem;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .confirm-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}
+/* Khi còn dưới 3 ngày */
+.rental-card.near-expiry {
+  background-color: #fff8e1; /* vàng nhạt */
+  border: 1px solid #ffeb3b; /* vàng đậm viền */
+}
+
+/* Khi hết hạn */
+.rental-card.expired {
+  background-color: #ffe6e6; /* hồng nhạt */
+  border: 1px solid #f44336; /* đỏ */
+}
