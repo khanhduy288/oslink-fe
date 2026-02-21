@@ -132,8 +132,8 @@ function RentalForm() {
           <h3>GÓI VIP</h3>
           <p className="price">250.000 VND / 1 Tab / 1 tháng</p>
           <ul className="vip-features">
-            <li>Ưu tiên cấp Tab nhanh</li>
-            <li>Hỗ trợ riêng</li>
+            <li>Ổn định</li>
+            <li>Mượt hơn</li>
           </ul>
           <button className="select-btn">Chọn gói</button>
         </div>
@@ -142,7 +142,7 @@ function RentalForm() {
       {/* Form thuê */}
       <form className="rental-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Số lượng Tab (tối đa 10)</label>
+          <label>Số lượng Tab</label>
           <div className="stepper">
             <button type="button" onClick={() => setTabs(Math.max(1, tabs - 1))}>-</button>
             <input type="number" value={tabs} readOnly />
