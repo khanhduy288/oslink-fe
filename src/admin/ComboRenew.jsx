@@ -22,7 +22,8 @@ function ComboRenew() {
   const [extendModal, setExtendModal] = useState({ show: false, months: 1 });
   const [detailModal, setDetailModal] = useState(null);
   const [compensateDays, setCompensateDays] = useState(1);
-
+  const [extendMode, setExtendMode] = useState("month"); // month | week
+  const [weeks, setWeeks] = useState(1); // 1–2–3
   const token = localStorage.getItem("token");
   const API_BASE = "https://api.tabtreo.com"; 
 
@@ -108,18 +109,23 @@ const handleCompensateSelected = () => {
 
 // --- Thêm hàm tính thời gian còn lại ---
 const getRemainingTime = (rental) => {
-  if (!rental.expiresAt) return "0 phút";
-  const rentalEnd = dayjs(rental.expiresAt).tz("Asia/Bangkok");
-  const now = dayjs().tz("Asia/Bangkok");
-  const diffMinutes = rentalEnd.diff(now, "minute");
+  if (!rental.expiresAt) return "Hết hạn";
+
+  const now = dayjs.utc();                 // 🔥 LUÔN UTC
+  const end = dayjs.utc(rental.expiresAt); // 🔥 LUÔN UTC
+
+  const diffMinutes = end.diff(now, "minute");
   if (diffMinutes <= 0) return "Hết hạn";
-  const days = Math.floor(diffMinutes / (24 * 60));
-  const hours = Math.floor((diffMinutes % (24 * 60)) / 60);
+
+  const days = Math.floor(diffMinutes / 1440);
+  const hours = Math.floor((diffMinutes % 1440) / 60);
   const minutes = diffMinutes % 60;
+
   let result = "";
   if (days > 0) result += `${days}d `;
   if (hours > 0) result += `${hours}h `;
   if (minutes > 0) result += `${minutes}m`;
+
   return result.trim();
 };
 
@@ -201,28 +207,29 @@ const getRemainingTime = (rental) => {
     setEditData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleEditSubmit = async () => {
-    try {
-      const months = Number(editData.requestedExtendMonths) || 0;
-      const oldExpiresAt = new Date(editData.expiresAt).getTime();
-      const extendMinutes = months * 30 * 24 * 60;
-      const newExpiresAt = new Date(oldExpiresAt + extendMinutes * 60000).toISOString();
-      await axios.patch(`${API_BASE}/rentals/${editingRental.id}`, {
+const handleEditSubmit = async () => {
+  try {
+    await axios.patch(
+      `${API_BASE}/rentals/${editingRental.id}`,
+      {
         username: editData.username,
         roomCode: editData.roomCode,
         rentalTime: Number(editData.rentalTime),
-        expiresAt: newExpiresAt,
+        expiresAt: editData.expiresAt, // 🔥 GỬI NGUYÊN
         requestedExtendMonths: null,
         status: editData.status,
-      }, { headers: { Authorization: `Bearer ${token}` } });
-      fetchRentals();
-      setEditingRental(null);
-      toast.success("✅ Đã cập nhật rental!");
-    } catch (err) {
-      console.error(err);
-      toast.error("❌ Lỗi khi cập nhật rental");
-    }
-  };
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    fetchRentals();
+    setEditingRental(null);
+    toast.success("✅ Đã cập nhật rental!");
+  } catch (err) {
+    console.error(err);
+    toast.error("❌ Lỗi khi cập nhật rental");
+  }
+};
   const handleEditCancel = () => setEditingRental(null);
 
   const handleCreateChange = (e) => {
@@ -249,65 +256,100 @@ const getRemainingTime = (rental) => {
     setSelectedRentals(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
-  const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
-    const comboPrices = [{ tabs: 5, price: 600000 }, { tabs: 3, price: 400000 }];
-    const basePrice = 150000;
-    let total = 0;
-    const normalizedObjects = selectedRentalObjects.map(r => ({ ...r, pricePerTab: r.pricePerTab < basePrice ? basePrice : r.pricePerTab }));
-    let normalTabs = normalizedObjects.filter(r => r.pricePerTab === basePrice).length;
-    const sortedCombos = [...comboPrices].sort((a,b) => b.tabs - a.tabs);
-    for(const combo of sortedCombos){
-      const count = Math.floor(normalTabs / combo.tabs);
-      total += count * combo.price;
-      normalTabs %= combo.tabs;
+const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
+  const WEEK_PRICE_PER_TAB = 50000; // 🔥 GIÁ TUẦN
+  const basePrice = 150000;
+
+  const comboPrices = [
+    { tabs: 5, price: 600000 },
+    { tabs: 3, price: 400000 },
+  ];
+
+  // ===== GÓI TUẦN =====
+  if (months < 1) {
+    const weeks = Math.round(months * 4); // 0.25 → 1 tuần
+    return selectedRentalObjects.length * weeks * WEEK_PRICE_PER_TAB;
+  }
+
+  // ===== GÓI THÁNG =====
+  let remainingTabs = selectedRentalObjects.length;
+  let total = 0;
+
+  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
+
+  for (const combo of sortedCombos) {
+    while (remainingTabs >= combo.tabs) {
+      total += combo.price;
+      remainingTabs -= combo.tabs;
     }
-    total += normalTabs * basePrice;
-    total += normalizedObjects.filter(r => r.pricePerTab !== basePrice).reduce((sum,r)=>sum+r.pricePerTab,0);
-    return total * months;
-  };
+  }
+
+  total += remainingTabs * basePrice;
+
+  return total * months;
+};
 
   const openExtendModal = () => {
-    if(selectedRentals.length === 0) return toast.info("Chọn ít nhất 1 đơn để gia hạn!");
-    const invalid = rentals.filter(r=>selectedRentals.includes(r.id) && !["active","expired"].includes(r.status));
-    if(invalid.length > 0) return toast.warning(`Có ${invalid.length} đơn chưa xác nhận hoặc đang chờ duyệt!`);
-    setExtendModal({ show:true, months:1 });
+    if (selectedRentals.length === 0)
+      return toast.info("Chọn ít nhất 1 đơn để gia hạn!");
+
+    const invalid = rentals.filter(
+      r => selectedRentals.includes(r.id) &&
+      !["active", "expired"].includes(r.status)
+    );
+    if (invalid.length > 0)
+      return toast.warning(`Có ${invalid.length} đơn chưa hợp lệ`);
+
+    setExtendModal({ show: true, months: 1 });
+    setExtendMode("month"); // 🔥 reset
+    setWeeks(1);
   };
+
   const closeExtendModal = () => setExtendModal({ show:false, months:1 });
 
 const handleConfirmExtendCombo = async () => {
-  if(selectedRentals.length === 0) return;
+  if (selectedRentals.length === 0) return;
+
   const months = extendModal.months;
+
+  const extendMinutes =
+    months < 1
+      ? Math.round(months * 4) * 7 * 24 * 60
+      : months * 30 * 24 * 60;
+
   try {
-    // 1️⃣ Gửi request-extend
     await Promise.all(
-      selectedRentals.map(id =>
-        axios.post(`${API_BASE}/rentals/${id}/request-extend`, {
-          months,
-          requestedExtendMonths: months,
-          extendTimeInMinutes: months * 30 * 24 * 60
-        }, { headers: { Authorization: `Bearer ${token}` } })
-      )
-    );
-    toast.info("Đang gửi yêu cầu gia hạn...");
-
-    // 2️⃣ Sleep 2 giây (có thể thêm animation loading)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // 3️⃣ Gọi confirm-extend (hàm admin confirm)
-    await Promise.all(
-      selectedRentals.map(id =>
-        axios.patch(`${API_BASE}/rentals/${id}/confirm-extend`, {}, { headers: { Authorization: `Bearer ${token}` } })
-      )
+      selectedRentals.map(id => {
+        const rental = rentals.find(r => r.id === id);
+        return axios.post(
+          `${API_BASE}/rentals/${id}/request-extend`,
+          {
+            months,
+            extendMinutes,
+            currentExpiresAt: rental?.expiresAt || null,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      })
     );
 
-    // 4️⃣ Cập nhật UI
-    toast.success(" Đã gửi yêu cầu và xác nhận gia hạn thành công!");
+    await Promise.all(
+      selectedRentals.map(id =>
+        axios.patch(
+          `${API_BASE}/rentals/${id}/confirm-extend`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+      )
+    );
+
+    toast.success("✅ Gia hạn combo thành công!");
     setSelectedRentals([]);
-    setExtendModal({ show:false, months:1 });
+    setExtendModal({ show: false, months: 1 });
     fetchRentals();
-  } catch(err) {
+  } catch (err) {
     console.error(err);
-    toast.error("❌ Gia hạn thất bại!");
+    toast.error("❌ Gia hạn combo thất bại!");
   }
 };
 
@@ -469,10 +511,64 @@ const handleConfirmExtendCombo = async () => {
         <div className="qr-modal" onClick={closeExtendModal}>
           <div className="qr-content" onClick={e=>e.stopPropagation()}>
             <h3>Gia hạn combo ({selectedRentals.length} đơn)</h3>
-            <label>Số tháng:</label>
-            <select value={extendModal.months} onChange={e=>setExtendModal({...extendModal, months:Number(e.target.value)})}>
-              {[...Array(12)].map((_,i)=><option key={i+1} value={i+1}>{i+1} tháng</option>)}
-            </select>
+              <label>Thời gian gia hạn:</label>
+
+              <div className="rent-mode">
+                <button
+                  type="button"
+                  className={extendMode === "month" ? "active" : ""}
+                  onClick={() => {
+                    setExtendMode("month");
+                    setExtendModal({ ...extendModal, months: 1 });
+                  }}
+                >
+                  Theo tháng
+                </button>
+
+                <button
+                  type="button"
+                  className={extendMode === "week" ? "active" : ""}
+                  onClick={() => {
+                    setExtendMode("week");
+                    setWeeks(1);
+                    setExtendModal({ ...extendModal, months: 0.25 });
+                  }}
+                >
+                  Theo tuần
+                </button>
+              </div>
+
+              {/* ===== CHỌN THÁNG ===== */}
+              {extendMode === "month" && (
+                <select
+                  value={extendModal.months}
+                  onChange={e =>
+                    setExtendModal({ ...extendModal, months: Number(e.target.value) })
+                  }
+                >
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1} tháng
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {/* ===== CHỌN TUẦN ===== */}
+              {extendMode === "week" && (
+                <select
+                  value={weeks}
+                  onChange={e => {
+                    const w = Number(e.target.value);
+                    setWeeks(w);
+                    setExtendModal({ ...extendModal, months: w * 0.25 });
+                  }}
+                >
+                  <option value={1}>1 tuần</option>
+                  <option value={2}>2 tuần</option>
+                  <option value={3}>3 tuần</option>
+                </select>
+              )}
             <p>Tổng tiền: <strong>{totalPrice.toLocaleString()} VND</strong></p>
             <img src="/images/qrthanhtoan.png" alt="QR thanh toán" style={{width:"300px"}}/>
             <div style={{marginTop:"10px", display:'flex', gap:'10px', justifyContent:'flex-end'}}>
