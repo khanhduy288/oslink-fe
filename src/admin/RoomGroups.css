@@ -40,7 +40,7 @@
 .room-groups-container .filter-select {
   padding: 6px 8px;
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  border: 2px solid #939599;
   background: #fff;
   font-size: 13px;
   outline: none;
@@ -98,7 +98,7 @@
 .room-groups-container .room-table td {
   padding: 8px 10px;
   vertical-align: top;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid #756d6d;
   font-size: 13px;
 }
 
