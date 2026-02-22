@@ -16,7 +16,9 @@ function VoucherPage() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyForm);
-
+  const [ctvs, setCtvs] = useState([]);
+  const [ctvPhone, setCtvPhone] = useState("");
+  const [loadingCTV, setLoadingCTV] = useState(false);
   const token = localStorage.getItem("token");
 
   const api = axios.create({
@@ -24,15 +26,42 @@ function VoucherPage() {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  useEffect(() => {
-    fetchVouchers();
-  }, []);
+useEffect(() => {
+  fetchVouchers();
+  fetchCTVs();
+}, []);
 
   /* ================= READ ================= */
   const fetchVouchers = async () => {
     const res = await api.get("/admin/vouchers");
     setVouchers(res.data);
   };
+
+/* ================= CTV ================= */
+const fetchCTVs = async () => {
+  const res = await api.get("/admin/ctvs");
+  setCtvs(res.data);
+};
+
+const addCTV = async () => {
+  if (!ctvPhone) return alert("Nhập số điện thoại");
+  setLoadingCTV(true);
+  try {
+    await api.post("/admin/ctvs", { phone: ctvPhone });
+    setCtvPhone("");
+    fetchCTVs();
+  } catch (err) {
+    alert(err.response?.data?.message || "Không thêm được CTV");
+  } finally {
+    setLoadingCTV(false);
+  }
+};
+
+const revokeCTV = async (id) => {
+  if (!window.confirm("Gỡ quyền CTV?")) return;
+  await api.patch(`/admin/ctvs/${id}/revoke`);
+  fetchCTVs();
+};
 
   /* ================= CREATE ================= */
   const createVoucher = async () => {
@@ -160,6 +189,61 @@ function VoucherPage() {
           </tbody>
         </table>
       </div>
+      <div className="voucher-header" style={{ marginTop: 40 }}>
+  <h2>👥 Quản lý CTV</h2>
+</div>
+
+<div className="voucher-card">
+  <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+    <input
+      placeholder="Nhập SĐT user"
+      value={ctvPhone}
+      onChange={(e) => setCtvPhone(e.target.value)}
+    />
+    <button className="btn-primary" onClick={addCTV} disabled={loadingCTV}>
+      + Thêm CTV
+    </button>
+  </div>
+
+  <table className="voucher-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>SĐT</th>
+        <th>Username</th>
+        <th>Level</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ctvs.map(u => (
+        <tr key={u.id}>
+          <td>{u.id}</td>
+          <td>{u.phone}</td>
+          <td>{u.username}</td>
+          <td>
+            <span className="status active">CTV</span>
+          </td>
+          <td>
+            <button
+              className="danger"
+              onClick={() => revokeCTV(u.id)}
+            >
+              Gỡ CTV
+            </button>
+          </td>
+        </tr>
+      ))}
+      {ctvs.length === 0 && (
+        <tr>
+          <td colSpan="5" style={{ textAlign: "center", opacity: 0.6 }}>
+            Chưa có CTV
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
 
       {/* MODAL */}
       {showModal && (
