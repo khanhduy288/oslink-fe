@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import "./RoomGroups.css";
 
 const API_BASE = "https://api.tabtreo.com";
 
@@ -51,7 +52,9 @@ function RoomGroups() {
           Object.values(groupMap).map((g) => ({
             ...g,
             count: g.rooms.length,
-            minRemaining: Math.min(...g.remainingTimes.filter((t) => t != null)),
+            minRemaining: Math.min(
+              ...g.remainingTimes.filter((t) => t != null)
+            ),
           }))
         );
       } catch (err) {
@@ -105,118 +108,94 @@ function RoomGroups() {
   const filteredGroups = groups
     .filter((g) => {
       const f =
-        filter === "all" ? true : filter === "active" ? !g.expired : g.expired;
+        filter === "all"
+          ? true
+          : filter === "active"
+          ? !g.expired
+          : g.expired;
+
       const s = g.rooms.some((r) =>
         r.roomCode.toLowerCase().includes(search.toLowerCase())
       );
+
       return f && (search === "" || s);
     })
     .sort((a, b) => a.minRemaining - b.minRemaining);
 
-  if (loading)
-    return <p style={{ textAlign: "center" }}>⏳ Đang tải dữ liệu...</p>;
+  if (loading) {
+    return <p className="loading-text">⏳ Đang tải dữ liệu...</p>;
+  }
 
   return (
-    <div style={{ padding: 20, maxWidth: 1300, margin: "auto" }}>
-      <h2 style={{ textAlign: "center", marginBottom: 16 }}>
+    <div className="room-groups-container">
+      <h2 className="room-groups-title">
         👥 Quản lý Groups ({filteredGroups.length})
       </h2>
 
       {/* ===== FILTER BAR ===== */}
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          justifyContent: "center",
-          marginBottom: 16,
-        }}
-      >
+      <div className="filter-bar">
         <input
+          className="filter-input"
           placeholder="🔍 Tìm RoomCode..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ padding: 8, width: 240 }}
         />
+
         <select
+          className="filter-select"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          style={{ padding: 8 }}
         >
           <option value="all">Tất cả</option>
           <option value="active">Còn hạn</option>
           <option value="expired">Hết hạn</option>
         </select>
-        <button
-          onClick={exportToExcel}
-          style={{
-            padding: "8px 14px",
-            background: "#2563eb",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer",
-          }}
-        >
+
+        <button className="export-btn" onClick={exportToExcel}>
           📤 Xuất Excel
         </button>
       </div>
 
       {/* ===== TABLE ===== */}
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#fff",
-          boxShadow: "0 4px 10px rgba(0,0,0,.05)",
-        }}
-      >
-        <thead style={{ background: "#f1f5ff" }}>
+      <table className="room-table">
+        <thead>
           <tr>
-            <th style={th}>#</th>
-            <th style={th}>Group</th>
-            <th style={th}>Phone</th>
-            <th style={th}>Rooms</th>
+            <th>#</th>
+            <th>Group</th>
+            <th>Phone</th>
+            <th>Rooms</th>
           </tr>
         </thead>
         <tbody>
           {filteredGroups.map((g, idx) => (
-            <tr key={idx} style={g.expired ? { background: "#fff1f1" } : {}}>
-              <td style={td}>{idx + 1}</td>
-              <td style={td}>{g.group}</td>
-              <td style={td}>{g.phone}</td>
-              <td style={td}>
+            <tr
+              key={idx}
+              className={g.expired ? "row-expired" : ""}
+            >
+              <td>{idx + 1}</td>
+              <td>{g.group}</td>
+              <td>{g.phone}</td>
+              <td>
                 {g.rooms.map((room, i) => {
                   const remain = g.remainingTimes[i];
                   return (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: "8px 12px",
-                        marginBottom: 6,
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 6,
-                        background: "#f9fafb",
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 600 }}>
+                    <div key={i} className="room-card">
+                      <div className="room-info">
+                        <div className="room-code">
                           {room.roomCode}
                         </div>
                         {room.createdAt && (
-                          <div style={{ fontSize: 12, color: "#6b7280" }}>
+                          <div className="room-created">
                             🕒{" "}
                             {new Date(room.createdAt).toLocaleString("vi-VN")}
                           </div>
                         )}
                       </div>
+
                       <span
-                        style={{
-                          fontWeight: 700,
-                          color: remain > 0 ? "#16a34a" : "#dc2626",
-                        }}
+                        className={`time-remaining ${
+                          remain > 0 ? "time-active" : "time-expired"
+                        }`}
                       >
                         {formatTime(remain)}
                       </span>
@@ -231,17 +210,5 @@ function RoomGroups() {
     </div>
   );
 }
-
-const th = {
-  padding: 10,
-  textAlign: "left",
-  borderBottom: "2px solid #e5e7eb",
-};
-
-const td = {
-  padding: 10,
-  verticalAlign: "top",
-  borderBottom: "1px solid #f1f1f1",
-};
 
 export default RoomGroups;

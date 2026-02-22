@@ -1,65 +1,127 @@
-/* ===== GLOBAL ===== */
+/* ====== GLOBAL RESET ====== */
 * {
   box-sizing: border-box;
 }
 
 body {
   background: #f7f9fb;
+  font-size: 13px; /* nền chữ nhỏ cho gọn */
+  color: #111827;
 }
 
-/* ===== TABLE ===== */
-table {
+/* ====== LAYOUT ====== */
+.room-groups-container {
+  padding: 16px;
+  max-width: 1300px;
+  margin: auto;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.room-groups-title {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ====== FILTER BAR ====== */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-input,
+.filter-select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.filter-input {
+  width: 220px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+}
+
+.export-btn {
+  padding: 6px 12px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.export-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ====== TABLE ====== */
+.room-table {
   width: 100%;
   border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
 }
 
-th {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff;
-  padding: 12px;
-  font-size: 14px;
+.room-table thead {
+  background: #f1f5ff;
+}
+
+.room-table th {
+  padding: 8px 10px;
   text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 2px solid #e5e7eb;
+  white-space: nowrap;
 }
 
-td {
-  border: 1px solid #e5e7eb;
-  padding: 10px;
+.room-table td {
+  padding: 8px 10px;
   vertical-align: top;
-  font-size: 14px;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 13px;
 }
 
-/* ===== ROW STATE ===== */
-tr:nth-child(even) {
-  background-color: #fafafa;
+/* ====== ROW STATES ====== */
+.row-expired {
+  background: #fff1f1;
 }
 
-tr:hover {
-  background-color: #f1f5ff;
-}
-
-tr[style*="ffecec"] {
-  background-color: #fff1f2 !important;
-}
-
-/* ===== ROOM CARD ===== */
+/* ====== ROOM CARD (COMPACT) ====== */
 .room-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  border-radius: 10px;
-  border: 1px solid #e0e7ff;
-  background: linear-gradient(135deg, #f8faff, #eef2ff);
-  transition: all 0.2s ease;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
 }
 
 .room-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15);
+  background: #f1f5ff;
 }
 
-/* ===== LEFT SIDE ===== */
 .room-info {
   display: flex;
   flex-direction: column;
@@ -68,86 +130,55 @@ tr[style*="ffecec"] {
 
 .room-code {
   font-weight: 600;
-  color: #1e3a8a;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.25;
 }
 
 .room-created {
-  font-size: 12px;
+  font-size: 11px;
   color: #6b7280;
+  line-height: 1.2;
 }
 
-/* ===== RIGHT SIDE – TIME ===== */
-.room-time {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 13px;
+/* ====== TIME ====== */
+.time-remaining {
+  font-weight: 700;
+  font-size: 12px;
   white-space: nowrap;
 }
 
-/* trạng thái time */
-.time-ok {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.time-warning {
-  background: #fef9c3;
-  color: #854d0e;
+.time-active {
+  color: #16a34a;
 }
 
 .time-expired {
-  background: #fee2e2;
-  color: #991b1b;
+  color: #dc2626;
 }
 
-/* ===== CONTROLS ===== */
-input,
-select {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  outline: none;
+/* ====== LOADING ====== */
+.loading-text {
+  text-align: center;
+  font-size: 14px;
+  padding: 24px;
+  color: #6b7280;
 }
 
-input:focus,
-select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-}
-
-button {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  background: #16a34a;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-button:hover {
-  background: #15803d;
-}
-
-/* ===== RESPONSIVE ===== */
+/* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {
-  th:nth-child(2),
-  td:nth-child(2),
-  th:nth-child(3),
-  td:nth-child(3) {
-    display: none; /* ẩn Group + Phone trên mobile */
+  .room-table th:nth-child(2),
+  .room-table td:nth-child(2),
+  .room-table th:nth-child(3),
+  .room-table td:nth-child(3) {
+    display: none;
   }
 
   .room-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
+    gap: 4px;
   }
 
-  .room-time {
+  .time-remaining {
     align-self: flex-end;
   }
 }
