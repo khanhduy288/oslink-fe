@@ -1,0 +1,153 @@
+/* ===== GLOBAL ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #f7f9fb;
+}
+
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  padding: 12px;
+  font-size: 14px;
+  text-align: left;
+}
+
+td {
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+/* ===== ROW STATE ===== */
+tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+tr:hover {
+  background-color: #f1f5ff;
+}
+
+tr[style*="ffecec"] {
+  background-color: #fff1f2 !important;
+}
+
+/* ===== ROOM CARD ===== */
+.room-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  border: 1px solid #e0e7ff;
+  background: linear-gradient(135deg, #f8faff, #eef2ff);
+  transition: all 0.2s ease;
+}
+
+.room-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15);
+}
+
+/* ===== LEFT SIDE ===== */
+.room-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.room-code {
+  font-weight: 600;
+  color: #1e3a8a;
+  font-size: 14px;
+}
+
+.room-created {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ===== RIGHT SIDE – TIME ===== */
+.room-time {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* trạng thái time */
+.time-ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.time-warning {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.time-expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===== CONTROLS ===== */
+input,
+select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #15803d;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  th:nth-child(2),
+  td:nth-child(2),
+  th:nth-child(3),
+  td:nth-child(3) {
+    display: none; /* ẩn Group + Phone trên mobile */
+  }
+
+  .room-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .room-time {
+    align-self: flex-end;
+  }
+}

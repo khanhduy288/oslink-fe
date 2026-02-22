@@ -4,6 +4,8 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import './Rentals.css'; // CSS cho bảng, nút và modal
 
+
+
 function Rentals() {
   const [rentals, setRentals] = useState([]);
   const [editingRental, setEditingRental] = useState(null);
@@ -108,18 +110,27 @@ const handleUpdateStatus = async (id, status, action = null) => {
     toast.info("Chức năng đang phát triển, vui lòng liên hệ admin support");
   };
 
-  const handleEditClick = (rental) => {
-    setEditingRental(rental);
-    setEditData({
-      username: rental.username,
-      rentalTime: rental.rentalTime,
-      roomCode: rental.roomCode || '',
-      requestedExtendMonths: rental.requestedExtendMonths || '',
-      expiresAt: rental.expiresAt ? rental.expiresAt.slice(0,16) : "",
-      status: rental.status,
-    });
-  };
+const handleEditClick = (rental) => {
+  setEditingRental(rental);
 
+  let localExpiresAt = "";
+
+  if (rental.expiresAt) {
+    const d = new Date(rental.expiresAt); // ISO UTC
+    localExpiresAt =
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}T` +
+      `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  }
+
+  setEditData({
+    username: rental.username,
+    rentalTime: rental.rentalTime,
+    roomCode: rental.roomCode || "",
+    requestedExtendMonths: rental.requestedExtendMonths || "",
+    expiresAt: localExpiresAt, // 🔥 LOCAL ĐÚNG
+    status: rental.status,
+  });
+};
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -130,18 +141,35 @@ const handleEditSubmit = async () => {
   try {
     const months = Number(editData.requestedExtendMonths) || 0;
 
-    const oldExpiresAt = new Date(editData.expiresAt).getTime();
-    const extendMinutes = months * 30 * 24 * 60;
+    let finalExpiresAtISO = null;
 
-    const newExpiresAt = new Date(oldExpiresAt + extendMinutes * 60000).toISOString();
+    // ====== 1️⃣ TÍNH TIME BẰNG LOCAL ======
+    if (editData.expiresAt) {
+      // editData.expiresAt: "YYYY-MM-DDTHH:mm" (LOCAL)
+      const [date, time] = editData.expiresAt.split("T");
+      const [y, m, d] = date.split("-").map(Number);
+      const [hh, mm] = time.split(":").map(Number);
 
+      const localDate = new Date(y, m - 1, d, hh, mm);
+
+      // ====== 2️⃣ GIA HẠN (NẾU CÓ) ======
+      if (months > 0) {
+        localDate.setMinutes(
+          localDate.getMinutes() + months * 30 * 24 * 60
+        );
+      }
+
+      // ====== 3️⃣ CONVERT → ISO UTC ======
+      finalExpiresAtISO = localDate.toISOString();
+    }
+
+    // ====== 4️⃣ GỬI BE ======
     await axios.patch(
       `${API_BASE}/rentals/${editingRental.id}`,
       {
-        username: editData.username,
         roomCode: editData.roomCode,
-        rentalTime: Number(editData.rentalTime), // admin tự nhập => lấy trực tiếp luôn
-        expiresAt: newExpiresAt,
+        rentalTime: Number(editData.rentalTime),
+        expiresAt: finalExpiresAtISO, // 🔥 ISO UTC
         requestedExtendMonths: null,
         status: editData.status,
       },

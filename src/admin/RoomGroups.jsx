@@ -41,12 +41,8 @@ function RoomGroups() {
               };
             }
 
-            groupMap[key].rooms.push({
-              roomCode: shortRoom,
-              createdAt
-            });
+            groupMap[key].rooms.push({ roomCode: shortRoom, createdAt });
             groupMap[key].remainingTimes.push(remaining);
-
             if (g.expired) groupMap[key].expired = true;
           });
         });
@@ -55,10 +51,9 @@ function RoomGroups() {
           Object.values(groupMap).map((g) => ({
             ...g,
             count: g.rooms.length,
-            minRemaining: Math.min(...(g.remainingTimes.filter(t => t != null)))
+            minRemaining: Math.min(...g.remainingTimes.filter((t) => t != null)),
           }))
         );
-
       } catch (err) {
         console.error("Fetch rooms error:", err);
       } finally {
@@ -71,250 +66,182 @@ function RoomGroups() {
 
   const formatTime = (minutes) => {
     if (minutes == null) return "-";
-    const days = Math.floor(minutes / 1440);
-    const hrs = Math.floor((minutes % 1440) / 60);
-    const mins = minutes % 60;
-    return `${days}d ${hrs}h ${mins}m`;
+    const d = Math.floor(minutes / 1440);
+    const h = Math.floor((minutes % 1440) / 60);
+    const m = minutes % 60;
+    return `${d}d ${h}h ${m}m`;
   };
 
-  // ✅ Sửa lại hàm exportToExcel
   const exportToExcel = () => {
-    const exportData = [];
-
+    const rows = [];
     groups.forEach((g, stt) => {
       g.rooms.forEach((room, i) => {
-        // Nếu là dòng đầu tiên của group thì hiển thị group info
-        exportData.push({
+        rows.push({
           STT: i === 0 ? stt + 1 : "",
-          GroupKey: i === 0 ? g.group : "",
+          Group: i === 0 ? g.group : "",
           Phone: i === 0 ? g.phone : "",
           RoomCode: room.roomCode,
-          "Thời gian còn lại": formatTime(g.remainingTimes[i]),
+          "Còn lại": formatTime(g.remainingTimes[i]),
           "Ngày tạo": room.createdAt
             ? new Date(room.createdAt).toLocaleString("vi-VN")
-            : ""
+            : "",
         });
       });
     });
 
-    // ✅ Thêm style format (tự căn độ rộng, border, font)
-    const worksheet = XLSX.utils.json_to_sheet(exportData, { origin: "A1" });
-    const workbook = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "RoomGroups");
+    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
 
-    // Auto width columns theo dữ liệu
-    const colWidths = Object.keys(exportData[0]).map((key) => ({
-      wch: Math.max(
-        key.length,
-        ...exportData.map((r) =>
-          r[key] ? r[key].toString().length + 2 : 5
-        )
-      ),
-    }));
-    worksheet["!cols"] = colWidths;
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, "RoomGroups");
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array"
-    });
-
-    const blob = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    });
-
-    saveAs(blob, `RoomGroups_${new Date().toLocaleDateString("vi-VN")}.xlsx`);
+    saveAs(
+      new Blob([buf], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }),
+      `RoomGroups_${new Date().toLocaleDateString("vi-VN")}.xlsx`
+    );
   };
-
 
   const filteredGroups = groups
     .filter((g) => {
-      const matchFilter =
+      const f =
         filter === "all" ? true : filter === "active" ? !g.expired : g.expired;
-
-      const matchSearch = g.rooms.some((r) =>
+      const s = g.rooms.some((r) =>
         r.roomCode.toLowerCase().includes(search.toLowerCase())
       );
-
-      return matchFilter && (search === "" || matchSearch);
+      return f && (search === "" || s);
     })
     .sort((a, b) => a.minRemaining - b.minRemaining);
 
-  const containerStyle = {
-    padding: "16px",
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#f7f9fb",
-    minHeight: "100vh",
-    boxSizing: "border-box",
-  };
-
-  const titleStyle = {
-    marginBottom: "15px",
-    fontSize: "22px",
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-  };
-
-  const controlsWrapper = {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px",
-    justifyContent: "center",
-    marginBottom: "20px",
-  };
-
-  const buttonStyle = {
-    padding: "8px 12px",
-    fontSize: "14px",
-    backgroundColor: "#28a745",
-    color: "#fff",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer"
-  };
-
-  const inputStyle = {
-    padding: "8px 10px",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
-    width: "200px",
-    fontSize: "14px",
-  };
-
-  const selectStyle = {
-    padding: "8px 12px",
-    fontSize: "14px",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
-    outline: "none",
-    cursor: "pointer",
-  };
-
-  const tableWrapper = {
-    overflowX: "auto",
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-  };
-
-  const tableStyle = {
-    width: "100%",
-    borderCollapse: "collapse",
-    minWidth: "600px",
-  };
-
-  const thStyle = {
-    backgroundColor: "#007bff",
-    color: "#fff",
-    padding: "10px",
-    textAlign: "left",
-    fontSize: "14px",
-  };
-
-  const tdStyle = {
-    border: "1px solid #ddd",
-    padding: "10px",
-    fontSize: "14px",
-    verticalAlign: "top",
-  };
-
-  const expiredRow = { backgroundColor: "#ffecec" };
-
-  if (loading) return <p style={{ textAlign: "center" }}>Đang tải danh sách...</p>;
+  if (loading)
+    return <p style={{ textAlign: "center" }}>⏳ Đang tải dữ liệu...</p>;
 
   return (
-    <div style={containerStyle}>
-      <h2 style={titleStyle}>
+    <div style={{ padding: 20, maxWidth: 1300, margin: "auto" }}>
+      <h2 style={{ textAlign: "center", marginBottom: 16 }}>
         👥 Quản lý Groups ({filteredGroups.length})
       </h2>
 
-      <div style={controlsWrapper}>
+      {/* ===== FILTER BAR ===== */}
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          justifyContent: "center",
+          marginBottom: 16,
+        }}
+      >
         <input
-          type="text"
-          placeholder="🔍 Tìm theo RoomCode..."
+          placeholder="🔍 Tìm RoomCode..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={inputStyle}
+          style={{ padding: 8, width: 240 }}
         />
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          style={selectStyle}
+          style={{ padding: 8 }}
         >
           <option value="all">Tất cả</option>
           <option value="active">Còn hạn</option>
           <option value="expired">Hết hạn</option>
         </select>
-
-        {/* ✅ NÚT EXPORT */}
-        <button onClick={exportToExcel} style={buttonStyle}>
+        <button
+          onClick={exportToExcel}
+          style={{
+            padding: "8px 14px",
+            background: "#2563eb",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer",
+          }}
+        >
           📤 Xuất Excel
         </button>
       </div>
 
-      {filteredGroups.length === 0 ? (
-        <p style={{ textAlign: "center", color: filter === "expired" ? "red" : "#007b55" }}>
-          Không có room nào {filter === "expired" ? "hết hạn" : "còn hạn"}.
-        </p>
-      ) : (
-        <div style={tableWrapper}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={thStyle}>STT</th>
-                <th style={thStyle}>GroupKey</th>
-                <th style={thStyle}>Phone</th>
-                <th style={thStyle}>RoomCode</th>
-                <th style={thStyle}>Thời gian còn lại</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredGroups.map((g, idx) => (
-                <tr key={idx} style={g.expired ? expiredRow : {}}>
-                  <td style={tdStyle}>{idx + 1}</td>
-                  <td style={tdStyle}>{g.group}</td>
-                  <td style={tdStyle}>{g.phone}</td>
-                  <td style={tdStyle}>
-                    {g.rooms.map((room, i) => (
-                      <div key={i} style={{
-                        marginBottom: "6px",
-                        padding: "6px",
-                        backgroundColor: "#f5f8ff",
-                        borderRadius: "6px",
-                        border: "1px solid #e1e7ff"
-                      }}>
-                        <div style={{ fontWeight: "600", color: "#1a3e72" }}>
+      {/* ===== TABLE ===== */}
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          background: "#fff",
+          boxShadow: "0 4px 10px rgba(0,0,0,.05)",
+        }}
+      >
+        <thead style={{ background: "#f1f5ff" }}>
+          <tr>
+            <th style={th}>#</th>
+            <th style={th}>Group</th>
+            <th style={th}>Phone</th>
+            <th style={th}>Rooms</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredGroups.map((g, idx) => (
+            <tr key={idx} style={g.expired ? { background: "#fff1f1" } : {}}>
+              <td style={td}>{idx + 1}</td>
+              <td style={td}>{g.group}</td>
+              <td style={td}>{g.phone}</td>
+              <td style={td}>
+                {g.rooms.map((room, i) => {
+                  const remain = g.remainingTimes[i];
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "8px 12px",
+                        marginBottom: 6,
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 6,
+                        background: "#f9fafb",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 600 }}>
                           {room.roomCode}
                         </div>
                         {room.createdAt && (
-                          <div style={{ fontSize: "12px", color: "#666" }}>
-                            🕒 {new Date(room.createdAt).toLocaleString("vi-VN")}
+                          <div style={{ fontSize: 12, color: "#6b7280" }}>
+                            🕒{" "}
+                            {new Date(room.createdAt).toLocaleString("vi-VN")}
                           </div>
                         )}
                       </div>
-                    ))}
-                  </td>
-
-                  <td style={tdStyle}>
-                    {g.remainingTimes.map((t, i) => (
-                      <div key={i} style={{
-                        marginBottom: "6px",
-                        fontWeight: "bold",
-                        color: t > 0 ? "#007b55" : "red"
-                      }}>
-                        {formatTime(t)}
-                      </div>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: remain > 0 ? "#16a34a" : "#dc2626",
+                        }}
+                      >
+                        {formatTime(remain)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
+
+const th = {
+  padding: 10,
+  textAlign: "left",
+  borderBottom: "2px solid #e5e7eb",
+};
+
+const td = {
+  padding: 10,
+  verticalAlign: "top",
+  borderBottom: "1px solid #f1f1f1",
+};
 
 export default RoomGroups;

@@ -58,25 +58,30 @@ function RentalList() {
   };
 
   const getRemainingTime = (rental) => {
-    if (!rental.expiresAt) return "0 phút";
-    const rentalEnd = dayjs(rental.expiresAt).tz("Asia/Bangkok");
-    const now = dayjs().tz("Asia/Bangkok");
-    const diffMinutes = rentalEnd.diff(now, "minute");
+    if (!rental.expiresAt) return "Hết hạn";
+
+    const now = dayjs();                 // thời gian local của trình duyệt
+    const end = dayjs(rental.expiresAt); // expiresAt là UTC (có Z)
+
+    const diffMinutes = end.diff(now, "minute");
+
     if (diffMinutes <= 0) return "Hết hạn";
-    const days = Math.floor(diffMinutes / (24 * 60));
-    const hours = Math.floor((diffMinutes % (24 * 60)) / 60);
+
+    const days = Math.floor(diffMinutes / 1440);
+    const hours = Math.floor((diffMinutes % 1440) / 60);
     const minutes = diffMinutes % 60;
+
     let result = "";
     if (days > 0) result += `${days}d `;
     if (hours > 0) result += `${hours}h `;
     if (minutes > 0) result += `${minutes}m`;
+
     return result.trim();
   };
 
   const isExpired = (rental) => {
-    const created = dayjs.utc(rental.createdAt).tz("Asia/Bangkok");
-    const rentalEnd = created.add(rental.rentalTime, "minute");
-    return dayjs().tz("Asia/Bangkok").isAfter(rentalEnd);
+    if (!rental.expiresAt) return true;
+    return dayjs().isAfter(dayjs(rental.expiresAt));
   };
 
   const handleSelectRental = (id) => {
@@ -295,9 +300,7 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
               </p>
               <p>
                 <strong>Ngày tạo:</strong>{" "}
-                {dayjs(rental.createdAt)
-                  .tz("Asia/Bangkok")
-                  .format("DD/MM/YYYY HH:mm:ss")}
+                {dayjs(rental.createdAt).format("DD/MM/YYYY HH:mm:ss")}
               </p>
               <p>
                 <strong>Status:</strong> {rental.status}

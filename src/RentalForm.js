@@ -25,21 +25,33 @@ function RentalForm() {
     { tabs: 5, discount: 150000, price: 600000 },
   ];
 
-  const calculatePrice = () => {
-    if (packageType === "vip") return tabs * vipPrice * months;
+const calculatePrice = () => {
+  // ================= GÓI TUẦN =================
+  if (months < 1) {
+    const weeks = Math.round(months * 4); // 0.25 => 1 tuần
+    const weeklyPricePerTab = 50000;
+    return tabs * weeks * weeklyPricePerTab;
+  }
 
-    let remainingTabs = tabs;
-    let total = 0;
-    const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
-    for (const combo of sortedCombos) {
-      while (remainingTabs >= combo.tabs) {
-        total += combo.price;
-        remainingTabs -= combo.tabs;
-      }
+  // ================= GÓI THÁNG =================
+  if (packageType === "vip") {
+    return tabs * vipPrice * months;
+  }
+
+  let remainingTabs = tabs;
+  let total = 0;
+  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
+
+  for (const combo of sortedCombos) {
+    while (remainingTabs >= combo.tabs) {
+      total += combo.price;
+      remainingTabs -= combo.tabs;
     }
-    total += remainingTabs * basePrice;
-    return total * months;
-  };
+  }
+
+  total += remainingTabs * basePrice;
+  return total * months;
+};
 
   const totalBeforeDiscount = calculatePrice();
   const discountAmount = Math.floor((totalBeforeDiscount * voucherDiscount) / 100);
@@ -75,34 +87,48 @@ function RentalForm() {
 
   const handleCloseQR = () => setShowQR(false);
 
-  const handleConfirmPayment = async () => {
-    if (loading) return;
-    setLoading(true);
-    const finalTotal = totalAfterDiscount;
-    const finalPricePerTab = Math.ceil(finalTotal / tabs);
+const handleConfirmPayment = async () => {
+  if (loading) return;
+  setLoading(true);
 
-    try {
-      for (let i = 0; i < tabs; i++) {
-        await axios.post(
-          "https://api.tabtreo.com/rentals",
-          {
-            username,
-            tabs: 1,
-            months,
-            pricePerTab: finalPricePerTab,
-            voucherCode: voucherCode || null,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
-      alert(`Tạo ${tabs} đơn thuê thành công! Tổng: ${finalTotal.toLocaleString()} VND`);
-      setShowQR(false);
-    } catch (err) {
-      alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
-    } finally {
-      setLoading(false);
+  const finalTotal = totalAfterDiscount;
+
+  // ================== QUYẾT ĐỊNH pricePerTab ==================
+  let finalPricePerTab;
+
+  if (months < 1) {
+    // 👉 GÓI TUẦN: FIX CỨNG 50K
+    finalPricePerTab = 50000;
+  } else {
+    // 👉 GÓI THÁNG (logic cũ)
+    finalPricePerTab = Math.ceil(finalTotal / tabs / months);
+  }
+
+  try {
+    for (let i = 0; i < tabs; i++) {
+      await axios.post(
+        "https://api.tabtreo.com/rentals",
+        {
+          username,
+          tabs: 1,
+          months,
+          pricePerTab: finalPricePerTab,
+          voucherCode: voucherCode || null,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
     }
-  };
+
+    alert(
+      `Tạo ${tabs} đơn thuê thành công! Tổng: ${finalTotal.toLocaleString()} VND`
+    );
+    setShowQR(false);
+  } catch (err) {
+    alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="rental-container">
@@ -151,10 +177,16 @@ function RentalForm() {
         </div>
 
         <div className="form-group">
-          <label>Thời gian thuê (tháng)</label>
+          <label>Thời gian thuê</label>
           <select value={months} onChange={(e) => setMonths(Number(e.target.value))}>
-            {[...Array(12)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1} tháng</option>
+            <option value={0.25}>1 tuần</option>
+            <option value={0.5}>2 tuần</option>
+            <option value={0.75}>3 tuần</option>
+            <option value={1}>1 tháng</option>
+            {[...Array(11)].map((_, i) => (
+              <option key={i + 2} value={i + 2}>
+                {i + 2} tháng
+              </option>
             ))}
           </select>
         </div>
