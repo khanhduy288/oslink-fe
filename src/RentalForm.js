@@ -14,7 +14,8 @@ function RentalForm() {
   const [voucherDiscount, setVoucherDiscount] = useState(0);
   const [voucherLoading, setVoucherLoading] = useState(false);
   const [voucherError, setVoucherError] = useState("");
-
+  const [rentMode, setRentMode] = useState("month"); // "month" | "week"
+  const [weeks, setWeeks] = useState(1); // 1-2-3 tuần
   const [showQR, setShowQR] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -178,17 +179,63 @@ const handleConfirmPayment = async () => {
 
         <div className="form-group">
           <label>Thời gian thuê</label>
-          <select value={months} onChange={(e) => setMonths(Number(e.target.value))}>
-            <option value={0.25}>1 tuần</option>
-            <option value={0.5}>2 tuần</option>
-            <option value={0.75}>3 tuần</option>
-            <option value={1}>1 tháng</option>
-            {[...Array(11)].map((_, i) => (
-              <option key={i + 2} value={i + 2}>
-                {i + 2} tháng
-              </option>
-            ))}
-          </select>
+
+          {/* Nút chọn chế độ */}
+          <div className="rent-mode">
+            <button
+              type="button"
+              className={rentMode === "month" ? "active" : ""}
+              onClick={() => {
+                setRentMode("month");
+                setMonths(1);
+              }}
+            >
+              Theo tháng
+            </button>
+
+            <button
+              type="button"
+              className={rentMode === "week" ? "active" : ""}
+              onClick={() => {
+                setRentMode("week");
+                setWeeks(1);
+                setMonths(0.25);
+              }}
+            >
+              Theo tuần
+            </button>
+          </div>
+
+          {/* CHỌN THÁNG */}
+          {rentMode === "month" && (
+            <select
+              value={months}
+              onChange={(e) => setMonths(Number(e.target.value))}
+            >
+              <option value={1}>1 tháng</option>
+              {[...Array(11)].map((_, i) => (
+                <option key={i + 2} value={i + 2}>
+                  {i + 2} tháng
+                </option>
+              ))}
+            </select>
+          )}
+
+          {/* CHỌN TUẦN */}
+          {rentMode === "week" && (
+            <select
+              value={weeks}
+              onChange={(e) => {
+                const w = Number(e.target.value);
+                setWeeks(w);
+                setMonths(w * 0.25); // quy đổi cho backend
+              }}
+            >
+              <option value={1}>1 tuần</option>
+              <option value={2}>2 tuần</option>
+              <option value={3}>3 tuần</option>
+            </select>
+          )}
         </div>
 
         <div className="form-group">

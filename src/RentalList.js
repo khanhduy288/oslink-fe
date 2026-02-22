@@ -21,6 +21,8 @@ function RentalList() {
   const [voucher, setVoucher] = useState("");
   const [discount, setDiscount] = useState(0);
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [extendMode, setExtendMode] = useState("month"); // month | week
+  const [weeks, setWeeks] = useState(1); // 1–2–3
   const token = localStorage.getItem("token");
   const BACKEND_URL = "https://api.tabtreo.com";
 
@@ -57,31 +59,30 @@ function RentalList() {
     }
   };
 
-  const getRemainingTime = (rental) => {
-    if (!rental.expiresAt) return "Hết hạn";
+const getRemainingTime = (rental) => {
+  if (!rental.expiresAt) return "Hết hạn";
 
-    const now = dayjs();                 // thời gian local của trình duyệt
-    const end = dayjs(rental.expiresAt); // expiresAt là UTC (có Z)
+  const now = dayjs.utc();                 // LUÔN UTC
+  const end = dayjs.utc(rental.expiresAt); // LUÔN UTC
 
-    const diffMinutes = end.diff(now, "minute");
+  const diffMinutes = end.diff(now, "minute");
+  if (diffMinutes <= 0) return "Hết hạn";
 
-    if (diffMinutes <= 0) return "Hết hạn";
+  const days = Math.floor(diffMinutes / 1440);
+  const hours = Math.floor((diffMinutes % 1440) / 60);
+  const minutes = diffMinutes % 60;
 
-    const days = Math.floor(diffMinutes / 1440);
-    const hours = Math.floor((diffMinutes % 1440) / 60);
-    const minutes = diffMinutes % 60;
+  let result = "";
+  if (days > 0) result += `${days}d `;
+  if (hours > 0) result += `${hours}h `;
+  if (minutes > 0) result += `${minutes}m`;
 
-    let result = "";
-    if (days > 0) result += `${days}d `;
-    if (hours > 0) result += `${hours}h `;
-    if (minutes > 0) result += `${minutes}m`;
-
-    return result.trim();
-  };
+  return result.trim();
+};
 
   const isExpired = (rental) => {
     if (!rental.expiresAt) return true;
-    return dayjs().isAfter(dayjs(rental.expiresAt));
+    return dayjs.utc().isAfter(dayjs.utc(rental.expiresAt));
   };
 
   const handleSelectRental = (id) => {
@@ -90,38 +91,38 @@ function RentalList() {
     );
   };
 
-  const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
-    const comboPrices = [
-      { tabs: 5, price: 600000 },
-      { tabs: 3, price: 400000 },
-    ];
-    const basePrice = 150000;
-    let total = 0;
+const calculateTotalPrice = (selectedRentalObjects, months = 1) => {
+  const WEEK_PRICE_PER_TAB = 50000;
+  const basePrice = 150000;
 
-    const normalizedObjects = selectedRentalObjects.map((r) => ({
-      ...r,
-      pricePerTab: r.pricePerTab < basePrice ? basePrice : r.pricePerTab,
-    }));
+  const comboPrices = [
+    { tabs: 3, price: 400000 },
+    { tabs: 5, price: 600000 },
+  ];
 
-    let normalTabs = normalizedObjects.filter((r) => r.pricePerTab === basePrice).length;
+  // ================= GÓI TUẦN =================
+  if (months < 1) {
+    const weeks = Math.round(months * 4); // 0.25 => 1 tuần
+    return selectedRentalObjects.length * weeks * WEEK_PRICE_PER_TAB;
+  }
 
-    const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
-    for (const combo of sortedCombos) {
-      const count = Math.floor(normalTabs / combo.tabs);
-      total += count * combo.price;
-      normalTabs %= combo.tabs;
+  // ================= GÓI THÁNG =================
+  let remainingTabs = selectedRentalObjects.length;
+  let total = 0;
+
+  const sortedCombos = [...comboPrices].sort((a, b) => b.tabs - a.tabs);
+
+  for (const combo of sortedCombos) {
+    while (remainingTabs >= combo.tabs) {
+      total += combo.price;
+      remainingTabs -= combo.tabs;
     }
+  }
 
-    total += normalTabs * basePrice;
+  total += remainingTabs * basePrice;
 
-    const vipTotal = normalizedObjects
-      .filter((r) => r.pricePerTab !== basePrice)
-      .reduce((sum, r) => sum + r.pricePerTab, 0);
-
-    total += vipTotal;
-
-    return total * months;
-  };
+  return total * months;
+};
 
   const openExtendModal = () => {
     if (selectedRentals.length === 0) {
@@ -141,6 +142,8 @@ function RentalList() {
     }
 
     setExtendModal({ show: true, months: 1 });
+    setExtendMode("month");
+    setWeeks(1);
     setVoucher("");
     setDiscount(0);
   };
@@ -166,38 +169,42 @@ const handleApplyVoucher = async () => {
 
 
 
-  const handleConfirmExtend = async () => {
-    const months = extendModal.months;
-    const extendTimeInMinutes = months * 30 * 24 * 60;
+const handleConfirmExtend = async () => {
+  const months = extendModal.months;
 
-    try {
-      await Promise.all(
-        selectedRentals.map((id) =>
-          axios.post(
-            `${BACKEND_URL}/rentals/${id}/request-extend`,
-            {
-              requestedExtendMonths: months,
-              extendTimeInMinutes,
-              months: extendModal.months,
-              voucherCode: voucher || null,
-              discount,
-            },
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
+  const extendMinutes =
+    months < 1
+      ? Math.round(months * 4) * 7 * 24 * 60 // tuần
+      : months * 30 * 24 * 60;              // tháng
+
+  try {
+    await Promise.all(
+      selectedRentalObjects.map((rental) =>
+        axios.post(
+          `${BACKEND_URL}/rentals/${rental.id}/request-extend`,
+          {
+            months,                         // ✅ BẮT BUỘC – FIX LỖI
+            extendMinutes,                  // phút gia hạn
+            currentExpiresAt: rental.expiresAt, // 🔥 để BE cộng tiếp
+            voucherCode: voucher || null,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         )
-      );
+      )
+    );
 
-      toast.success("Gửi yêu cầu gia hạn combo thành công!");
-      setSelectedRentals([]);
-      setExtendModal({ show: false, months: 1 });
-      setVoucher("");
-      setDiscount(0);
-      fetchRentals();
-    } catch (error) {
-      console.error("Lỗi khi gửi yêu cầu gia hạn combo:", error);
-      toast.error("Không thể gửi yêu cầu. Vui lòng thử lại!");
-    }
-  };
+    toast.success("Gửi yêu cầu gia hạn thành công!");
+    setSelectedRentals([]);
+    setExtendModal({ show: false, months: 1 });
+    setVoucher("");
+    fetchRentals();
+  } catch (err) {
+    console.error(err);
+    toast.error("Không thể gửi yêu cầu gia hạn!");
+  }
+};
 
   if (loading) return <p>Đang tải danh sách thuê...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -207,12 +214,17 @@ const handleApplyVoucher = async () => {
     .filter(Boolean);
   const totalTabs = selectedRentalObjects.length;
   const totalPrice = calculateTotalPrice(selectedRentalObjects, extendModal.months);
-const totalPriceBeforeDiscount = calculateTotalPrice(selectedRentalObjects, extendModal.months);
+const totalPriceBeforeDiscount = calculateTotalPrice(
+  selectedRentalObjects,
+  extendModal.months
+);
+
 const totalPriceAfterDiscount = discountPercent
-  ? Math.round(totalPriceBeforeDiscount * (100 - discountPercent) / 100)
+  ? Math.round((totalPriceBeforeDiscount * (100 - discountPercent)) / 100)
   : totalPriceBeforeDiscount;
 
-const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
+const discountAmount =
+  totalPriceBeforeDiscount - totalPriceAfterDiscount;
 
   return (
     
@@ -331,19 +343,65 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
           <div className="qr-content" onClick={(e) => e.stopPropagation()}>
             <h3>Gia hạn combo ({selectedRentals.length} đơn)</h3>
 
-            <label>Thời gian gia hạn (tháng):</label>
-            <select
-              value={extendModal.months}
-              onChange={(e) =>
-                setExtendModal({ ...extendModal, months: Number(e.target.value) })
-              }
-            >
-              {[...Array(12)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1} tháng
-                </option>
-              ))}
-            </select>
+        <label>Thời gian gia hạn:</label>
+
+        <div className="rent-mode">
+          <button
+            type="button"
+            className={extendMode === "month" ? "active" : ""}
+            onClick={() => {
+              setExtendMode("month");
+              setExtendModal({ ...extendModal, months: 1 });
+            }}
+          >
+            Theo tháng
+          </button>
+
+          <button
+            type="button"
+            className={extendMode === "week" ? "active" : ""}
+            onClick={() => {
+              setExtendMode("week");
+              setWeeks(1);
+              setExtendModal({ ...extendModal, months: 0.25 });
+            }}
+          >
+            Theo tuần
+          </button>
+        </div>
+
+        {/* ===== CHỌN THÁNG ===== */}
+        {extendMode === "month" && (
+          <select
+            value={extendModal.months}
+            onChange={(e) =>
+              setExtendModal({ ...extendModal, months: Number(e.target.value) })
+            }
+          >
+            <option value={1}>1 tháng</option>
+            {[...Array(11)].map((_, i) => (
+              <option key={i + 2} value={i + 2}>
+                {i + 2} tháng
+              </option>
+            ))}
+          </select>
+        )}
+
+        {/* ===== CHỌN TUẦN ===== */}
+        {extendMode === "week" && (
+          <select
+            value={weeks}
+            onChange={(e) => {
+              const w = Number(e.target.value);
+              setWeeks(w);
+              setExtendModal({ ...extendModal, months: w * 0.25 });
+            }}
+          >
+            <option value={1}>1 tuần</option>
+            <option value={2}>2 tuần</option>
+            <option value={3}>3 tuần</option>
+          </select>
+        )}
 
             <div style={{ margin: "10px 0" }}>
               <label>Mã voucher:</label>
@@ -442,11 +500,19 @@ const discountAmount = totalPriceBeforeDiscount - totalPriceAfterDiscount;
               >
                 <strong>Nội dung CK:</strong>{" "}
                 <span style={{ color: "#007bff", fontWeight: "600" }}>
-                  Gia hạn combo {selectedRentals.length}T ({extendModal.months}T)
+                  Gia hạn combo {selectedRentals.length}T (
+                  {extendModal.months < 1
+                    ? `${Math.round(extendModal.months * 4)} tuần`
+                    : `${extendModal.months} tháng`}
+                  )
                 </span>
                 <button
                   onClick={() => {
-                    const txt = `Gia hạn combo ${selectedRentals.length}T (${extendModal.months}T)`;
+                    const txt = `Gia hạn combo ${selectedRentals.length}T (${
+                      extendModal.months < 1
+                        ? `${Math.round(extendModal.months * 4)} tuần`
+                        : `${extendModal.months} tháng`
+                    })`;
                     navigator.clipboard.writeText(txt);
                     toast.success("Đã copy nội dung!");
                   }}
