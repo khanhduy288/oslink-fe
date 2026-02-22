@@ -1,12 +1,15 @@
-/* ====== GLOBAL RESET ====== */
-* {
-  box-sizing: border-box;
-}
-
-body {
+/* ====== SCOPE ROOT (chỉ áp dụng cho RoomGroups) ====== */
+.room-groups-container {
   background: #f7f9fb;
   font-size: 13px; /* nền chữ nhỏ cho gọn */
   color: #111827;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* reset box-sizing CHỈ trong RoomGroups */
+.room-groups-container,
+.room-groups-container * {
+  box-sizing: border-box;
 }
 
 /* ====== LAYOUT ====== */
@@ -14,7 +17,6 @@ body {
   padding: 16px;
   max-width: 1300px;
   margin: auto;
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .room-groups-title {
@@ -25,7 +27,7 @@ body {
 }
 
 /* ====== FILTER BAR ====== */
-.filter-bar {
+.room-groups-container .filter-bar {
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -34,8 +36,8 @@ body {
   flex-wrap: wrap;
 }
 
-.filter-input,
-.filter-select {
+.room-groups-container .filter-input,
+.room-groups-container .filter-select {
   padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid #e5e7eb;
@@ -45,17 +47,17 @@ body {
   transition: all 0.2s ease;
 }
 
-.filter-input {
+.room-groups-container .filter-input {
   width: 220px;
 }
 
-.filter-input:focus,
-.filter-select:focus {
+.room-groups-container .filter-input:focus,
+.room-groups-container .filter-select:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
 }
 
-.export-btn {
+.room-groups-container .export-btn {
   padding: 6px 12px;
   background: #2563eb;
   color: #fff;
@@ -66,12 +68,12 @@ body {
   font-size: 13px;
 }
 
-.export-btn:hover {
+.room-groups-container .export-btn:hover {
   background: #1d4ed8;
 }
 
 /* ====== TABLE ====== */
-.room-table {
+.room-groups-container .room-table {
   width: 100%;
   border-collapse: collapse;
   background: #ffffff;
@@ -80,11 +82,11 @@ body {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
 }
 
-.room-table thead {
+.room-groups-container .room-table thead {
   background: #f1f5ff;
 }
 
-.room-table th {
+.room-groups-container .room-table th {
   padding: 8px 10px;
   text-align: left;
   font-size: 13px;
@@ -93,7 +95,7 @@ body {
   white-space: nowrap;
 }
 
-.room-table td {
+.room-groups-container .room-table td {
   padding: 8px 10px;
   vertical-align: top;
   border-bottom: 1px solid #f1f1f1;
@@ -101,12 +103,12 @@ body {
 }
 
 /* ====== ROW STATES ====== */
-.row-expired {
+.room-groups-container .row-expired {
   background: #fff1f1;
 }
 
-/* ====== ROOM CARD (COMPACT) ====== */
-.room-card {
+/* ====== ROOM CARD ====== */
+.room-groups-container .room-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -118,45 +120,45 @@ body {
   background: #fafafa;
 }
 
-.room-card:hover {
+.room-groups-container .room-card:hover {
   background: #f1f5ff;
 }
 
-.room-info {
+.room-groups-container .room-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.room-code {
+.room-groups-container .room-code {
   font-weight: 600;
   font-size: 13px;
   line-height: 1.25;
 }
 
-.room-created {
+.room-groups-container .room-created {
   font-size: 11px;
   color: #6b7280;
   line-height: 1.2;
 }
 
 /* ====== TIME ====== */
-.time-remaining {
+.room-groups-container .time-remaining {
   font-weight: 700;
   font-size: 12px;
   white-space: nowrap;
 }
 
-.time-active {
+.room-groups-container .time-active {
   color: #16a34a;
 }
 
-.time-expired {
+.room-groups-container .time-expired {
   color: #dc2626;
 }
 
 /* ====== LOADING ====== */
-.loading-text {
+.room-groups-container .loading-text {
   text-align: center;
   font-size: 14px;
   padding: 24px;
@@ -165,20 +167,20 @@ body {
 
 /* ====== RESPONSIVE ====== */
 @media (max-width: 768px) {
-  .room-table th:nth-child(2),
-  .room-table td:nth-child(2),
-  .room-table th:nth-child(3),
-  .room-table td:nth-child(3) {
+  .room-groups-container .room-table th:nth-child(2),
+  .room-groups-container .room-table td:nth-child(2),
+  .room-groups-container .room-table th:nth-child(3),
+  .room-groups-container .room-table td:nth-child(3) {
     display: none;
   }
 
-  .room-card {
+  .room-groups-container .room-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
   }
 
-  .time-remaining {
+  .room-groups-container .time-remaining {
     align-self: flex-end;
   }
 }
