@@ -400,11 +400,12 @@
 }
 
 
-@media (max-height: 600px) {
+@media (max-height: 1000px) {
   .qr-content {
     max-height: 95vh;
     padding: 10px;
     border-radius: 8px;
+    margin-bottom: 86px;
   }
 
   /* QR nhỏ lại */
