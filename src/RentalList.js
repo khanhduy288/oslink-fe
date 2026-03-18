@@ -59,6 +59,20 @@ function RentalList() {
     }
   };
 
+const now = dayjs();
+
+const sortedRentals = [...rentals].sort((a, b) => {
+  const ra = a.expiresAt
+    ? dayjs(a.expiresAt).diff(now, "minute")
+    : -Infinity;
+
+  const rb = b.expiresAt
+    ? dayjs(b.expiresAt).diff(now, "minute")
+    : -Infinity;
+
+  return ra - rb; // 🔥 ít → nhiều
+});
+
 const getRemainingTime = (rental) => {
   if (!rental.expiresAt) return "Hết hạn";
 
@@ -239,103 +253,97 @@ const discountAmount =
         </button>
       </div>
 
-      {rentals.length === 0 ? (
-          <p style={{ textAlign: "center", marginTop: "30px", color: "#666" }}>
-            Bạn chưa có đơn thuê nào
-          </p>
-        ) : (
-          rentals.map((rental) => (
-        <div
-          key={rental.id}
-          className={`rental-card ${isExpired(rental) ? "expired" : ""}`}
-        >
-          <div className="card-summary">
-            <input
-              type="checkbox"
-              checked={selectedRentals.includes(rental.id)}
-              onChange={() => handleSelectRental(rental.id)}
-            />
-            <div>
-              <strong>ID:</strong> {rental.id}
-            </div>
-            <div>
-              <strong>Room Code:</strong>{" "}
-              {rental.roomCode
-                ? rental.roomCode.split(" ").slice(0, -1).join(" ")
-                : "Chờ 3-5 phút"}
-            </div>
-            <div>
-              <strong>Pass:</strong>{" "}
-              {rental.roomCode ? (
-                <>
-                  <span>{rental.roomCode.split(" ").slice(-1)[0]}</span>
-                  <button
-                    className="copy-pass"
-                    onClick={() => {
-                      navigator.clipboard.writeText(
-                        rental.roomCode.split(" ").slice(-1)[0]
-                      );
-                      toast.success("Copied Pass!");
-                    }}
-                    style={{ marginLeft: "6px" }}
-                  >
-                    Copy
-                  </button>
-                </>
-              ) : (
-                "-"
-              )}
-            </div>
-            <div>
-              <strong>Còn lại:</strong> {getRemainingTime(rental)}
-            </div>
-            <button
-              className="toggle-detail-btn"
-              onClick={() =>
-                setShowDetail((prev) => ({
-                  ...prev,
-                  [rental.id]: !prev[rental.id],
-                }))
-              }
-            >
-              {showDetail[rental.id] ? "Ẩn chi tiết" : "Xem chi tiết"}
-            </button>
-          </div>
+{rentals.length === 0 ? (
+  <p style={{ textAlign: "center", marginTop: "30px", color: "#666" }}>
+    Bạn chưa có đơn thuê nào
+  </p>
+) : (
+  sortedRentals.map((rental) => (
+    <div
+      key={rental.id}
+      className={`rental-card ${isExpired(rental) ? "expired" : ""}`}
+    >
+      <div className="card-summary">
+        <input
+          type="checkbox"
+          checked={selectedRentals.includes(rental.id)}
+          onChange={() => handleSelectRental(rental.id)}
+        />
+        <div><strong>ID:</strong> {rental.id}</div>
 
-          {showDetail[rental.id] && (
-            <div className="card-detail">
-              <p>
-                <strong>Username:</strong> {rental.username}
-              </p>
-              <p>
-                <strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ
-              </p>
-              <p>
-                <strong>Ngày tạo:</strong>{" "}
-                {dayjs(rental.createdAt).format("DD/MM/YYYY HH:mm:ss")}
-              </p>
-              <p>
-                <strong>Status:</strong> {rental.status}
-              </p>
-
-              <button
-                onClick={() => handleRequestChangeTab(rental.id)}
-                style={{
-                  marginTop: "10px",
-                  padding: "6px 12px",
-                  borderRadius: "6px",
-                  border: "none",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
-              >
-                Đổi tab
-              </button>
-            </div>
-          )}
+        <div>
+          <strong>Room Code:</strong>{" "}
+          {rental.roomCode
+            ? rental.roomCode.split(" ").slice(0, -1).join(" ")
+            : "Chờ 3-5 phút"}
         </div>
-        ))
+
+        <div>
+          <strong>Pass:</strong>{" "}
+          {rental.roomCode ? (
+            <>
+              <span>{rental.roomCode.split(" ").slice(-1)[0]}</span>
+              <button
+                className="copy-pass"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    rental.roomCode.split(" ").slice(-1)[0]
+                  );
+                  toast.success("Copied Pass!");
+                }}
+                style={{ marginLeft: "6px" }}
+              >
+                Copy
+              </button>
+            </>
+          ) : "-"}
+        </div>
+
+        <div>
+          <strong>Còn lại:</strong> {getRemainingTime(rental)}
+        </div>
+
+        <button
+          className="toggle-detail-btn"
+          onClick={() =>
+            setShowDetail((prev) => ({
+              ...prev,
+              [rental.id]: !prev[rental.id],
+            }))
+          }
+        >
+          {showDetail[rental.id] ? "Ẩn chi tiết" : "Xem chi tiết"}
+        </button>
+      </div>
+
+      {showDetail[rental.id] && (
+        <div className="card-detail">
+          <p><strong>Username:</strong> {rental.username}</p>
+          <p><strong>Thời gian thuê:</strong> {rental.rentalTime / 60} giờ</p>
+          <p>
+            <strong>Ngày tạo:</strong>{" "}
+            {dayjs(rental.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+          </p>
+          <p><strong>Status:</strong> {rental.status}</p>
+
+          <button
+            onClick={() => handleRequestChangeTab(rental.id)}
+            style={{
+              marginTop: "10px",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: "none",
+              backgroundColor: "#007bff",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            Đổi tab
+          </button>
+        </div>
+      )}
+    </div>
+  ))
 )}
 
       {extendModal.show && (
