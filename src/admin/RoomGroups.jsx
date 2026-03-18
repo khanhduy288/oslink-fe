@@ -49,13 +49,36 @@ function RoomGroups() {
         });
 
         setGroups(
-          Object.values(groupMap).map((g) => ({
-            ...g,
-            count: g.rooms.length,
-            minRemaining: Math.min(
-              ...g.remainingTimes.filter((t) => t != null)
-            ),
-          }))
+          Object.values(groupMap).map((g) => {
+            // zip rooms + remainingTimes lại để sort
+            const combined = g.rooms.map((room, i) => ({
+              room,
+              remaining: g.remainingTimes[i],
+            }));
+
+            // sort theo remaining tăng dần
+            combined.sort((a, b) => {
+              const ra = a.remaining ?? Infinity;
+              const rb = b.remaining ?? Infinity;
+              return ra - rb;
+            });
+
+            // tách lại sau khi sort
+            const sortedRooms = combined.map((c) => c.room);
+            const sortedTimes = combined.map((c) => c.remaining);
+
+            const validTimes = sortedTimes.filter((t) => t != null);
+
+            return {
+              ...g,
+              rooms: sortedRooms,
+              remainingTimes: sortedTimes,
+              count: sortedRooms.length,
+              minRemaining: validTimes.length
+                ? Math.min(...validTimes)
+                : 0,
+            };
+          })
         );
       } catch (err) {
         console.error("Fetch rooms error:", err);
