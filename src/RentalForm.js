@@ -153,7 +153,13 @@ const handleConfirmPayment = async () => {
 
         <div
           className={`package-card vip ${packageType === "vip" ? "active" : ""}`}
-          onClick={() => setPackageType("vip")}
+          onClick={() => {
+              if (rentMode === "week") {
+                alert("Gói VIP không hỗ trợ thuê theo tuần!");
+                return;
+              }
+              setPackageType("vip");
+            }}
         >
           <div className="badge">Ưu đãi lớn</div>
           <h3>GÓI VIP</h3>
@@ -197,9 +203,19 @@ const handleConfirmPayment = async () => {
               type="button"
               className={rentMode === "week" ? "active" : ""}
               onClick={() => {
+                // 🔥 nếu đang VIP thì báo trước
+                if (packageType === "vip") {
+                  alert("Gói tuần chỉ hỗ trợ gói THƯỜNG. Hệ thống sẽ chuyển về gói thường!");
+                }
+
                 setRentMode("week");
                 setWeeks(1);
                 setMonths(0.25);
+
+                // 👉 reset sau khi báo
+                if (packageType === "vip") {
+                  setPackageType("normal");
+                }
               }}
             >
               Theo tuần
