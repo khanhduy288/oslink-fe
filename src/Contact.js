@@ -3,7 +3,7 @@ import BottomNav from "./BottomNav";
 
 const contacts = [
   { number: "0972 734 444", link: "https://zalo.me/0972734444" },
-  { number: "0866 015 496", link: "https://zalo.me/0866015496" },
+  { number: "0943262234", link: "https://zalo.me/0943262234" },
 ];
 
 const Contact = () => {
