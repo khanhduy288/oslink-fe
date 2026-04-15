@@ -70,8 +70,17 @@ const compensateTime = async (rentalIds, days) => {
   }
 };
 
-const toggleSelectAll = (e) => {
+const handleSelectAllWithConfirm = (e) => {
   if (e.target.checked) {
+    const confirmSelect = window.confirm(
+      "Bạn có chắc muốn chọn TẤT CẢ các đơn còn hạn?"
+    );
+
+    if (!confirmSelect) {
+      e.target.checked = false;
+      return;
+    }
+
     const validIds = rentals
       .filter(r =>
         r.status === "active" &&
@@ -81,6 +90,15 @@ const toggleSelectAll = (e) => {
 
     setSelectedRentals(validIds);
   } else {
+    const confirmClear = window.confirm(
+      "Bạn có chắc muốn BỎ chọn tất cả?"
+    );
+
+    if (!confirmClear) {
+      e.target.checked = true;
+      return;
+    }
+
     setSelectedRentals([]);
   }
 };
@@ -385,10 +403,19 @@ const handleConfirmExtendCombo = async () => {
         </button>
         <div className="admin-toolbar">
           {/* checkbox chọn tất cả */}
-          <label>
-            <input type="checkbox" onChange={toggleSelectAll} />
-            Chọn tất cả
-          </label>
+          <div className="select-all-box">
+            <label>
+              <input
+                type="checkbox"
+                checked={selectedRentals.length > 0 && selectedRentals.length === rentals.filter(r =>
+                  r.status === "active" &&
+                  dayjs(r.expiresAt).isAfter(dayjs())
+                ).length}
+                onChange={handleSelectAllWithConfirm}
+              />
+              Chọn tất cả ({selectedRentals.length})
+            </label>
+          </div>
 
           {/* bù giờ */}
           <div className="compensate-box">

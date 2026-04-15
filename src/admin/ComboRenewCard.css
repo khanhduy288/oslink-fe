@@ -252,3 +252,48 @@
   box-shadow: none;
   transform: none;
 }
+/* ===== SELECT ALL (góc phải trên riêng biệt) ===== */
+.select-all-box {
+  position: absolute;
+  top: -10px;           /* đẩy lên trên cho tách biệt */
+  right: 0;
+  background: #1f2937;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.select-all-box label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.select-all-box {
+  position: absolute;
+  top: -25px; /* 🔥 tăng lên nữa */
+  right: 0;
+
+  background: #1f2937;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  z-index: 20; /* 🔥 tránh bị đè */
+}
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+
+  padding-top: 30px; /* 🔥 THÊM DÒNG NÀY */
+}
