@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./RentalForm.css";
 import BottomNav from "./BottomNav";
+import { jwtDecode } from "jwt-decode";
 
 function RentalForm() {
   const username = localStorage.getItem("username") || "guest";
   const token = localStorage.getItem("token");
-
+  const user = token ? jwtDecode(token) : null;
+  const userLevel = user?.level || 1;
   const [tabs, setTabs] = useState(1);
   const [months, setMonths] = useState(1);
   const [packageType, setPackageType] = useState("normal");
@@ -18,6 +20,7 @@ function RentalForm() {
   const [weeks, setWeeks] = useState(1); // 1-2-3 tuần
   const [showQR, setShowQR] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [qrReady, setQrReady] = useState(false);
 
   const basePrice = 150000;
   const vipPrice = 250000;
@@ -54,6 +57,7 @@ const calculatePrice = () => {
   return total * months;
 };
 
+
   const totalBeforeDiscount = calculatePrice();
   const discountAmount = Math.floor((totalBeforeDiscount * voucherDiscount) / 100);
   const totalAfterDiscount = totalBeforeDiscount - discountAmount;
@@ -77,14 +81,16 @@ const calculatePrice = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!token) {
-      alert("Bạn chưa đăng nhập!");
-      return;
-    }
-    setShowQR(true); // hiện modal QR thay vì gửi API trực tiếp
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+  if (!token) {
+    alert("Bạn chưa đăng nhập!");
+    return;
+  }
+
+  setShowQR(true);
+  setQrReady(false); // 👉 ban đầu chưa hiện QR
+};
 
   const handleCloseQR = () => setShowQR(false);
 
@@ -94,14 +100,11 @@ const handleConfirmPayment = async () => {
 
   const finalTotal = totalAfterDiscount;
 
-  // ================== QUYẾT ĐỊNH pricePerTab ==================
   let finalPricePerTab;
 
   if (months < 1) {
-    // 👉 GÓI TUẦN: FIX CỨNG 50K
     finalPricePerTab = 50000;
   } else {
-    // 👉 GÓI THÁNG (logic cũ)
     finalPricePerTab = Math.ceil(finalTotal / tabs / months);
   }
 
@@ -120,10 +123,9 @@ const handleConfirmPayment = async () => {
       );
     }
 
-    alert(
-      `Tạo ${tabs} đơn thuê thành công! Tổng: ${finalTotal.toLocaleString()} VND`
-    );
-    setShowQR(false);
+    // ✅ CHỈ SAU KHI TẠO ĐƠN THÀNH CÔNG
+    setQrReady(true);
+
   } catch (err) {
     alert(err.response?.data?.message || "Lỗi khi tạo đơn thuê");
   } finally {
@@ -153,13 +155,7 @@ const handleConfirmPayment = async () => {
 
         <div
           className={`package-card vip ${packageType === "vip" ? "active" : ""}`}
-          onClick={() => {
-              if (rentMode === "week") {
-                alert("Gói VIP không hỗ trợ thuê theo tuần!");
-                return;
-              }
-              setPackageType("vip");
-            }}
+          onClick={() => setPackageType("vip")}
         >
           <div className="badge">Ưu đãi lớn</div>
           <h3>GÓI VIP</h3>
@@ -203,19 +199,9 @@ const handleConfirmPayment = async () => {
               type="button"
               className={rentMode === "week" ? "active" : ""}
               onClick={() => {
-                // 🔥 nếu đang VIP thì báo trước
-                if (packageType === "vip") {
-                  alert("Gói tuần chỉ hỗ trợ gói THƯỜNG. Hệ thống sẽ chuyển về gói thường!");
-                }
-
                 setRentMode("week");
                 setWeeks(1);
                 setMonths(0.25);
-
-                // 👉 reset sau khi báo
-                if (packageType === "vip") {
-                  setPackageType("normal");
-                }
               }}
             >
               Theo tuần
@@ -284,52 +270,54 @@ const handleConfirmPayment = async () => {
     <div className="qr-content" onClick={(e) => e.stopPropagation()}>
       <h3>Quét QR hoặc chuyển khoản</h3>
 
-      <img
-        src="/images/qrthanhtoan.png"
-        alt="QR Payment"
-      />
+{qrReady ? (
+  <>
+    <img src="/images/qrthanhtoan.png" alt="QR Payment" />
 
-      <div className="qr-info-box">
-        <strong>Viettinbank:</strong>{" "}
-        <span>0981263234</span>
-        <button
-          onClick={() => {
-            navigator.clipboard.writeText("0981263234");
-            alert("Đã copy STK!");
-          }}
-        >
-          Copy STK
-        </button>
-      </div>
+    <div className="qr-info-box">
+      <strong>Viettinbank:</strong> <span>0981263234</span>
+      <button onClick={() => {
+        navigator.clipboard.writeText("0981263234");
+        alert("Đã copy STK!");
+      }}>
+        Copy STK
+      </button>
+    </div>
 
-      <div className="qr-info-box">
-        <strong>Nội dung CK:</strong>{" "}
-        <span>{packageType === "vip" ? `${username} vip` : username}</span>
-        <button
-          onClick={() => {
-            const txt = packageType === "vip" ? `${username} vip` : username;
-            navigator.clipboard.writeText(txt);
-            alert("Đã copy nội dung CK!");
-          }}
-        >
-          Copy ND
-        </button>
-      </div>
+    <div className="qr-info-box">
+      <strong>Nội dung CK:</strong>{" "}
+      <span>{packageType === "vip" ? `${username} vip` : username}</span>
+    </div>
 
-      <div className="qr-info-box">
-        <strong>💵 Số tiền cần chuyển:</strong> {totalAfterDiscount.toLocaleString()} VND
-        <p style={{ color: "red", fontWeight: "bold", marginTop: "6px" }}>
-          ⚠️ Lưu ý: Bank xong bấm xác nhận gửi bill cho support!
-        </p>
-      </div>
+    <div className="qr-info-box">
+      <strong>💵 Số tiền:</strong> {totalAfterDiscount.toLocaleString()} VND
+    </div>
+    <p style={{
+      color: "red",
+      fontWeight: "bold",
+      fontSize: "13px",
+      marginTop: "8px",
+      textAlign: "center"
+    }}>
+      ⚠️ Sau khi chuyển khoản, vui lòng chụp bill và gửi cho admin support để được xử lý nhanh nhất!
+    </p>
+  </>
+) : (
+  <div style={{ textAlign: "center", padding: "20px" }}>
+    <p style={{ fontWeight: "bold", fontSize: "16px" }}>
+      👉 Bấm xác nhận để tạo đơn và hiển thị QR thanh toán
+    </p>
+  </div>
+)}
+
 
       <div className="qr-buttons">
         <button
           className="confirm-btn"
           onClick={handleConfirmPayment}
-          disabled={loading}
+          disabled={loading || qrReady}
         >
-          {loading ? "Đang xử lý..." : "Xác nhận"}
+          {loading ? "Đang tạo đơn..." : qrReady ? "Đã tạo đơn" : "Xác nhận tạo đơn"}
         </button>
         <button className="close-btn" onClick={handleCloseQR}>
           Đóng
